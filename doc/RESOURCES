@@ -1,0 +1,25 @@
+Bluetooth Documentation
+-------------------------------------------------------------------------------
+
+HID Profile:
+https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=7108
+
+HID Lite:
+https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=41207
+
+Device Identification Profile Specification:
+https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=75536
+
+
+
+USB Documentation
+-------------------------------------------------------------------------------
+
+Device Class Definition for Human Interface Devices (HID):
+http://www.usb.org/developers/devclass_docs/HID1_11.pdf
+
+HID Usage Tables
+http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
+
+Language Identifiers:
+http://www.usb.org/developers/docs/USB_LANGIDs.pdf

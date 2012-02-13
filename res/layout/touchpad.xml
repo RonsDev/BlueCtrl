@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res/org.ronsdev.bluectrl"
+              android:layout_height="match_parent"
+              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:baselineAligned="false">
+
+    <LinearLayout style="@style/action_bar">
+        <ImageButton style="@style/action_bar_home"
+                     android:id="@+id/action_bar_home"
+                     android:src="@drawable/action_bar_home"
+                     android:contentDescription="@string/description_app_icon" />
+        <TextView style="@style/action_bar_title"
+                  android:id="@+id/action_bar_title" />
+        <ImageButton style="@style/action_bar_button"
+                     android:id="@+id/button_keyboard"
+                     android:src="@drawable/ab_btn_keyboard"
+                     android:contentDescription="@string/description_keyboard" />
+    </LinearLayout>
+
+    <RelativeLayout android:layout_height="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1">
+        <org.ronsdev.bluectrl.widget.KeyboardInputView
+            android:id="@+id/keyboard_input"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+        <org.ronsdev.bluectrl.widget.TouchpadBackgroundView
+            android:id="@+id/touch_background"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+
+        <LinearLayout style="@style/info_block">
+            <ProgressBar style="@style/info_block_wait"
+                         android:id="@+id/info_wait" />
+            <ImageView style="@style/info_block_image"
+                       android:id="@+id/info_image"
+                       android:contentDescription="@string/description_info_image" />
+                <LinearLayout style="@style/info_block_content">
+                    <TextView style="@style/info_block_title"
+                              android:id="@+id/info_title" />
+                    <TextView style="@style/info_block_text"
+                              android:id="@+id/info_text" />
+                    <TextView style="@style/info_block_text"
+                              android:id="@+id/info_reconnect"
+                              android:text="@string/info_text_reconnect" />
+                </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

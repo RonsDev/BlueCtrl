@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/view_about"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    <LinearLayout style="@style/about_dialog">
+
+        <LinearLayout style="@style/about_header">
+            <ImageView style="@style/about_header_icon"
+                       android:src="@drawable/app_icon"
+                       android:contentDescription="@string/description_app_icon" />
+
+            <LinearLayout style="@style/about_header_text">
+                <TextView style="@style/about_header_app_name"
+                          android:text="@string/app_name" />
+                <TextView style="@style/about_header_version"
+                          android:id="@+id/version_text" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView style="@style/about_app_text"
+                  android:text="@string/about_app_text" />
+
+        <TableLayout style="@style/table">
+            <TableRow style="@style/table_row">
+                <TextView style="@style/about_table_label"
+                          android:text="@string/about_email_text" />
+                <TextView style="@style/about_table_value"
+                          android:id="@+id/about_email_address"
+                          android:autoLink="email" />
+            </TableRow>
+            <TableRow style="@style/table_row">
+                <TextView style="@style/about_table_label"
+                          android:text="@string/about_webpage_text" />
+                <TextView style="@style/about_table_value"
+                          android:id="@+id/about_webpage_address"
+                          android:autoLink="web" />
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>

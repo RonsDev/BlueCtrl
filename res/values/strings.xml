@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BlueCtrl</string>
+
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_text">Continue</string>
+    <string name="close">Close</string>
+
+    <string name="description_app_icon">Application Icon</string>
+    <string name="description_info_image">Info Image</string>
+    <string name="description_keyboard">Keyboard</string>
+
+    <string name="menu_about">About</string>
+    <string name="menu_preferences">Settings</string>
+    <string name="menu_connect">Connect</string>
+    <string name="menu_remove_device">Remove Device</string>
+    <string name="menu_paste">Paste Text</string>
+
+    <string name="device_list_add_device">Add Device</string>
+    <string name="device_list_empty">No device configured</string>
+    <string name="device_list_connected_info">Connected with “%1$s”</string>
+
+    <string name="pairing_prepare_title">Add device</string>
+    <string name="pairing_prepare_text1">Before you can use this application with a remote device, you need to pair the devices via Bluetooth.</string>
+    <string name="pairing_prepare_text2">If the devices are already paired, they must be paired again so that the remote device is aware of the new capabilities. In this case please remove this Bluetooth device on the remote device before proceeding.</string>
+    <string name="pairing_wait_title">Waiting for request\u2026</string>
+    <string name="pairing_search_for_device_text"><![CDATA[The device is now visible. Please search on the remote device for a Bluetooth device with the name “<b>%1$s</b>” and pair it.]]></string>
+    <string name="pairing_finish_title">Finish pairing</string>
+    <string name="pairing_confirm_ready_text">Please confirm any Bluetooth pairing request notification and press connect when the remote device is ready.</string>
+    <string name="pairing_connect">Connect</string>
+    <string name="service_conflict_text"><![CDATA[<b>Warning:</b> Another Bluetooth input service is active on this device. This is problematic if you want to pair with an <b>iOS</b> or <b>Windows</b> device.]]></string>
+    <string name="service_conflict_more_info">More information</string>
+    <string name="service_conflict_ios_title">Notes for iOS</string>
+    <string name="service_conflict_ios_text">You might get an “Connection refused” error on connect because iOS has already established a connection and blocks other connection attempts. To fix this close the Bluetooth connection on the iOS device (turn Bluetooth off and on again) and reconnect from BlueCtrl.</string>
+    <string name="service_conflict_windows_title">Notes for Windows</string>
+    <string name="service_conflict_windows_text">Sorry, but you are unable to use this application with a Microsoft Windows device if another Bluetooth input service is active. You can try to pair the devices but you will receive an authorization error on connect even if Windows reports that the device has been successfully added.</string>
+
+    <string name="device_preferences">Device Settings</string>
+    <string name="pref_cat_keyboard">Keyboard</string>
+    <string name="pref_cat_mouse">Mouse</string>
+    <string name="pref_keymap">Layout</string>
+    <string name="pref_keymap_dlg_title">Keyboard Layout</string>
+    <string name="pref_mouse_sensitivity">Sensitivity</string>
+    <string name="pref_invert_scroll">Invert Scroll Direction</string>
+
+    <string name="info_title_connecting">Connecting\u2026</string>
+    <string name="info_title_disconnected">Disconnected</string>
+    <string name="info_text_reconnect">Tap to reconnect.</string>
+    <string name="info_title_permission_denied">Permission denied</string>
+    <string name="info_text_pair_again">Try to pair the devices again.</string>
+    <string name="info_title_host_unavailable">Host unavailable</string>
+    <string name="info_text_host_unavailable">Make sure you are in range and Bluetooth is active.</string>
+    <string name="info_title_connection_refused">Connection refused</string>
+    <string name="info_text_connection_refused">The remote device is busy or the devices aren’t correctly paired.</string>
+    <string name="info_title_authorization_error">Authorization error</string>
+    <string name="info_title_connection_timeout">Connection timed out</string>
+    <string name="info_title_connection_problem">Connection problem</string>
+
+    <string name="about_version">Version %1$s</string>
+    <string name="about_app_text">A Bluetooth input device emulator that can control remote devices.</string>
+    <string name="about_email_text">Send email</string>
+    <string name="about_webpage_text">Visit web page</string>
+
+    <string name="error_root_required">Root permissions required</string>
+    <string name="error_bluetooth_required">Bluetooth required</string>
+    <string name="error_daemon_unavailable">Daemon unavailable</string>
+    <string name="error_critical">The application encountered a problem and cannot continue (Error %1$d).</string>
+</resources>

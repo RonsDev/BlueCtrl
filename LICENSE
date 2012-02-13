@@ -1,0 +1,31 @@
+This application uses the following licenses:
+
+ * Application Daemon Source Code
+
+	The application daemon source code inside the directory "jni" is
+	licensed under the GNU General Public License, Version 2. The full
+	license text can be found in the "LICENSE.GPL" file.
+
+
+ * Android Application Source Code
+
+	The Android application source code inside the directory "src" is
+	licensed under the Apache License, Version 2.0. The full license text
+	can be found at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+
+ * Images
+
+	The images inside the directories "drawablesrc" and "res/drawable*" are
+	licensed under the Creative Commons BY-SA 3.0 License. The full license
+	text can be found at
+
+	http://creativecommons.org/licenses/by-sa/3.0/
+
+	Most images are based on the artwork of the "GNOME Project". For more
+	information look at
+
+	http://www.gnome.org
+	http://git.gnome.org/browse/gnome-icon-theme

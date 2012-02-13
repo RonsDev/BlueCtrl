@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.ronsdev.bluectrl"
+          android:versionCode="1"
+          android:versionName="1.0">
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-sdk android:minSdkVersion="10" />
+
+    <uses-feature android:name="android.hardware.bluetooth"
+                  android:required="true" />
+
+    <application android:icon="@drawable/app_icon"
+                 android:label="@string/app_name">
+
+        <activity android:name=".MainActivity"
+                  android:configChanges="orientation|keyboardHidden"
+                  android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".PairingActivity"
+                  android:configChanges="orientation|keyboardHidden"
+                  android:theme="@android:style/Theme.NoTitleBar" />
+
+        <activity android:name=".DevicePreferenceActivity"
+                  android:configChanges="orientation|keyboardHidden" />
+
+        <activity android:name=".TouchpadActivity"
+                  android:configChanges="orientation|keyboardHidden"
+                  android:theme="@android:style/Theme.NoTitleBar"
+                  android:windowSoftInputMode="adjustResize" />
+
+        <service android:name=".daemon.DaemonService"
+                 android:exported="false" />
+
+    </application>
+
+</manifest>

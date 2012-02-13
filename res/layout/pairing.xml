@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+             style="@style/pairing_flipper"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:id="@+id/flipper">
+
+    <!-- Prepare pairing -->
+    <LinearLayout style="@style/pairing_flipper_child">
+        <ScrollView style="@style/pairing_content"
+                    android:id="@+id/scroll_prepare">
+            <LinearLayout style="@style/pairing_text_block">
+                <TextView style="@style/pairing_text_title"
+                          android:text="@string/pairing_prepare_title" />
+                <TextView style="@style/pairing_text_paragraph.first"
+                          android:text="@string/pairing_prepare_text1" />
+                <TextView style="@style/pairing_text_paragraph"
+                          android:text="@string/pairing_prepare_text2" />
+
+                <LinearLayout style="@style/pairing_service_conflict_box"
+                              android:id="@+id/service_conflict">
+	                <TextView style="@style/pairing_text_paragraph"
+	                          android:id="@+id/service_conflict_text"
+	                          android:text="@string/service_conflict_text" />
+	                <LinearLayout style="@style/pairing_service_conflict_box"
+	                              android:id="@+id/service_conflict_more_info">
+		                <TextView style="@style/pairing_text_paragraph_title"
+		                          android:text="@string/service_conflict_ios_title" />
+		                <TextView style="@style/pairing_text_paragraph.first"
+		                          android:text="@string/service_conflict_ios_text" />
+		                <TextView style="@style/pairing_text_paragraph_title"
+		                          android:text="@string/service_conflict_windows_title" />
+		                <TextView style="@style/pairing_text_paragraph.first"
+		                          android:text="@string/service_conflict_windows_text" />
+		            </LinearLayout>
+	            </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        <LinearLayout style="@style/pairing_buttons">
+            <Button style="@style/pairing_buttons_button"
+                    android:id="@+id/button_cancel_prepare"
+                    android:text="@string/cancel" />
+            <Button style="@style/pairing_buttons_button"
+                    android:id="@+id/button_continue_prepare"
+                    android:text="@string/continue_text" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Wait for Request -->
+    <LinearLayout style="@style/pairing_flipper_child"
+                  android:id="@+id/view_wait">
+        <RelativeLayout style="@style/pairing_content">
+            <LinearLayout style="@style/info_block">
+                <ProgressBar style="@style/info_block_wait" />
+                    <LinearLayout style="@style/info_block_content">
+                        <TextView style="@style/info_block_title"
+                                  android:text="@string/pairing_wait_title" />
+                        <TextView style="@style/info_block_text"
+                                  android:id="@+id/text_search_for_device"
+                                  android:text="@string/pairing_search_for_device_text" />
+                    </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout style="@style/pairing_buttons">
+            <Button style="@style/pairing_buttons_button"
+                    android:id="@+id/button_cancel_wait"
+                    android:text="@string/cancel" />
+            <Button style="@style/pairing_buttons_button"
+                    android:enabled="false"
+                    android:text="@string/pairing_connect" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Finish pairing -->
+    <LinearLayout style="@style/pairing_flipper_child"
+                  android:id="@+id/view_finish">
+        <RelativeLayout style="@style/pairing_content">
+            <LinearLayout style="@style/info_block">
+                <ImageView style="@style/info_block_image"
+                           android:src="@drawable/paired"
+                           android:contentDescription="@string/description_info_image" />
+                    <LinearLayout style="@style/info_block_content">
+                        <TextView style="@style/info_block_title"
+                                  android:text="@string/pairing_finish_title" />
+                        <TextView style="@style/info_block_text"
+                                  android:text="@string/pairing_confirm_ready_text" />
+                    </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout style="@style/pairing_buttons">
+            <Button style="@style/pairing_buttons_button"
+                    android:id="@+id/button_cancel_finish"
+                    android:text="@string/cancel" />
+            <Button style="@style/pairing_buttons_button"
+                    android:id="@+id/button_connect"
+                    android:text="@string/pairing_connect" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ViewFlipper>

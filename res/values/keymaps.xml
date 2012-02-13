@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="keymap_values">
+        <item>de_DE</item>
+        <item>en_US</item>
+    </array>
+    <array name="keymap_names">
+        <item>Deutsch</item>
+        <item>English</item>
+    </array>
+</resources>

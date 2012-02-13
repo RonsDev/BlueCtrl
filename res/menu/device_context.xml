@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_connect"
+          android:title="@string/menu_connect" />
+    <item android:id="@+id/menu_preferences"
+          android:title="@string/menu_preferences" />
+    <item android:id="@+id/menu_remove_device"
+          android:title="@string/menu_remove_device" />
+</menu>
