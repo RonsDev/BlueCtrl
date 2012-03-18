@@ -21,19 +21,24 @@ import org.ronsdev.bluectrl.daemon.DaemonService;
 import org.ronsdev.bluectrl.widget.KeyboardInputView;
 import org.ronsdev.bluectrl.widget.TouchpadBackgroundView;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -62,6 +67,9 @@ public class TouchpadActivity extends DaemonActivity
      */
     public static final String EXTRA_IS_NEW_DEVICE =
             "org.ronsdev.bluectrl.touchpad.extra.IS_NEW_DEVICE";
+
+
+    private static final int DIALOG_HELP = 1;
 
 
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
@@ -259,6 +267,16 @@ public class TouchpadActivity extends DaemonActivity
     }
 
     @Override
+    protected Dialog onCreateDialog(int id, Bundle args) {
+        switch(id) {
+        case DIALOG_HELP:
+            return createHelpDialog();
+        default:
+            return null;
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.touchpad, menu);
@@ -287,6 +305,9 @@ public class TouchpadActivity extends DaemonActivity
             Intent prefIntent = new Intent(this, DevicePreferenceActivity.class);
             prefIntent.putExtra(DevicePreferenceActivity.EXTRA_DEVICE, mBtDevice);
             startActivity(prefIntent);
+            return true;
+        case R.id.menu_help:
+            showDialog(DIALOG_HELP);
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -335,6 +356,22 @@ public class TouchpadActivity extends DaemonActivity
 
         refreshViewInfo();
         initInputHandler();
+    }
+
+    public Dialog createHelpDialog() {
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.help_dialog,
+                (ViewGroup)findViewById(R.id.view_help));
+
+        return new AlertDialog.Builder(this)
+            .setView(layout)
+            .setTitle(R.string.menu_help)
+            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            })
+            .create();
     }
 
     private void initInputHandler() {

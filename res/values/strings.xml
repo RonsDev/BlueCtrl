@@ -12,6 +12,7 @@
     <string name="description_keyboard">Keyboard</string>
 
     <string name="menu_about">About</string>
+    <string name="menu_help">Help</string>
     <string name="menu_preferences">Settings</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_remove_device">Remove Device</string>
@@ -66,4 +67,22 @@
     <string name="error_bluetooth_required">Bluetooth required</string>
     <string name="error_daemon_unavailable">Daemon unavailable</string>
     <string name="error_critical">The application encountered a problem and cannot continue (Error %1$d).</string>
+
+    <string name="help_mouse_control">Mouse Control</string>
+    <string name="help_mctrl_move_pointer_action">Move Pointer</string>
+    <string name="help_mctrl_move_pointer_how">touch and move</string>
+    <string name="help_mctrl_button1_action">Left Mouse Button</string>
+    <string name="help_mctrl_button1_how">tap with one finger</string>
+    <string name="help_mctrl_button2_action">Right Mouse Button</string>
+    <string name="help_mctrl_button2_how">tap with two fingers</string>
+    <string name="help_mctrl_button3_action">Middle Mouse Button</string>
+    <string name="help_mctrl_button3_how">tap with three fingers</string>
+    <string name="help_mctrl_button4_action">Button 4 (Back)</string>
+    <string name="help_mctrl_button4_how">swipe left with two fingers</string>
+    <string name="help_mctrl_button5_action">Button 5 (Forward)</string>
+    <string name="help_mctrl_button5_how">swipe right with two fingers</string>
+    <string name="help_mctrl_scroll_action">Scroll</string>
+    <string name="help_mctrl_scroll_how">touch with two fingers or touch the right edge of the screen and move up/down</string>
+    <string name="help_mctrl_drag_action">Drag</string>
+    <string name="help_mctrl_drag_how">tap and instantly touch</string>
 </resources>
