@@ -42,15 +42,14 @@
         <item name="android:layout_marginBottom">5dp</item>
         <item name="android:gravity">center_horizontal</item>
     </style>
-        <style name="about_table_label">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="about_table_label">
     </style>
     <style name="about_table_value">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingLeft">10dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lines">1</item>
+        <item name="android:scrollHorizontally">true</item>
     </style>
 </resources>

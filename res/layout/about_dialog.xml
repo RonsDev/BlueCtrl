@@ -21,7 +21,9 @@
         <TextView style="@style/about_app_text"
                   android:text="@string/about_app_text" />
 
-        <TableLayout style="@style/table">
+        <TableLayout style="@style/table"
+                     android:shrinkColumns="1"
+                     android:stretchColumns="1">
             <TableRow style="@style/table_row">
                 <TextView style="@style/about_table_label"
                           android:text="@string/about_email_text" />
