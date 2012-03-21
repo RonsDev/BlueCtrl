@@ -23,13 +23,17 @@ import org.ronsdev.bluectrl.widget.TouchpadBackgroundView;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,7 +73,15 @@ public class TouchpadActivity extends DaemonActivity
             "org.ronsdev.bluectrl.touchpad.extra.IS_NEW_DEVICE";
 
 
+    private static final String TAG = "TouchpadActivity";
+
+
     private static final int DIALOG_HELP = 1;
+    private static final int DIALOG_SEND_TEXT_PROGRESS = 2;
+
+
+    private static final int SEND_TEXT_PROGRESS_MIN_SIZE = 300;
+    private static final int SEND_TEXT_CHUNK_SIZE = 30;
 
 
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
@@ -87,6 +99,7 @@ public class TouchpadActivity extends DaemonActivity
     private TextView mInfoTitle;
     private TextView mInfoText;
     private TextView mInfoReconnect;
+    private ProgressDialog mSendTextProgressDlg;
 
     private BluetoothDevice mBtDevice;
     private InputMethodManager mInputMethodManager;
@@ -102,6 +115,9 @@ public class TouchpadActivity extends DaemonActivity
     private boolean mIsFullscreen = false;
     private boolean mWasSoftKeyboardToggled = false;
 
+    private CharSequence mSendTextValue = "";
+    private SendTextThread mSendTextThread;
+
 
     private OnClickListener mActionBarHomeClickListener = new OnClickListener() {
         @Override
@@ -116,6 +132,63 @@ public class TouchpadActivity extends DaemonActivity
             toggleSoftKeyboard();
         }
     };
+
+
+    private final Handler mSendTextProgressHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (mSendTextProgressDlg.isShowing()) {
+                int total = msg.arg1;
+                if (total >= 0) {
+                    mSendTextProgressDlg.setProgress(total);
+                } else {
+                    mSendTextProgressDlg.dismiss();
+                }
+            }
+        }
+    };
+
+    private class SendTextThread extends Thread {
+        Handler mHandler;
+        CharSequence mText;
+
+
+        SendTextThread(Handler handler, CharSequence text) {
+            mHandler = handler;
+            mText = text;
+        }
+
+        public void run() {
+            int position = 0;
+            while ((position < mText.length()) && !interrupted()) {
+                // The KeyboardInputHandler can become temporarily inactive if the screen is
+                // rotated. In this case wait until it is active again.
+                if (!mKeyInputHandler.isActive()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                    continue;
+                }
+
+                int endPosition = position + SEND_TEXT_CHUNK_SIZE;
+                if (endPosition > mText.length()) {
+                    endPosition = mText.length();
+                }
+                CharSequence chunk = mText.subSequence(position, endPosition);
+                mKeyboardInputView.pasteText(chunk.toString());
+                position = endPosition;
+
+                Message msg = mHandler.obtainMessage();
+                msg.arg1 = position;
+                mHandler.sendMessage(msg);
+            }
+
+            Message msg = mHandler.obtainMessage();
+            msg.arg1 = -1;
+            mHandler.sendMessage(msg);
+        }
+    }
 
 
     @Override
@@ -144,6 +217,8 @@ public class TouchpadActivity extends DaemonActivity
     @Override
     protected void onPause() {
         super.onPause();
+
+        stopSendTextTask();
 
         if (isDaemonAvailable()) {
             final DaemonService daemon = getDaemon();
@@ -190,6 +265,8 @@ public class TouchpadActivity extends DaemonActivity
 
     @Override
     protected void onDaemonUnavailable(int errorCode) {
+        stopSendTextTask();
+
         // This Activity is useless without the daemon
         this.finish();
     }
@@ -271,8 +348,19 @@ public class TouchpadActivity extends DaemonActivity
         switch(id) {
         case DIALOG_HELP:
             return createHelpDialog();
+        case DIALOG_SEND_TEXT_PROGRESS:
+            return createSendTextProgressDialog();
         default:
             return null;
+        }
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
+        switch(id) {
+        case DIALOG_SEND_TEXT_PROGRESS:
+            prepareSendTextProgressDialog();
+            break;
         }
     }
 
@@ -372,6 +460,31 @@ public class TouchpadActivity extends DaemonActivity
                 }
             })
             .create();
+    }
+
+    private Dialog createSendTextProgressDialog() {
+        mSendTextProgressDlg = new ProgressDialog(this);
+
+        mSendTextProgressDlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mSendTextProgressDlg.setMessage(getString(R.string.info_title_sending_text));
+
+        mSendTextProgressDlg.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            public void onDismiss(DialogInterface dialog) {
+                stopSendTextTask();
+            }
+        });
+
+        return mSendTextProgressDlg;
+    }
+
+    private void prepareSendTextProgressDialog() {
+        mSendTextProgressDlg.setProgress(0);
+        mSendTextProgressDlg.setMax(mSendTextValue.length());
+
+        mSendTextThread = new SendTextThread(mSendTextProgressHandler, mSendTextValue);
+        mSendTextThread.start();
+
+        mSendTextValue = "";
     }
 
     private void initInputHandler() {
@@ -478,10 +591,35 @@ public class TouchpadActivity extends DaemonActivity
         mWasSoftKeyboardToggled = true;
     }
 
+    private void startSendTextTask(CharSequence text) {
+        mSendTextValue = text;
+        showDialog(DIALOG_SEND_TEXT_PROGRESS);
+    }
+
+    private void stopSendTextTask() {
+        if (mSendTextThread != null) {
+            mSendTextThread.interrupt();
+            try {
+                mSendTextThread.join();
+            } catch (InterruptedException e) {
+                Log.e(TAG, "SendTextThread join failed", e);
+            }
+            mSendTextThread = null;
+        }
+
+        if ((mSendTextProgressDlg != null) && mSendTextProgressDlg.isShowing()) {
+            mSendTextProgressDlg.dismiss();
+        }
+    }
+
     private void pasteClipboard() {
         final CharSequence pasteText = mClipboard.getText();
-        if (pasteText != null) {
-            mKeyboardInputView.pasteText(pasteText.toString());
+        if ((pasteText != null) && (pasteText.length() > 0)) {
+            if (pasteText.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
+                mKeyboardInputView.pasteText(pasteText.toString());
+            } else {
+                startSendTextTask(pasteText);
+            }
         }
     }
 

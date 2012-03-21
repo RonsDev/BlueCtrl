@@ -47,6 +47,7 @@
 
     <string name="info_title_connecting">Connecting\u2026</string>
     <string name="info_title_disconnected">Disconnected</string>
+    <string name="info_title_sending_text">Sending text\u2026</string>
     <string name="info_text_reconnect">Tap to reconnect.</string>
     <string name="info_title_permission_denied">Permission denied</string>
     <string name="info_text_pair_again">Try to pair the devices again.</string>
