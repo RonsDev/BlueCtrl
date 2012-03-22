@@ -96,7 +96,7 @@ public class FloatSliderPreference extends DialogPreference
         super.onDialogClosed(positiveResult);
 
         final float newValue = convertToFloat(mSeekBar.getProgress());
-        if (positiveResult && callChangeListener(new Float(newValue))) {
+        if (positiveResult && callChangeListener(Float.valueOf(newValue))) {
             mValue = newValue;
             if (shouldPersist()) {
                 persistFloat(mValue);

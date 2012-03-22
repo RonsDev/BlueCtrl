@@ -39,7 +39,7 @@
         <LinearLayout style="@style/pairing_buttons">
             <Button style="@style/pairing_buttons_button"
                     android:id="@+id/button_cancel_prepare"
-                    android:text="@string/cancel" />
+                    android:text="@android:string/cancel" />
             <Button style="@style/pairing_buttons_button"
                     android:id="@+id/button_continue_prepare"
                     android:text="@string/continue_text" />
@@ -52,19 +52,19 @@
         <RelativeLayout style="@style/pairing_content">
             <LinearLayout style="@style/info_block">
                 <ProgressBar style="@style/info_block_wait" />
-                    <LinearLayout style="@style/info_block_content">
-                        <TextView style="@style/info_block_title"
-                                  android:text="@string/pairing_wait_title" />
-                        <TextView style="@style/info_block_text"
-                                  android:id="@+id/text_search_for_device"
-                                  android:text="@string/pairing_search_for_device_text" />
-                    </LinearLayout>
+                <LinearLayout style="@style/info_block_content">
+                    <TextView style="@style/info_block_title"
+                              android:text="@string/pairing_wait_title" />
+                    <TextView style="@style/info_block_text"
+                              android:id="@+id/text_search_for_device"
+                              android:text="@string/pairing_search_for_device_text" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
         <LinearLayout style="@style/pairing_buttons">
             <Button style="@style/pairing_buttons_button"
                     android:id="@+id/button_cancel_wait"
-                    android:text="@string/cancel" />
+                    android:text="@android:string/cancel" />
             <Button style="@style/pairing_buttons_button"
                     android:enabled="false"
                     android:text="@string/pairing_connect" />
@@ -79,18 +79,18 @@
                 <ImageView style="@style/info_block_image"
                            android:src="@drawable/paired"
                            android:contentDescription="@string/description_info_image" />
-                    <LinearLayout style="@style/info_block_content">
-                        <TextView style="@style/info_block_title"
-                                  android:text="@string/pairing_finish_title" />
-                        <TextView style="@style/info_block_text"
-                                  android:text="@string/pairing_confirm_ready_text" />
-                    </LinearLayout>
+                <LinearLayout style="@style/info_block_content">
+                    <TextView style="@style/info_block_title"
+                              android:text="@string/pairing_finish_title" />
+                    <TextView style="@style/info_block_text"
+                              android:text="@string/pairing_confirm_ready_text" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
         <LinearLayout style="@style/pairing_buttons">
             <Button style="@style/pairing_buttons_button"
                     android:id="@+id/button_cancel_finish"
-                    android:text="@string/cancel" />
+                    android:text="@android:string/cancel" />
             <Button style="@style/pairing_buttons_button"
                     android:id="@+id/button_connect"
                     android:text="@string/pairing_connect" />

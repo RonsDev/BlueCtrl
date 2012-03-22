@@ -338,7 +338,7 @@ public class MainActivity extends DaemonListActivity
 
         return new AlertDialog.Builder(this)
             .setView(layout)
-            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.cancel();
                 }

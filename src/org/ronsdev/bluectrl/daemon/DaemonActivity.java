@@ -32,7 +32,7 @@ import android.os.IBinder;
 /**
  * Basic implementation for Activities that are using the application daemon.
  */
-public class DaemonActivity extends Activity {
+public abstract class DaemonActivity extends Activity {
 
     private DaemonService mDaemon;
 

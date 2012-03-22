@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -75,11 +74,11 @@ public class TouchpadBackgroundView extends View {
         while (topPos < canvas.getHeight()) {
             int leftPos = leftOffset + dotMargin;
             while (leftPos < canvas.getWidth()) {
-                Rect rect = new Rect(leftPos,
+                canvas.drawRect(leftPos,
                         topPos,
                         leftPos + dotDiameter,
-                        topPos + dotDiameter);
-                canvas.drawRect(rect, mPaint);
+                        topPos + dotDiameter,
+                        mPaint);
 
                 leftPos += totalDotWidth;
             }

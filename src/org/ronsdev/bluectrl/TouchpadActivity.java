@@ -454,7 +454,7 @@ public class TouchpadActivity extends DaemonActivity
         return new AlertDialog.Builder(this)
             .setView(layout)
             .setTitle(R.string.menu_help)
-            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.cancel();
                 }

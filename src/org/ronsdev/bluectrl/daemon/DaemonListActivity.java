@@ -33,7 +33,7 @@ import android.os.IBinder;
  * Basic implementation for List-Activities that are using the application daemon.
  * It is a one-on-one copy of the DaemonActivity class except that it extends ListActivity.
  */
-public class DaemonListActivity extends ListActivity {
+public abstract class DaemonListActivity extends ListActivity {
 
     private DaemonService mDaemon;
 
