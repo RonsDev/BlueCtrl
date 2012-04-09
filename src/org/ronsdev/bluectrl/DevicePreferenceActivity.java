@@ -47,6 +47,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
     private static final String KEY_KEYMAP = "keymap";
     private static final String KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
     private static final String KEY_INVERT_SCROLL = "invert_scroll";
+    private static final String KEY_FLING_SCROLL = "fling_scroll";
 
 
     private DeviceSettings mDeviceSettings;
@@ -54,6 +55,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
     private ListPreference mKeyMap;
     private FloatSliderPreference mMouseSensitivity;
     private CheckBoxPreference mInvertScroll;
+    private CheckBoxPreference mFlingScroll;
 
 
     /*
@@ -89,6 +91,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mKeyMap = (ListPreference)findPreference(KEY_KEYMAP);
         mMouseSensitivity = (FloatSliderPreference)findPreference(KEY_MOUSE_SENSITIVITY);
         mInvertScroll = (CheckBoxPreference)findPreference(KEY_INVERT_SCROLL);
+        mFlingScroll = (CheckBoxPreference)findPreference(KEY_FLING_SCROLL);
     }
 
     @Override
@@ -124,11 +127,13 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mKeyMap.setValue(mDeviceSettings.getKeyMap());
         mMouseSensitivity.setValue(mDeviceSettings.getMouseSensitivity());
         mInvertScroll.setChecked(mDeviceSettings.getInvertScroll());
+        mFlingScroll.setChecked(mDeviceSettings.getFlingScroll());
     }
 
     private void updateSettings() {
         mDeviceSettings.setKeyMap(mKeyMap.getValue());
         mDeviceSettings.setMouseSensitivity(mMouseSensitivity.getValue());
         mDeviceSettings.setInvertScroll(mInvertScroll.isChecked());
+        mDeviceSettings.setFlingScroll(mFlingScroll.isChecked());
     }
 }

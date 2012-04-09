@@ -148,7 +148,6 @@ public class MouseInputHandler implements OnTouchListener {
     private final float mMouseSensitivity;
     private final float mScrollSensitivity;
     private final float mSmoothScrollSensitivity;
-
     private final float mDisplayDensity;
 
     private final float mGestureEdgeThreshold;
@@ -160,6 +159,8 @@ public class MouseInputHandler implements OnTouchListener {
     private final float mMaxTouchEndPredictDistanceSquare;
     private final float mFlingScrollTreshold;
     private final float mFlingScrollStopTreshold;
+
+    private final boolean mIsFlingScrollOn;
 
     /** The current internal touch event listener that handles the touch events. */
     private OnTouchListener mInternalTouchListener;
@@ -214,6 +215,8 @@ public class MouseInputHandler implements OnTouchListener {
 
         mFlingScrollTreshold = FLING_SCROLL_THRESHOLD_DP * mDisplayDensity;
         mFlingScrollStopTreshold = FLING_SCROLL_STOP_THRESHOLD_DP * mDisplayDensity;
+
+        mIsFlingScrollOn = settings.getFlingScroll();
 
         view.setOnTouchListener(this);
     }
@@ -819,7 +822,7 @@ public class MouseInputHandler implements OnTouchListener {
                 resetMembers();
                 return true;
             case MotionEvent.ACTION_UP:
-                if (Math.abs(mFlingScrollMoveY) > mFlingScrollTreshold) {
+                if (mIsFlingScrollOn && (Math.abs(mFlingScrollMoveY) > mFlingScrollTreshold)) {
                     startFlingScroll();
                     return true;
                 } else {

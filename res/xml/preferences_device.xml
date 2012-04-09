@@ -17,4 +17,7 @@
     <CheckBoxPreference android:key="invert_scroll"
                         android:title="@string/pref_invert_scroll"
                         android:persistent="false" />
+    <CheckBoxPreference android:key="fling_scroll"
+                        android:title="@string/pref_fling_scroll"
+                        android:persistent="false" />
 </PreferenceScreen>

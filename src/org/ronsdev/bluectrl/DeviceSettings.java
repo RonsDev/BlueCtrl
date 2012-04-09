@@ -33,11 +33,13 @@ public class DeviceSettings {
     private static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
     private static final String PREF_KEY_SCROLL_SENSITIVITY = "scroll_sensitivity";
     private static final String PREF_KEY_INVERT_SCROLL = "invert_scroll";
+    private static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
     private static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
 
     private static final float DEFAULT_MOUSE_SENSITIVITY = 3f;
     private static final float DEFAULT_SCROLL_SENSITIVITY = 2.5f;
     private static final boolean DEFAULT_INVERT_SCROLL = false;
+    private static final boolean DEFAULT_FLING_SCROLL = true;
     private static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
 
 
@@ -52,6 +54,7 @@ public class DeviceSettings {
     private float mMouseSensitivity;
     private float mScrollSensitivity;
     private boolean mInvertScroll;
+    private boolean mFlingScroll;
     private boolean mForceSmoothScroll;
 
 
@@ -122,6 +125,8 @@ public class DeviceSettings {
                 DEFAULT_SCROLL_SENSITIVITY);
         mInvertScroll = preferences.getBoolean(getKey(PREF_KEY_INVERT_SCROLL),
                 DEFAULT_INVERT_SCROLL);
+        mFlingScroll = preferences.getBoolean(getKey(PREF_KEY_FLING_SCROLL),
+                DEFAULT_FLING_SCROLL);
         mForceSmoothScroll = preferences.getBoolean(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL),
                 DEFAULT_FORCE_SMOOTH_SCROLL);
     }
@@ -144,6 +149,9 @@ public class DeviceSettings {
         if (mInvertScroll != oldSettings.mInvertScroll) {
             editor.putBoolean(getKey(PREF_KEY_INVERT_SCROLL), mInvertScroll);
         }
+        if (mFlingScroll != oldSettings.mFlingScroll) {
+            editor.putBoolean(getKey(PREF_KEY_FLING_SCROLL), mFlingScroll);
+        }
         if (mForceSmoothScroll != oldSettings.mForceSmoothScroll) {
             editor.putBoolean(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL), mForceSmoothScroll);
         }
@@ -159,6 +167,7 @@ public class DeviceSettings {
         editor.remove(getKey(PREF_KEY_MOUSE_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_SCROLL_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_INVERT_SCROLL));
+        editor.remove(getKey(PREF_KEY_FLING_SCROLL));
         editor.remove(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL));
 
         editor.commit();
@@ -193,6 +202,13 @@ public class DeviceSettings {
     }
     public void setInvertScroll(boolean value) {
         mInvertScroll = value;
+    }
+
+    public boolean getFlingScroll() {
+        return mFlingScroll;
+    }
+    public void setFlingScroll(boolean value) {
+        mFlingScroll = value;
     }
 
     public boolean getForceSmoothScroll() {

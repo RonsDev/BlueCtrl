@@ -42,6 +42,7 @@
     <string name="pref_keymap_dlg_title">Keyboard Layout</string>
     <string name="pref_mouse_sensitivity">Sensitivity</string>
     <string name="pref_invert_scroll">Invert Scroll Direction</string>
+    <string name="pref_fling_scroll">Fling Scroll</string>
 
     <string name="info_title_connecting">Connecting\u2026</string>
     <string name="info_title_disconnected">Disconnected</string>
