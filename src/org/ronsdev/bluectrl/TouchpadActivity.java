@@ -511,9 +511,16 @@ public class TouchpadActivity extends DaemonActivity
         daemon.connectHid(mBtDevice.getAddress());
     }
 
-    public void onMouseModeChanged(int mode) {
-        switch (mode) {
+    public void onMouseModeChanged(int newMode, int oldMode) {
+        switch (oldMode) {
         case MouseInputHandler.MODE_SCROLL:
+            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            break;
+        }
+
+        switch (newMode) {
+        case MouseInputHandler.MODE_SCROLL:
+            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             showViewInfoTouchpad(R.drawable.scroll);
             break;
         default:
@@ -563,6 +570,7 @@ public class TouchpadActivity extends DaemonActivity
             break;
         }
     }
+
     private void setWindowFullscreen(boolean fullscreen) {
         if (mIsFullscreen != fullscreen) {
             mIsFullscreen = fullscreen;

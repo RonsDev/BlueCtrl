@@ -23,8 +23,10 @@ public interface OnMouseModeChangedListener {
 
     /**
      * Called when the Mouse input mode has changed.
-     * @param mode
+     * @param newMode
      * The new mode ('MODE_*' constants in the MouseInputHandler class)
+     * @param oldMode
+     * The old mode ('MODE_*' constants in the MouseInputHandler class)
      */
-    public abstract void onMouseModeChanged(int mode);
+    public abstract void onMouseModeChanged(int newMode, int oldMode);
 }

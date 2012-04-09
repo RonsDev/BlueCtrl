@@ -292,7 +292,7 @@ public class MouseInputHandler implements OnTouchListener {
         if (newMode != oldMode) {
             if (V) Log.v(TAG, String.format("Mouse input mode changed (%d)", newMode));
 
-            onMouseModeChanged(newMode);
+            onMouseModeChanged(newMode, oldMode);
         }
 
         if (event != null) {
@@ -321,9 +321,9 @@ public class MouseInputHandler implements OnTouchListener {
         return mInternalTouchListener.onTouch(view, event);
     }
 
-    private void onMouseModeChanged(int mode) {
+    private void onMouseModeChanged(int newMode, int oldMode) {
         if (mOnMouseModeChangedListener != null) {
-            mOnMouseModeChangedListener.onMouseModeChanged(mode);
+            mOnMouseModeChangedListener.onMouseModeChanged(newMode, oldMode);
         }
     }
 
