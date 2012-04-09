@@ -129,6 +129,10 @@ public class MouseInputHandler implements OnTouchListener {
     private static final float MAX_TOUCH_END_PREDICT_DISTANCE_DP = 5.0f;
 
 
+    /** Intermediate step count of the Smooth Scroll feature. */
+    private static final int SMOOTH_SCROLL_STEPS = 16;
+
+
     /** Repeat time (in ms) for the fling scroll loop. */
     private static final int FLING_SCROLL_LOOP_TIME = 100;
 
@@ -190,7 +194,7 @@ public class MouseInputHandler implements OnTouchListener {
         } else {
             mSmoothScrollSensitivity = settings.getScrollSensitivity() * -1;
         }
-        mScrollSensitivity = mSmoothScrollSensitivity / 16;
+        mScrollSensitivity = mSmoothScrollSensitivity / SMOOTH_SCROLL_STEPS;
 
         mDisplayDensity = mView.getResources().getDisplayMetrics().density;
 
