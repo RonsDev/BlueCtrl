@@ -246,7 +246,7 @@ public class PairingActivity extends DaemonActivity {
     }
 
     private void onBluetoothAdapterScanModeChanged(int scanMode) {
-        if (mIsPairingActive && !mWasDiscoverableSet && isDaemonAvailable() &&
+        if (mIsPairingActive && isDaemonAvailable() &&
                 (scanMode != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)) {
             final DaemonService daemon = getDaemon();
 
