@@ -32,6 +32,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -87,6 +88,7 @@ public class TouchpadActivity extends DaemonActivity
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
     private static final String SAVED_STATE_IS_PAIRING_CONNECT = "IsPairingConnect";
     private static final String SAVED_STATE_IS_FULLSCREEN = "IsFullscreen";
+    private static final String SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT = "ShowKeyboardOnConnect";
 
 
     private ImageButton mActionBarHome;
@@ -113,7 +115,8 @@ public class TouchpadActivity extends DaemonActivity
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
     private boolean mIsFullscreen = false;
-    private boolean mWasSoftKeyboardToggled = false;
+    private boolean mShowKeyboardOnConnect = false;
+    private boolean mWasKeyboardToggled = false;
 
     private CharSequence mSendTextValue = "";
     private SendTextThread mSendTextThread;
@@ -129,7 +132,7 @@ public class TouchpadActivity extends DaemonActivity
     private OnClickListener mToggleKeyboardClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            toggleSoftKeyboard();
+            toggleKeyboard();
         }
     };
 
@@ -204,6 +207,8 @@ public class TouchpadActivity extends DaemonActivity
             mIsAutoConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_AUTO_CONNECT);
             mIsPairingConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_PAIRING_CONNECT);
             setWindowFullscreen(savedInstanceState.getBoolean(SAVED_STATE_IS_FULLSCREEN));
+            mShowKeyboardOnConnect = savedInstanceState.getBoolean(
+                    SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT);
         }
 
         mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -225,9 +230,8 @@ public class TouchpadActivity extends DaemonActivity
             daemon.disconnectHid();
         }
 
-        if (mWasSoftKeyboardToggled) {
-            mWasSoftKeyboardToggled = false;
-            mInputMethodManager.hideSoftInputFromWindow(mKeyboardInputView.getWindowToken(), 0);
+        if (mWasKeyboardToggled) {
+            hideKeyboard();
         }
     }
 
@@ -236,6 +240,7 @@ public class TouchpadActivity extends DaemonActivity
         outState.putBoolean(SAVED_STATE_IS_AUTO_CONNECT, mIsAutoConnect);
         outState.putBoolean(SAVED_STATE_IS_PAIRING_CONNECT, mIsPairingConnect);
         outState.putBoolean(SAVED_STATE_IS_FULLSCREEN, mIsFullscreen);
+        outState.putBoolean(SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT, mShowKeyboardOnConnect);
 
         super.onSaveInstanceState(outState);
     }
@@ -586,7 +591,28 @@ public class TouchpadActivity extends DaemonActivity
         }
     }
 
-    private void toggleSoftKeyboard() {
+    private void showKeyboard() {
+        mKeyboardInputView.requestFocus();
+        mInputMethodManager.showSoftInput(mKeyboardInputView, InputMethodManager.SHOW_FORCED);
+        mWasKeyboardToggled = true;
+    }
+
+    private void hideKeyboard() {
+        mWasKeyboardToggled = false;
+        mInputMethodManager.hideSoftInputFromWindow(
+                mKeyboardInputView.getWindowToken(),
+                0,
+                new ResultReceiver(null) {
+                    @Override
+                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                        if (resultCode == InputMethodManager.RESULT_HIDDEN) {
+                            mShowKeyboardOnConnect = true;
+                        }
+                    }
+                });
+    }
+
+    private void toggleKeyboard() {
         mKeyboardInputView.requestFocus();
 
         /*
@@ -596,7 +622,7 @@ public class TouchpadActivity extends DaemonActivity
          * work in landscape mode.
          */
         mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        mWasSoftKeyboardToggled = true;
+        mWasKeyboardToggled = true;
     }
 
     private void startSendTextTask(CharSequence text) {
@@ -678,11 +704,6 @@ public class TouchpadActivity extends DaemonActivity
     }
 
     private void refreshViewInfo() {
-        // No need for update when the Activity is closing
-        if (isFinishing()) {
-            return;
-        }
-
         final DaemonService daemon = getDaemon();
         int hidState;
         int errorCode = 0;
@@ -696,64 +717,76 @@ public class TouchpadActivity extends DaemonActivity
             errorCode = daemon.getHidErrorCode();
         }
 
+        final boolean isConnected = (hidState == DaemonService.HID_STATE_CONNECTED);
+        setWindowFullscreen(isConnected);
+        mButtonKeyboard.setVisibility(isConnected ? View.VISIBLE : View.GONE);
+
         switch (hidState) {
         case DaemonService.HID_STATE_CONNECTING:
-            setWindowFullscreen(false);
             showViewInfoWait(getString(R.string.info_title_connecting), "");
             break;
         case DaemonService.HID_STATE_DISCONNECTING:
         case DaemonService.HID_STATE_DISCONNECTED:
-            setWindowFullscreen(false);
+            if (mWasKeyboardToggled) {
+                hideKeyboard();
+            }
 
-            switch (errorCode) {
-            case 0:
-                showViewInfoImage(R.drawable.disconnected,
-                        getString(R.string.info_title_disconnected), "", true);
-                break;
-            case DaemonService.ERROR_ACCES:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_permission_denied),
-                        getString(R.string.info_text_pair_again),
-                        false);
-                break;
-            case DaemonService.ERROR_HOSTDOWN:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_host_unavailable),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
-                break;
-            case DaemonService.ERROR_CONNREFUSED:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_refused),
-                        getString(R.string.info_text_connection_refused),
-                        true);
-                break;
-            case DaemonService.ERROR_BADE:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_authorization_error),
-                        getString(R.string.info_text_pair_again),
-                        false);
-                break;
-            case DaemonService.ERROR_TIMEDOUT:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_timeout),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
-                break;
-            case DaemonService.ERROR_ALREADY:
-                showViewInfoWait(getString(R.string.info_title_connecting), "");
-                break;
-            default:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_problem),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
-                break;
+            // No need for update when the Activity is closing
+            if (!isFinishing()) {
+                switch (errorCode) {
+                case 0:
+                    showViewInfoImage(R.drawable.disconnected,
+                            getString(R.string.info_title_disconnected), "", true);
+                    break;
+                case DaemonService.ERROR_ACCES:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_permission_denied),
+                            getString(R.string.info_text_pair_again),
+                            false);
+                    break;
+                case DaemonService.ERROR_HOSTDOWN:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_host_unavailable),
+                            getString(R.string.info_text_host_unavailable),
+                            true);
+                    break;
+                case DaemonService.ERROR_CONNREFUSED:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_connection_refused),
+                            getString(R.string.info_text_connection_refused),
+                            true);
+                    break;
+                case DaemonService.ERROR_BADE:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_authorization_error),
+                            getString(R.string.info_text_pair_again),
+                            false);
+                    break;
+                case DaemonService.ERROR_TIMEDOUT:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_connection_timeout),
+                            getString(R.string.info_text_host_unavailable),
+                            true);
+                    break;
+                case DaemonService.ERROR_ALREADY:
+                    showViewInfoWait(getString(R.string.info_title_connecting), "");
+                    break;
+                default:
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_connection_problem),
+                            getString(R.string.info_text_host_unavailable),
+                            true);
+                    break;
+                }
             }
             break;
         case DaemonService.HID_STATE_CONNECTED:
-            setWindowFullscreen(true);
             showViewInfoTouchpad();
+
+            if (mShowKeyboardOnConnect) {
+                mShowKeyboardOnConnect = false;
+                showKeyboard();
+            }
             break;
         }
     }
