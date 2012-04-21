@@ -97,10 +97,20 @@ public class FloatSliderPreference extends DialogPreference
 
         final float newValue = convertToFloat(mSeekBar.getProgress());
         if (positiveResult && callChangeListener(Float.valueOf(newValue))) {
-            mValue = newValue;
+            setValue(newValue);
             if (shouldPersist()) {
                 persistFloat(mValue);
             }
+        }
+    }
+
+    @Override
+    public CharSequence getSummary() {
+        final CharSequence summary = super.getSummary();
+        if (summary == null) {
+            return null;
+        } else {
+            return String.format(summary.toString(), mValue);
         }
     }
 
@@ -150,6 +160,7 @@ public class FloatSliderPreference extends DialogPreference
 
     public void setValue(float value) {
         mValue = value;
+        notifyChanged();
         if (mSeekBar != null) {
             mSeekBar.setProgress(convertToInt(value));
         }

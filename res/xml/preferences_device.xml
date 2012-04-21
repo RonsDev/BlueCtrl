@@ -1,18 +1,18 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:title="@string/device_preferences">
-    <PreferenceCategory android:title="@string/pref_cat_keyboard" />
-    <ListPreference android:key="keymap"
-                    android:title="@string/pref_keymap"
-                    android:dialogTitle="@string/pref_keymap_dlg_title"
-                    android:entries="@array/keymap_names"
-                    android:entryValues="@array/keymap_values"
-                    android:persistent="false" />
-
-    <PreferenceCategory android:title="@string/pref_cat_mouse" />
+    <org.ronsdev.bluectrl.widget.SummaryListPreference
+        android:key="keymap"
+        android:title="@string/pref_keymap"
+        android:dialogTitle="@string/pref_keymap"
+        android:entries="@array/keymap_names"
+        android:entryValues="@array/keymap_values"
+        android:summary="%s"
+        android:persistent="false" />
     <org.ronsdev.bluectrl.widget.FloatSliderPreference
         android:key="mouse_sensitivity"
         android:title="@string/pref_mouse_sensitivity"
         android:max="8"
+        android:summary="%.1f"
         android:persistent="false" />
     <CheckBoxPreference android:key="invert_scroll"
                         android:title="@string/pref_invert_scroll"
