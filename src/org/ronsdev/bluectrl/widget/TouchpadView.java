@@ -116,7 +116,7 @@ public class TouchpadView extends View
     }
 
     public boolean isActive() {
-        return (isShown() && (mHidMouse != null) && mHidMouse.isConnected());
+        return ((mHidMouse != null) && mHidMouse.isConnected());
     }
 
     public HidMouse getHidMouse() {

@@ -113,8 +113,7 @@ public class KeyboardInputView extends View {
     }
 
     public boolean isActive() {
-        return (isShown() && (mCharKeyMap != null) &&
-                (mHidKeyboard != null) && mHidKeyboard.isConnected());
+        return ((mCharKeyMap != null) && (mHidKeyboard != null) && mHidKeyboard.isConnected());
     }
 
     public HidKeyboard getHidKeyboard() {

@@ -229,7 +229,7 @@ public class MouseTouchListener implements OnTouchListener {
 
 
     private boolean isActive() {
-        return (mView.isShown() && (mHidMouse != null) && mHidMouse.isConnected());
+        return ((mHidMouse != null) && mHidMouse.isConnected());
     }
 
     public HidMouse getHidMouse() {
@@ -571,7 +571,7 @@ public class MouseTouchListener implements OnTouchListener {
         {
              @Override
              public void run() {
-                 if (isActive()) {
+                 if (mView.isShown() && isActive()) {
                      mHidMouse.clickButton(convertPointerCountToButtonMask(mMaxTouchPoints));
                  }
                  changeSubListener(mIdleSubListener, null);
@@ -878,7 +878,8 @@ public class MouseTouchListener implements OnTouchListener {
         {
              @Override
              public void run() {
-                 if (isActive() && (Math.abs(mFlingScrollMoveY) > mFlingScrollStopTreshold)) {
+                 if (mView.isShown() && isActive() &&
+                         (Math.abs(mFlingScrollMoveY) > mFlingScrollStopTreshold)) {
                      mFlingScrollMoveY -= mFlingScrollMoveY * FLING_SCROLL_FRICTION;
 
                      scrollWheel(mFlingScrollMoveY);
