@@ -663,6 +663,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     private void refreshViewInfo() {
+        // No need for update when the Activity is closing
+        if (isFinishing()) {
+            return;
+        }
+
         final DaemonService daemon = getDaemon();
         int hidState;
         int errorCode = 0;
@@ -690,53 +695,50 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                 hideKeyboard();
             }
 
-            // No need for update when the Activity is closing
-            if (!isFinishing()) {
-                switch (errorCode) {
-                case 0:
-                    showViewInfoImage(R.drawable.disconnected,
-                            getString(R.string.info_title_disconnected), "", true);
-                    break;
-                case DaemonService.ERROR_ACCES:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_permission_denied),
-                            getString(R.string.info_text_pair_again),
-                            false);
-                    break;
-                case DaemonService.ERROR_HOSTDOWN:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_host_unavailable),
-                            getString(R.string.info_text_host_unavailable),
-                            true);
-                    break;
-                case DaemonService.ERROR_CONNREFUSED:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_connection_refused),
-                            getString(R.string.info_text_connection_refused),
-                            true);
-                    break;
-                case DaemonService.ERROR_BADE:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_authorization_error),
-                            getString(R.string.info_text_pair_again),
-                            false);
-                    break;
-                case DaemonService.ERROR_TIMEDOUT:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_connection_timeout),
-                            getString(R.string.info_text_host_unavailable),
-                            true);
-                    break;
-                case DaemonService.ERROR_ALREADY:
-                    showViewInfoWait(getString(R.string.info_title_connecting), "");
-                    break;
-                default:
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_connection_problem),
-                            getString(R.string.info_text_host_unavailable),
-                            true);
-                    break;
-                }
+            switch (errorCode) {
+            case 0:
+                showViewInfoImage(R.drawable.disconnected,
+                        getString(R.string.info_title_disconnected), "", true);
+                break;
+            case DaemonService.ERROR_ACCES:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_permission_denied),
+                        getString(R.string.info_text_pair_again),
+                        false);
+                break;
+            case DaemonService.ERROR_HOSTDOWN:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_host_unavailable),
+                        getString(R.string.info_text_host_unavailable),
+                        true);
+                break;
+            case DaemonService.ERROR_CONNREFUSED:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_connection_refused),
+                        getString(R.string.info_text_connection_refused),
+                        true);
+                break;
+            case DaemonService.ERROR_BADE:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_authorization_error),
+                        getString(R.string.info_text_pair_again),
+                        false);
+                break;
+            case DaemonService.ERROR_TIMEDOUT:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_connection_timeout),
+                        getString(R.string.info_text_host_unavailable),
+                        true);
+                break;
+            case DaemonService.ERROR_ALREADY:
+                showViewInfoWait(getString(R.string.info_title_connecting), "");
+                break;
+            default:
+                showViewInfoImage(R.drawable.problem,
+                        getString(R.string.info_title_connection_problem),
+                        getString(R.string.info_text_host_unavailable),
+                        true);
+                break;
             }
             break;
         case DaemonService.HID_STATE_CONNECTED:
