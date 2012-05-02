@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.ronsdev.bluectrl;
+package org.ronsdev.bluectrl.widget;
 
 /**
- * Interface definition for a callback to be invoked when a Mouse gesture has been detected.
+ * Interface definition for a callback to be invoked when a touchpad gesture has been detected.
  */
-public interface OnMouseGestureListener {
+public interface OnTouchpadGestureListener {
 
     /**
-     * Called when a Mouse gesture has been detected.
+     * Called when a touchpad gesture has been detected.
      * @param gesture
-     * The detected gesture ('GESTURE_*' constants in the MouseInputHandler class)
+     * The detected gesture ('GESTURE_*' constants in the {@link TouchpadView} class)
      * @param direction
-     * The direction of the gesture ('GESTURE_DIRECTION_*' constants in the MouseInputHandler
+     * The direction of the gesture ('GESTURE_DIRECTION_*' constants in the {@link TouchpadView}
      * class)
      * @return
      * Return {@code true} if you have handled the gesture, {@code false} if you haven't
      */
-    public abstract boolean onMouseGesture(int gesture, int direction);
+    public abstract boolean onTouchpadGesture(int gesture, int direction);
 }

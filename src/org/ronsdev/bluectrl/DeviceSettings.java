@@ -36,11 +36,12 @@ public class DeviceSettings {
     private static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
     private static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
 
-    private static final float DEFAULT_MOUSE_SENSITIVITY = 3f;
-    private static final float DEFAULT_SCROLL_SENSITIVITY = 2.5f;
-    private static final boolean DEFAULT_INVERT_SCROLL = false;
-    private static final boolean DEFAULT_FLING_SCROLL = true;
-    private static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
+    public static final String DEFAULT_KEYMAP = "en_US";
+    public static final float DEFAULT_MOUSE_SENSITIVITY = 3f;
+    public static final float DEFAULT_SCROLL_SENSITIVITY = 2.5f;
+    public static final boolean DEFAULT_INVERT_SCROLL = false;
+    public static final boolean DEFAULT_FLING_SCROLL = true;
+    public static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
 
 
     private static Context sContext = null;
@@ -69,7 +70,7 @@ public class DeviceSettings {
             }
         }
 
-        return "en_US";
+        return DEFAULT_KEYMAP;
     }
 
     private static void initStaticMembers(Context context) {

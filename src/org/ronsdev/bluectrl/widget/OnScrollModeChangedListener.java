@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.ronsdev.bluectrl;
+package org.ronsdev.bluectrl.widget;
 
 /**
- * Interface definition for a callback to be invoked when the Mouse input mode has changed.
+ * Interface definition for a callback to be invoked when the scroll mode has changed.
  */
-public interface OnMouseModeChangedListener {
+public interface OnScrollModeChangedListener {
 
     /**
-     * Called when the Mouse input mode has changed.
+     * Called when the scroll mode has changed.
      * @param newMode
-     * The new mode ('MODE_*' constants in the MouseInputHandler class)
+     * The new mode ('SCROLL_MODE_*' constants in the {@link TouchpadView} class)
      * @param oldMode
-     * The old mode ('MODE_*' constants in the MouseInputHandler class)
+     * The old mode ('SCROLL_MODE_*' constants in the {@link TouchpadView} class)
      */
-    public abstract void onMouseModeChanged(int newMode, int oldMode);
+    public abstract void onScrollModeChanged(int newMode, int oldMode);
 }

@@ -19,7 +19,7 @@ package org.ronsdev.bluectrl;
 import org.ronsdev.bluectrl.daemon.DaemonActivity;
 import org.ronsdev.bluectrl.daemon.DaemonService;
 import org.ronsdev.bluectrl.widget.KeyboardInputView;
-import org.ronsdev.bluectrl.widget.TouchpadBackgroundView;
+import org.ronsdev.bluectrl.widget.TouchpadView;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,8 +56,7 @@ import android.widget.TextView;
 /**
  * This Activity is a Touchpad for the Mouse input and also allows Keyboard input.
  */
-public class TouchpadActivity extends DaemonActivity
-        implements OnMouseModeChangedListener, OnMouseGestureListener, OnMouseButtonClickListener {
+public class TouchpadActivity extends DaemonActivity implements OnMouseButtonClickListener {
 
     /**
      * Used as a Parcelable BluetoothDevice extra field in start Activity intents to get the
@@ -95,7 +94,7 @@ public class TouchpadActivity extends DaemonActivity
     private TextView mActionBarTitle;
     private ImageButton mButtonKeyboard;
     private KeyboardInputView mKeyboardInputView;
-    private TouchpadBackgroundView mTouchBackground;
+    private TouchpadView mTouchpadView;
     private ProgressBar mInfoWait;
     private ImageView mInfoImage;
     private TextView mInfoTitle;
@@ -107,10 +106,8 @@ public class TouchpadActivity extends DaemonActivity
     private InputMethodManager mInputMethodManager;
     private ClipboardManager mClipboard;
     private DeviceSettings mDeviceSettings;
-    private HidKeyboard mKeyboard;
-    private HidMouse mMouse;
-    private KeyboardInputHandler mKeyInputHandler;
-    private MouseInputHandler mMouseInputHandler;
+    private HidKeyboard mHidKeyboard;
+    private HidMouse mHidMouse;
 
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
@@ -163,9 +160,9 @@ public class TouchpadActivity extends DaemonActivity
         public void run() {
             int position = 0;
             while ((position < mText.length()) && !interrupted()) {
-                // The KeyboardInputHandler can become temporarily inactive if the screen is
+                // The KeyboardInputView can become temporarily inactive if the screen is
                 // rotated. In this case wait until it is active again.
-                if (!mKeyInputHandler.isActive()) {
+                if ((mKeyboardInputView == null) || !mKeyboardInputView.isActive()) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -220,6 +217,13 @@ public class TouchpadActivity extends DaemonActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        updateViewSettings();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -256,12 +260,18 @@ public class TouchpadActivity extends DaemonActivity
     protected void onDaemonAvailable() {
         final DaemonService daemon = getDaemon();
 
-        mKeyboard = new HidKeyboard(daemon);
+        mHidKeyboard = new HidKeyboard(daemon);
 
-        mMouse = new HidMouse(daemon);
-        mMouse.setOnMouseButtonClickListener(this);
+        if (mKeyboardInputView != null) {
+            mKeyboardInputView.setHidKeyboard(mHidKeyboard);
+        }
 
-        initInputHandler();
+        mHidMouse = new HidMouse(daemon);
+        mHidMouse.setOnMouseButtonClickListener(this);
+
+        if (mTouchpadView != null) {
+            mTouchpadView.setHidMouse(mHidMouse);
+        }
 
         onHidStateChanged(daemon.getHidState(),
                 daemon.getConnectedDevice(),
@@ -379,8 +389,8 @@ public class TouchpadActivity extends DaemonActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        final boolean keyboardInputActive = ((mKeyInputHandler != null) &&
-                mKeyInputHandler.isActive());
+        final boolean keyboardInputActive = ((mKeyboardInputView != null) &&
+                mKeyboardInputView.isActive());
 
         MenuItem pasteItem = menu.findItem(R.id.menu_paste);
         pasteItem.setEnabled(keyboardInputActive && mClipboard.hasText());
@@ -437,9 +447,11 @@ public class TouchpadActivity extends DaemonActivity
         mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
 
         mKeyboardInputView = (KeyboardInputView)findViewById(R.id.keyboard_input);
+        mKeyboardInputView.setHidKeyboard(mHidKeyboard);
         mKeyboardInputView.requestFocus();
 
-        mTouchBackground = (TouchpadBackgroundView)findViewById(R.id.touch_background);
+        mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
+        mTouchpadView.setHidMouse(mHidMouse);
 
         mInfoWait = (ProgressBar)findViewById(R.id.info_wait);
         mInfoImage = (ImageView)findViewById(R.id.info_image);
@@ -447,8 +459,21 @@ public class TouchpadActivity extends DaemonActivity
         mInfoText = (TextView)findViewById(R.id.info_text);
         mInfoReconnect = (TextView)findViewById(R.id.info_reconnect);
 
+        updateViewSettings();
         refreshViewInfo();
-        initInputHandler();
+    }
+
+    private void updateViewSettings() {
+        if (mKeyboardInputView != null) {
+            mKeyboardInputView.setKeyMap(mDeviceSettings.getKeyMap());
+        }
+
+        if (mTouchpadView != null) {
+            mTouchpadView.setMouseSensitivity(mDeviceSettings.getMouseSensitivity());
+            mTouchpadView.setInvertScroll(mDeviceSettings.getInvertScroll());
+            mTouchpadView.setScrollSensitivity(mDeviceSettings.getScrollSensitivity());
+            mTouchpadView.setFlingScroll(mDeviceSettings.getFlingScroll());
+        }
     }
 
     public Dialog createHelpDialog() {
@@ -492,20 +517,6 @@ public class TouchpadActivity extends DaemonActivity
         mSendTextValue = "";
     }
 
-    private void initInputHandler() {
-        if (mKeyboard != null) {
-            mKeyInputHandler = new KeyboardInputHandler(mKeyboardInputView,
-                    mKeyboard,
-                    mDeviceSettings);
-        }
-
-        if (mMouse != null) {
-            mMouseInputHandler = new MouseInputHandler(mTouchBackground, mMouse, mDeviceSettings);
-            mMouseInputHandler.setOnMouseModeChangedListener(this);
-            mMouseInputHandler.setOnMouseGestureListener(this);
-        }
-    }
-
     /** Checks if the given Bluetooth device is from another HID host */
     private boolean isForeignHostDevice(BluetoothDevice btDevice) {
         return ((btDevice != null) && !btDevice.equals(mBtDevice));
@@ -516,62 +527,16 @@ public class TouchpadActivity extends DaemonActivity
         daemon.connectHid(mBtDevice.getAddress());
     }
 
-    public void onMouseModeChanged(int newMode, int oldMode) {
-        switch (oldMode) {
-        case MouseInputHandler.MODE_SCROLL:
-            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            break;
-        }
-
-        switch (newMode) {
-        case MouseInputHandler.MODE_SCROLL:
-            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            showViewInfoTouchpad(R.drawable.scroll);
-            break;
-        default:
-            showViewInfoTouchpad();
-            break;
-        }
-    }
-
-    public boolean onMouseGesture(int gesture, int direction) {
-        switch (gesture) {
-        case MouseInputHandler.GESTURE_EDGE_RIGHT:
-            switch (direction) {
-            case MouseInputHandler.GESTURE_DIRECTION_UP:
-            case MouseInputHandler.GESTURE_DIRECTION_DOWN:
-                mMouseInputHandler.activateScrollMode();
-                return true;
-            }
-            break;
-        case MouseInputHandler.GESTURE_2FINGER:
-            switch (direction) {
-            case MouseInputHandler.GESTURE_DIRECTION_UP:
-            case MouseInputHandler.GESTURE_DIRECTION_DOWN:
-                mMouseInputHandler.activateScrollMode();
-                return true;
-            case MouseInputHandler.GESTURE_DIRECTION_LEFT:
-                mMouse.clickButton(HidMouse.BUTTON_4);
-                return true;
-            case MouseInputHandler.GESTURE_DIRECTION_RIGHT:
-                mMouse.clickButton(HidMouse.BUTTON_5);
-                return true;
-            }
-            break;
-        }
-        return false;
-    }
-
     public void onMouseButtonClick(int clickType) {
         switch (clickType) {
         case HidMouse.CLICK_TYPE_DOWN:
         case HidMouse.CLICK_TYPE_UP:
-            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            mTouchBackground.playSoundEffect(SoundEffectConstants.CLICK);
+            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
             break;
         case HidMouse.CLICK_TYPE_CLICK:
-            mTouchBackground.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            mTouchBackground.playSoundEffect(SoundEffectConstants.CLICK);
+            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
             break;
         }
     }
@@ -647,12 +612,14 @@ public class TouchpadActivity extends DaemonActivity
     }
 
     private void pasteClipboard() {
-        final CharSequence pasteText = mClipboard.getText();
-        if ((pasteText != null) && (pasteText.length() > 0)) {
-            if (pasteText.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
-                mKeyboardInputView.pasteText(pasteText.toString());
-            } else {
-                startSendTextTask(pasteText);
+        if ((mKeyboardInputView != null) && mKeyboardInputView.isActive()) {
+            final CharSequence pasteText = mClipboard.getText();
+            if ((pasteText != null) && (pasteText.length() > 0)) {
+                if (pasteText.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
+                    mKeyboardInputView.pasteText(pasteText.toString());
+                } else {
+                    startSendTextTask(pasteText);
+                }
             }
         }
     }
@@ -674,29 +641,21 @@ public class TouchpadActivity extends DaemonActivity
     }
 
     private void showViewInfoTouchpad() {
-        mTouchBackground.setVisibility(View.VISIBLE);
+        mTouchpadView.setVisibility(View.VISIBLE);
         mInfoWait.setVisibility(View.GONE);
         mInfoImage.setVisibility(View.GONE);
         setViewInfoText("", "", false);
     }
 
-    private void showViewInfoTouchpad(int resid) {
-        mTouchBackground.setVisibility(View.VISIBLE);
-        mInfoWait.setVisibility(View.GONE);
-        mInfoImage.setImageResource(resid);
-        mInfoImage.setVisibility(View.VISIBLE);
-        setViewInfoText("", "", false);
-    }
-
     private void showViewInfoWait(String title, String text) {
-        mTouchBackground.setVisibility(View.GONE);
+        mTouchpadView.setVisibility(View.GONE);
         mInfoWait.setVisibility(View.VISIBLE);
         mInfoImage.setVisibility(View.GONE);
         setViewInfoText(title, text, false);
     }
 
     private void showViewInfoImage(int resid, String title, String text, boolean showReconnect) {
-        mTouchBackground.setVisibility(View.GONE);
+        mTouchpadView.setVisibility(View.GONE);
         mInfoWait.setVisibility(View.GONE);
         mInfoImage.setImageResource(resid);
         mInfoImage.setVisibility(View.VISIBLE);

@@ -25,8 +25,8 @@
             android:id="@+id/keyboard_input"
             android:layout_height="match_parent"
             android:layout_width="match_parent" />
-        <org.ronsdev.bluectrl.widget.TouchpadBackgroundView
-            android:id="@+id/touch_background"
+        <org.ronsdev.bluectrl.widget.TouchpadView
+            android:id="@+id/touchpad"
             android:layout_height="match_parent"
             android:layout_width="match_parent" />
 
