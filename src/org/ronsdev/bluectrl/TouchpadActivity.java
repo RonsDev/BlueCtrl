@@ -158,30 +158,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         public void run() {
-            int position = 0;
-            while ((position < mText.length()) && !interrupted()) {
-                // The KeyboardInputView can become temporarily inactive if the screen is
-                // rotated. In this case wait until it is active again.
-                if ((mKeyboardInputView == null) || !mKeyboardInputView.isActive()) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        break;
+            // Save the current KeyboardInputView because the mKeyboardInputView variable can
+            // change if the screen is rotated.
+            KeyboardInputView localKIV = mKeyboardInputView;
+            if (localKIV != null) {
+                int position = 0;
+                while ((position < mText.length()) && !interrupted() && localKIV.isActive()) {
+                    int endPosition = position + SEND_TEXT_CHUNK_SIZE;
+                    if (endPosition > mText.length()) {
+                        endPosition = mText.length();
                     }
-                    continue;
-                }
+                    CharSequence chunk = mText.subSequence(position, endPosition);
+                    localKIV.pasteText(chunk.toString());
+                    position = endPosition;
 
-                int endPosition = position + SEND_TEXT_CHUNK_SIZE;
-                if (endPosition > mText.length()) {
-                    endPosition = mText.length();
-                }
-                CharSequence chunk = mText.subSequence(position, endPosition);
-                mKeyboardInputView.pasteText(chunk.toString());
-                position = endPosition;
-
-                Message msg = mHandler.obtainMessage();
-                msg.arg1 = position;
-                mHandler.sendMessage(msg);
+                    Message msg = mHandler.obtainMessage();
+                    msg.arg1 = position;
+                    mHandler.sendMessage(msg);
+            }
             }
 
             Message msg = mHandler.obtainMessage();
@@ -280,8 +274,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     @Override
     protected void onDaemonUnavailable(int errorCode) {
-        stopSendTextTask();
-
         // This Activity is useless without the daemon
         this.finish();
     }
