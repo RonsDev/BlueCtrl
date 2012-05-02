@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.ResultReceiver;
 import android.text.ClipboardManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -86,7 +87,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
     private static final String SAVED_STATE_IS_PAIRING_CONNECT = "IsPairingConnect";
-    private static final String SAVED_STATE_IS_FULLSCREEN = "IsFullscreen";
     private static final String SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT = "ShowKeyboardOnConnect";
 
 
@@ -197,7 +197,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         } else {
             mIsAutoConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_AUTO_CONNECT);
             mIsPairingConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_PAIRING_CONNECT);
-            setWindowFullscreen(savedInstanceState.getBoolean(SAVED_STATE_IS_FULLSCREEN));
             mShowKeyboardOnConnect = savedInstanceState.getBoolean(
                     SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT);
         }
@@ -237,7 +236,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(SAVED_STATE_IS_AUTO_CONNECT, mIsAutoConnect);
         outState.putBoolean(SAVED_STATE_IS_PAIRING_CONNECT, mIsPairingConnect);
-        outState.putBoolean(SAVED_STATE_IS_FULLSCREEN, mIsFullscreen);
         outState.putBoolean(SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT, mShowKeyboardOnConnect);
 
         super.onSaveInstanceState(outState);
@@ -533,6 +531,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
     }
 
+    private boolean isScreenHeightSmall() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return ((displayMetrics.heightPixels / displayMetrics.density) < 400);
+    }
+
     private void setWindowFullscreen(boolean fullscreen) {
         if (mIsFullscreen != fullscreen) {
             mIsFullscreen = fullscreen;
@@ -674,8 +677,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         final boolean isConnected = (hidState == DaemonService.HID_STATE_CONNECTED);
-        setWindowFullscreen(isConnected);
         mButtonKeyboard.setVisibility(isConnected ? View.VISIBLE : View.GONE);
+        setWindowFullscreen(isConnected && isScreenHeightSmall());
 
         switch (hidState) {
         case DaemonService.HID_STATE_CONNECTING:
