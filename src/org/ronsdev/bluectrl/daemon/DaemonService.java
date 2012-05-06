@@ -516,12 +516,12 @@ public class DaemonService extends Service {
 
         /*
          * The 'su' command will return 1 or 255 if the Superuser permissions are denied.
-         * Otherwise it returns 0 on success or the actual command result added with 256 on error.
+         * Otherwise it returns 0 on success or a positive version of an daemon error code.
          */
         if ((suResult == 1) || (suResult == 255)) {
             return ERROR_ROOT_REQUIRED;
         } else if (suResult != 0) {
-            return (suResult - 256);
+            return (-suResult);
         } else {
             return 0;
         }

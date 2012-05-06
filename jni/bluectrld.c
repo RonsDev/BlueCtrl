@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 		if (daemon(0, 0)) {
 			errsv = errno;
 			log_ec(errsv, "Can't start daemon");
-			result = errsv;
+			result = hidc_convert_errno(errsv);
 			goto done;
 		}
 	}
@@ -260,5 +260,5 @@ done:
 
 	log_i("BlueCtrl daemon stopped");
 
-	return result;
+	exit(-result);
 }
