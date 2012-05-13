@@ -84,10 +84,12 @@ public class TouchpadView extends View
     private static final int BUTTON_BAR_HEIGHT_DP = 48;
     private static final int MIDDLE_BUTTON_WIDTH_DP = 48;
     private static final int MAX_BUTTON_WIDTH_DP = 300;
+    private static final int BUTTON_CLICK_DURATION = 100;
 
     private static final int BUTTON_INDEX_FIRST = 0;
     private static final int BUTTON_INDEX_SECOND = 1;
     private static final int BUTTON_INDEX_MIDDLE = 2;
+    private static final int BUTTON_COUNT = 3;
 
 
     private Paint mBackgroundPaint = new Paint();
@@ -114,13 +116,19 @@ public class TouchpadView extends View
      * Array with the rectangles for the buttons (see 'BUTTON_INDEX_*' constants for index
      * mapping).
      */
-    private Rect[] mButtonRects = new Rect[3];
+    private Rect[] mButtonRects = new Rect[BUTTON_COUNT];
 
     /**
      * Array with Pointer ID Lists of every touched button (see 'BUTTON_INDEX_*' constants for
      * index mapping).
      */
-    private IntArrayList[] mButtonPointerIds = new IntArrayList[3];
+    private IntArrayList[] mButtonPointerIds = new IntArrayList[BUTTON_COUNT];
+
+    /**
+     * Array with the pressed states of short clicked buttons (see 'BUTTON_INDEX_*' constants for
+     * index mapping).
+     */
+    private boolean[] mClickedButtons = new boolean[BUTTON_COUNT];
 
 
     public TouchpadView(Context context) {
@@ -263,7 +271,22 @@ public class TouchpadView extends View
         initButtonRects();
     }
 
-    public void onMouseButtonClick(int clickType) {
+    public void onMouseButtonClick(int clickType, int button) {
+        if (clickType == HidMouse.CLICK_TYPE_CLICK) {
+            final int buttonIndex = convertHidMouseBtToBtIndex(button);
+            if (buttonIndex > -1) {
+                mClickedButtons[buttonIndex] = true;
+                postDelayed(new Runnable()
+                {
+                     @Override
+                     public void run() {
+                         mClickedButtons[buttonIndex] = false;
+                         invalidate();
+                     }
+                }, BUTTON_CLICK_DURATION);
+            }
+        }
+
         invalidate();
     }
 
@@ -381,6 +404,19 @@ public class TouchpadView extends View
         }
     }
 
+    private int convertHidMouseBtToBtIndex(int hidMouseButton) {
+        switch (hidMouseButton) {
+        case HidMouse.BUTTON_FIRST:
+            return BUTTON_INDEX_FIRST;
+        case HidMouse.BUTTON_SECOND:
+            return BUTTON_INDEX_SECOND;
+        case HidMouse.BUTTON_MIDDLE:
+            return BUTTON_INDEX_MIDDLE;
+        default:
+            return -1;
+        }
+    }
+
     private void releaseAllButtons() {
         for (int i = 0; i < mButtonPointerIds.length; i++) {
             if (!mButtonPointerIds[i].isEmpty()) {
@@ -443,8 +479,9 @@ public class TouchpadView extends View
 
     private void drawButtons(Canvas canvas) {
         for (int i = 0; i < mButtonRects.length; i++) {
-            if ((mHidMouse != null) &&
-                    mHidMouse.isButtonPressed(convertBtIndexToHidMouseBt(i))) {
+            final int hidMouseBt = convertBtIndexToHidMouseBt(i);
+            if (mClickedButtons[i] ||
+                    ((mHidMouse != null) && mHidMouse.isButtonPressed(hidMouseBt))) {
                 mButtonDrawable.setState(PRESSED_ENABLED_STATE_SET);
             } else {
                 mButtonDrawable.setState(EMPTY_STATE_SET);

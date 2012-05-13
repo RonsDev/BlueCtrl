@@ -68,9 +68,9 @@ public class HidMouse {
     }
 
 
-    private void onMouseButtonClick(int clickType) {
+    private void onMouseButtonClick(int clickType, int button) {
         if (mOnMouseButtonClickListener != null) {
-            mOnMouseButtonClickListener.onMouseButtonClick(clickType);
+            mOnMouseButtonClickListener.onMouseButtonClick(clickType, button);
         }
     }
 
@@ -98,7 +98,7 @@ public class HidMouse {
 
             mDaemon.sendMouseReport(mPressedButtons, 0, 0, 0, 0);
 
-            onMouseButtonClick(CLICK_TYPE_DOWN);
+            onMouseButtonClick(CLICK_TYPE_DOWN, button);
 
             if (V) Log.v(TAG, String.format("Mouse button pressed (0x%h)", button));
         }
@@ -111,7 +111,7 @@ public class HidMouse {
 
             mDaemon.sendMouseReport(mPressedButtons, 0, 0, 0, 0);
 
-            onMouseButtonClick(CLICK_TYPE_UP);
+            onMouseButtonClick(CLICK_TYPE_UP, button);
 
             if (V) Log.v(TAG, String.format("Mouse button released (0x%h)", button));
         }
@@ -128,7 +128,7 @@ public class HidMouse {
             }
             mDaemon.sendMouseReport(mPressedButtons, 0, 0, 0, 0);
 
-            onMouseButtonClick(CLICK_TYPE_CLICK);
+            onMouseButtonClick(CLICK_TYPE_CLICK, button);
 
             if (V) Log.v(TAG, String.format("Mouse button clicked (0x%h)", button));
         }

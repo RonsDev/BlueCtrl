@@ -531,7 +531,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         daemon.connectHid(mBtDevice.getAddress());
     }
 
-    public void onMouseButtonClick(int clickType) {
+    public void onMouseButtonClick(int clickType, int button) {
         switch (clickType) {
         case HidMouse.CLICK_TYPE_DOWN:
         case HidMouse.CLICK_TYPE_UP:
@@ -544,7 +544,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             break;
         }
 
-        mTouchpadView.onMouseButtonClick(clickType);
+        mTouchpadView.onMouseButtonClick(clickType, button);
     }
 
     private boolean isScreenHeightSmall() {

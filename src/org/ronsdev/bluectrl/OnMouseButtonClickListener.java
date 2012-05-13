@@ -25,6 +25,8 @@ public interface OnMouseButtonClickListener {
      * Called when a Mouse button is clicked.
      * @param clickType
      * Specifies how the button is clicked ('CLICK_TYPE_*' constants in the HidMouse class)
+     * @param button
+     * The clicked button
      */
-    public abstract void onMouseButtonClick(int clickType);
+    public abstract void onMouseButtonClick(int clickType, int button);
 }
