@@ -459,10 +459,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         if (mTouchpadView != null) {
+            mTouchpadView.setShowButtons(getShowTouchpadButtons());
             mTouchpadView.setMouseSensitivity(mDeviceSettings.getMouseSensitivity());
             mTouchpadView.setInvertScroll(mDeviceSettings.getInvertScroll());
             mTouchpadView.setScrollSensitivity(mDeviceSettings.getScrollSensitivity());
             mTouchpadView.setFlingScroll(mDeviceSettings.getFlingScroll());
+        }
+    }
+
+    private boolean getShowTouchpadButtons() {
+        final String prefValue = mDeviceSettings.getTouchpadButtons();
+
+        if (prefValue.equals(DeviceSettings.TOUCHPAD_BUTTONS_SHOW)) {
+            return true;
+        } else if (prefValue.equals(DeviceSettings.TOUCHPAD_BUTTONS_SHOW_PORTRAIT)) {
+            final Configuration config = getResources().getConfiguration();
+            return (config.orientation == Configuration.ORIENTATION_PORTRAIT);
+        } else {
+            return false;
         }
     }
 
@@ -529,6 +543,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
             break;
         }
+
+        mTouchpadView.onMouseButtonClick(clickType);
     }
 
     private boolean isScreenHeightSmall() {

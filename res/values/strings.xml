@@ -38,8 +38,13 @@
     <string name="device_preferences">Device settings</string>
     <string name="pref_keymap">Keyboard layout</string>
     <string name="pref_mouse_sensitivity">Mouse sensitivity</string>
+    <string name="pref_touchpad_buttons">Touchpad buttons</string>
     <string name="pref_invert_scroll">Invert scroll direction</string>
     <string name="pref_fling_scroll">Fling scroll</string>
+
+    <string name="pref_touchpad_buttons_show">Always show</string>
+    <string name="pref_touchpad_buttons_show_portrait">Show on portrait mode</string>
+    <string name="pref_touchpad_buttons_hide">Always hide</string>
 
     <string name="info_title_connecting">Connecting\u2026</string>
     <string name="info_title_disconnected">Disconnected</string>

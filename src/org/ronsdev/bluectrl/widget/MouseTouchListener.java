@@ -137,11 +137,11 @@ public class MouseTouchListener implements OnTouchListener {
     /** A list with the currently tracked pointer IDs. */
     private ArrayList<Integer> mPointerIdList = new ArrayList<Integer>(10);
 
-    /** The pointer ID of the controlling pointer. */
-    private int mMainPointerId = -1;
-
     /** The touched point from the first touch down event. */
     private PointerCoords mFirstPoint = new PointerCoords();
+
+    /** The event time of the first touch down event. */
+    private long mFirstEventTime = 0;
 
     /** The previous touched point from the controlling pointer. */
     private PointerCoords mPreviousPoint = new PointerCoords();
@@ -299,8 +299,22 @@ public class MouseTouchListener implements OnTouchListener {
         }
     }
 
+    private void setFirstEventData(MotionEvent event, int pointerIndex) {
+        event.getPointerCoords(pointerIndex, mFirstPoint);
+        mFirstEventTime = event.getEventTime();
+    }
+
+    private void setPreviousEventData(MotionEvent event, int pointerIndex) {
+        event.getPointerCoords(pointerIndex, mPreviousPoint);
+        mPreviousEventTime = event.getEventTime();
+    }
+
     private int getMainPointerIndex(MotionEvent event) {
-        return event.findPointerIndex(mMainPointerId);
+        if (mPointerIdList.isEmpty()) {
+            return -1;
+        } else {
+            return event.findPointerIndex(mPointerIdList.get(0));
+        }
     }
 
     private void onScrollModeChanged(int newMode, int oldMode) {
@@ -330,7 +344,6 @@ public class MouseTouchListener implements OnTouchListener {
         if (!isActive() || (event.getActionMasked() == MotionEvent.ACTION_CANCEL)) {
             changeSubListener(mIdleSubListener, null);
             mPointerIdList.clear();
-            mMainPointerId = -1;
             return false;
         }
 
@@ -341,41 +354,52 @@ public class MouseTouchListener implements OnTouchListener {
             final int downPointerId = event.getPointerId(downPointerIndex);
 
             if (mPointerIdList.isEmpty()) {
-                mMainPointerId = downPointerId;
-                event.getPointerCoords(downPointerIndex, mFirstPoint);
-                event.getPointerCoords(downPointerIndex, mPreviousPoint);
-                mPreviousEventTime = event.getEventTime();
+                setFirstEventData(event, downPointerIndex);
+                setPreviousEventData(event, downPointerIndex);
             }
             if (!mPointerIdList.contains((Integer)downPointerId)) {
                 mPointerIdList.add(downPointerId);
             }
+
+            mSubListener.onTouch(view, event);
             break;
         case MotionEvent.ACTION_POINTER_UP:
             final int upPointerIndex = event.getActionIndex();
             final int upPointerId = event.getPointerId(upPointerIndex);
+            final int listIndex = mPointerIdList.indexOf((Integer)upPointerId);
 
-            mPointerIdList.remove((Integer)upPointerId);
-            if (mMainPointerId == upPointerId) {
-                if (mPointerIdList.isEmpty()) {
-                    mMainPointerId = -1;
-                } else {
-                    mMainPointerId = mPointerIdList.get(0);
+            if (listIndex >= 0) {
+                mPointerIdList.remove(listIndex);
+
+                // If the controlling pointer changed, reset the previous event data
+                if (listIndex == 0) {
+                    final int mainPointerIndex = getMainPointerIndex(event);
+                    if (mainPointerIndex >= 0) {
+                        setPreviousEventData(event, mainPointerIndex);
+                    }
                 }
+
+                mSubListener.onTouch(view, event);
             }
             break;
         case MotionEvent.ACTION_UP:
-            mPointerIdList.clear();
-            mMainPointerId = -1;
+            if (!mPointerIdList.isEmpty()) {
+                mPointerIdList.clear();
+
+                mSubListener.onTouch(view, event);
+            }
+            break;
+        case MotionEvent.ACTION_MOVE:
+            if (!mPointerIdList.isEmpty()) {
+                mSubListener.onTouch(view, event);
+
+                final int mainPointerIndex = getMainPointerIndex(event);
+                if (mainPointerIndex >= 0) {
+                    setPreviousEventData(event, mainPointerIndex);
+                }
+            }
             break;
         }
-
-        mSubListener.onTouch(view, event);
-
-        final int mainPointerIndex = getMainPointerIndex(event);
-        if (mainPointerIndex >= 0) {
-            event.getPointerCoords(mainPointerIndex, mPreviousPoint);
-        }
-        mPreviousEventTime = event.getEventTime();
 
         return true;
     }
@@ -521,13 +545,13 @@ public class MouseTouchListener implements OnTouchListener {
                     } else {
                         changeSubListener(mPointerSubListener, event);
                     }
-                } else if (event.getPointerCount() == 2) {
+                } else if (mPointerIdList.size() == 2) {
                     if (V) Log.v(TAG, String.format("two finger gesture detected (%d)", direction));
 
                     if (onTouchpadGesture(TouchpadView.GESTURE_2FINGER, direction)) {
                         mWasHandled = true;
                     }
-                } else if (event.getPointerCount() == 3) {
+                } else if (mPointerIdList.size() == 3) {
                     if (V) Log.v(TAG, String.format("three finger gesture detected (%d)", direction));
 
                     if (onTouchpadGesture(TouchpadView.GESTURE_3FINGER, direction)) {
@@ -572,7 +596,10 @@ public class MouseTouchListener implements OnTouchListener {
              @Override
              public void run() {
                  if (mView.isShown() && isActive()) {
-                     mHidMouse.clickButton(convertPointerCountToButtonMask(mMaxTouchPoints));
+                     final int buttonMask = convertPointerCountToButtonMask(mMaxTouchPoints);
+                     if (!mHidMouse.isButtonPressed(buttonMask)) {
+                         mHidMouse.clickButton(buttonMask);
+                     }
                  }
                  changeSubListener(mIdleSubListener, null);
              }
@@ -581,7 +608,7 @@ public class MouseTouchListener implements OnTouchListener {
 
         @Override
         protected void resetMembers() {
-            mMaxTouchPoints = 0;
+            mMaxTouchPoints = 1;
             mTapCount = 0;
         }
 
@@ -589,8 +616,8 @@ public class MouseTouchListener implements OnTouchListener {
         public boolean onTouch(View view, MotionEvent event) {
             stopDeferredClick();
 
-            if (mMaxTouchPoints < event.getPointerCount()) {
-                mMaxTouchPoints = event.getPointerCount();
+            if (mMaxTouchPoints < mPointerIdList.size()) {
+                mMaxTouchPoints = mPointerIdList.size();
             }
 
             return super.onTouch(view, event);
@@ -639,7 +666,7 @@ public class MouseTouchListener implements OnTouchListener {
          * Checks if the touch event is a valid tap action.
          */
         private boolean isTap(MotionEvent event) {
-            if ((event.getEventTime() - event.getDownTime()) > MAX_TAP_TOUCH_TIME) {
+            if ((event.getEventTime() - mFirstEventTime) > MAX_TAP_TOUCH_TIME) {
                 if (V) Log.v(TAG, "tap limit exceeded (Time)");
                 return false;
             }
@@ -649,7 +676,7 @@ public class MouseTouchListener implements OnTouchListener {
                 final float deltaX = mFirstPoint.x - event.getX(pointerIndex);
                 final float deltaY = mFirstPoint.y - event.getY(pointerIndex);
                 float maxDistanceSquare;
-                if (event.getPointerCount() > 1) {
+                if (mPointerIdList.size() > 1) {
                     maxDistanceSquare = mMaxMultitouchTapDistanceSquare;
                 } else {
                     maxDistanceSquare = mMaxTapDistanceSquare;
@@ -674,10 +701,11 @@ public class MouseTouchListener implements OnTouchListener {
 
         private void executeDoubleClick() {
             if (mHidMouse != null) {
-                int buttonMask = convertPointerCountToButtonMask(mMaxTouchPoints);
-
-                mHidMouse.clickButton(buttonMask);
-                mHidMouse.clickButton(buttonMask);
+                final int buttonMask = convertPointerCountToButtonMask(mMaxTouchPoints);
+                if (!mHidMouse.isButtonPressed(buttonMask)) {
+                    mHidMouse.clickButton(buttonMask);
+                    mHidMouse.clickButton(buttonMask);
+                }
             }
         }
     }
@@ -772,9 +800,10 @@ public class MouseTouchListener implements OnTouchListener {
             if ((mHidMouse != null) && (dragButton != mDragButton)) {
                 if (mDragButton > 0) {
                     mHidMouse.releaseButton(mDragButton);
+                    mDragButton = 0;
                 }
-                mDragButton = dragButton;
-                if (mDragButton > 0) {
+                if ((dragButton > 0) && !mHidMouse.isButtonPressed(dragButton)) {
+                    mDragButton = dragButton;
                     mHidMouse.pressButton(mDragButton);
                 }
             }

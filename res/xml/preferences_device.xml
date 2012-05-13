@@ -3,7 +3,6 @@
     <org.ronsdev.bluectrl.widget.SummaryListPreference
         android:key="keymap"
         android:title="@string/pref_keymap"
-        android:dialogTitle="@string/pref_keymap"
         android:entries="@array/keymap_names"
         android:entryValues="@array/keymap_values"
         android:summary="%s"
@@ -13,6 +12,13 @@
         android:title="@string/pref_mouse_sensitivity"
         android:max="8"
         android:summary="%.1f"
+        android:persistent="false" />
+    <org.ronsdev.bluectrl.widget.SummaryListPreference
+        android:key="touchpad_buttons"
+        android:title="@string/pref_touchpad_buttons"
+        android:entries="@array/pref_touchpad_buttons_names"
+        android:entryValues="@array/pref_touchpad_buttons_values"
+        android:summary="%s"
         android:persistent="false" />
     <CheckBoxPreference android:key="invert_scroll"
                         android:title="@string/pref_invert_scroll"

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_touchpad_buttons_values">
+        <item>show</item>
+        <item>show_portrait</item>
+        <item>hide</item>
+    </array>
+    <array name="pref_touchpad_buttons_names">
+        <item>@string/pref_touchpad_buttons_show</item>
+        <item>@string/pref_touchpad_buttons_show_portrait</item>
+        <item>@string/pref_touchpad_buttons_hide</item>
+    </array>
+</resources>

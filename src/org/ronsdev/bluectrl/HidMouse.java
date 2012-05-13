@@ -87,6 +87,10 @@ public class HidMouse {
         return mPressedButtons;
     }
 
+    public boolean isButtonPressed(int button) {
+        return ((button & mPressedButtons) > 0);
+    }
+
     public void pressButton(int button) {
         final int newButtons = mPressedButtons | button;
         if (mPressedButtons != newButtons) {

@@ -29,14 +29,20 @@ import java.util.Locale;
  */
 public class DeviceSettings {
 
-    private static final String PREF_KEY_KEYMAP = "keymap";
-    private static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
-    private static final String PREF_KEY_SCROLL_SENSITIVITY = "scroll_sensitivity";
-    private static final String PREF_KEY_INVERT_SCROLL = "invert_scroll";
-    private static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
-    private static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
+    public static final String PREF_KEY_KEYMAP = "keymap";
+    public static final String PREF_KEY_TOUCHPAD_BUTTONS = "touchpad_buttons";
+    public static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
+    public static final String PREF_KEY_SCROLL_SENSITIVITY = "scroll_sensitivity";
+    public static final String PREF_KEY_INVERT_SCROLL = "invert_scroll";
+    public static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
+    public static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
+
+    public static final String TOUCHPAD_BUTTONS_SHOW = "show";
+    public static final String TOUCHPAD_BUTTONS_SHOW_PORTRAIT = "show_portrait";
+    public static final String TOUCHPAD_BUTTONS_HIDE = "hide";
 
     public static final String DEFAULT_KEYMAP = "en_US";
+    public static final String DEFAULT_TOUCHPAD_BUTTONS = TOUCHPAD_BUTTONS_SHOW_PORTRAIT;
     public static final float DEFAULT_MOUSE_SENSITIVITY = 3f;
     public static final float DEFAULT_SCROLL_SENSITIVITY = 2.5f;
     public static final boolean DEFAULT_INVERT_SCROLL = false;
@@ -52,6 +58,7 @@ public class DeviceSettings {
     private String mDeviceId;
 
     private String mKeyMap;
+    private String mTouchpadButtons;
     private float mMouseSensitivity;
     private float mScrollSensitivity;
     private boolean mInvertScroll;
@@ -120,6 +127,8 @@ public class DeviceSettings {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
 
         mKeyMap = preferences.getString(getKey(PREF_KEY_KEYMAP), sDefaultKeyMap);
+        mTouchpadButtons = preferences.getString(getKey(PREF_KEY_TOUCHPAD_BUTTONS),
+                DEFAULT_TOUCHPAD_BUTTONS);
         mMouseSensitivity = preferences.getFloat(getKey(PREF_KEY_MOUSE_SENSITIVITY),
                 DEFAULT_MOUSE_SENSITIVITY);
         mScrollSensitivity = preferences.getFloat(getKey(PREF_KEY_SCROLL_SENSITIVITY),
@@ -140,6 +149,9 @@ public class DeviceSettings {
 
         if (!mKeyMap.equals(oldSettings.mKeyMap)) {
             editor.putString(getKey(PREF_KEY_KEYMAP), mKeyMap);
+        }
+        if (!mTouchpadButtons.equals(oldSettings.mTouchpadButtons)) {
+            editor.putString(getKey(PREF_KEY_TOUCHPAD_BUTTONS), mTouchpadButtons);
         }
         if (mMouseSensitivity != oldSettings.mMouseSensitivity) {
             editor.putFloat(getKey(PREF_KEY_MOUSE_SENSITIVITY), mMouseSensitivity);
@@ -165,6 +177,7 @@ public class DeviceSettings {
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.remove(getKey(PREF_KEY_KEYMAP));
+        editor.remove(getKey(PREF_KEY_TOUCHPAD_BUTTONS));
         editor.remove(getKey(PREF_KEY_MOUSE_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_SCROLL_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_INVERT_SCROLL));
@@ -182,6 +195,13 @@ public class DeviceSettings {
     }
     public void setKeyMap(String value) {
         mKeyMap = value;
+    }
+
+    public String getTouchpadButtons() {
+        return mTouchpadButtons;
+    }
+    public void setTouchpadButtons(String value) {
+        mTouchpadButtons = value;
     }
 
     public float getMouseSensitivity() {
