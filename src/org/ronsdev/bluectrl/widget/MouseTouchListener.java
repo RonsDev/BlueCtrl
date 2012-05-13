@@ -524,6 +524,10 @@ public class MouseTouchListener implements OnTouchListener {
                 return;
             }
 
+            if (mPointerIdList.size() > 1) {
+                mEdgeGestureType = 0;
+            }
+
             final float deltaX = mFirstPoint.x - event.getX(pointerIndex);
             final float deltaY = mFirstPoint.y - event.getY(pointerIndex);
             float maxDistanceSquare;
