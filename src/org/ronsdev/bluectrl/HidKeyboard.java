@@ -20,8 +20,6 @@ import org.ronsdev.bluectrl.daemon.DaemonService;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-
 /**
  * Virtual Keyboard that sends HID Keyboard Reports to the application daemon.
  */
@@ -81,20 +79,18 @@ public class HidKeyboard {
     private int mPressedModifier = 0;
     private int mPressedHardwareKeys = 0;
     private int mPressedMediaKeys = 0;
-    private ArrayList<Integer> mPressedKeys;
+    private IntArrayList mPressedKeys = new IntArrayList(6);
 
 
     public HidKeyboard(DaemonService daemon) {
         mDaemon = daemon;
-
-        mPressedKeys = new ArrayList<Integer>(6);
     }
 
 
     private int[] getPressedKeysArray() {
         int result[] = new int[mPressedKeys.size()];
         for (int i=0; i < mPressedKeys.size(); i++) {
-            result[i] = mPressedKeys.get(i);
+            result[i] = mPressedKeys.getValue(i);
         }
         return result;
     }
@@ -127,8 +123,8 @@ public class HidKeyboard {
     }
 
     public void pressKey(int hidKeyCode) {
-        if (!mPressedKeys.contains((Integer)hidKeyCode)) {
-            mPressedKeys.add((Integer)hidKeyCode);
+        if (!mPressedKeys.containsValue(hidKeyCode)) {
+            mPressedKeys.addValue(hidKeyCode);
 
             mDaemon.sendKeyboardReport(mPressedModifier, getPressedKeysArray());
 
@@ -137,8 +133,8 @@ public class HidKeyboard {
     }
 
     public void releaseKey(int hidKeyCode) {
-        if (mPressedKeys.contains((Integer)hidKeyCode)) {
-            mPressedKeys.remove((Integer)hidKeyCode);
+        if (mPressedKeys.containsValue(hidKeyCode)) {
+            mPressedKeys.removeValue(hidKeyCode);
 
             mDaemon.sendKeyboardReport(mPressedModifier, getPressedKeysArray());
 

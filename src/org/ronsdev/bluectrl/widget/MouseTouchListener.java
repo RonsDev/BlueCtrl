@@ -18,14 +18,13 @@ package org.ronsdev.bluectrl.widget;
 
 import org.ronsdev.bluectrl.DeviceSettings;
 import org.ronsdev.bluectrl.HidMouse;
+import org.ronsdev.bluectrl.IntArrayList;
 
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MotionEvent.PointerCoords;
 import android.view.View.OnTouchListener;
-
-import java.util.ArrayList;
 
 /**
  * Touch event listener that controls a HID Mouse.
@@ -135,7 +134,7 @@ public class MouseTouchListener implements OnTouchListener {
     private SubListener mSubListener;
 
     /** A list with the currently tracked pointer IDs. */
-    private ArrayList<Integer> mPointerIdList = new ArrayList<Integer>(10);
+    private IntArrayList mPointerIdList = new IntArrayList(10);
 
     /** The touched point from the first touch down event. */
     private PointerCoords mFirstPoint = new PointerCoords();
@@ -313,7 +312,7 @@ public class MouseTouchListener implements OnTouchListener {
         if (mPointerIdList.isEmpty()) {
             return -1;
         } else {
-            return event.findPointerIndex(mPointerIdList.get(0));
+            return event.findPointerIndex(mPointerIdList.getValue(0));
         }
     }
 
@@ -357,8 +356,8 @@ public class MouseTouchListener implements OnTouchListener {
                 setFirstEventData(event, downPointerIndex);
                 setPreviousEventData(event, downPointerIndex);
             }
-            if (!mPointerIdList.contains((Integer)downPointerId)) {
-                mPointerIdList.add(downPointerId);
+            if (!mPointerIdList.containsValue(downPointerId)) {
+                mPointerIdList.addValue(downPointerId);
             }
 
             mSubListener.onTouch(view, event);
@@ -366,7 +365,7 @@ public class MouseTouchListener implements OnTouchListener {
         case MotionEvent.ACTION_POINTER_UP:
             final int upPointerIndex = event.getActionIndex();
             final int upPointerId = event.getPointerId(upPointerIndex);
-            final int listIndex = mPointerIdList.indexOf((Integer)upPointerId);
+            final int listIndex = mPointerIdList.indexOfValue(upPointerId);
 
             if (listIndex >= 0) {
                 mPointerIdList.remove(listIndex);
