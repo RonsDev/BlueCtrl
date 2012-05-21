@@ -76,6 +76,12 @@ public class TouchpadView extends View
     /** Indicates that the vertical scroll mode is active. */
     public static final int SCROLL_MODE_VERTICAL = 10;
 
+    /** Indicates that the horizontal scroll mode is active. */
+    public static final int SCROLL_MODE_HORIZONTAL = 20;
+
+    /** Indicates that the vertical and horizontal scroll mode is active. */
+    public static final int SCROLL_MODE_ALL = 30;
+
 
     private static final int BG_DOT_COLOR = Color.rgb(80, 84, 89);
     private static final int BG_DOT_DIAMETER_DP = 2;
@@ -95,7 +101,9 @@ public class TouchpadView extends View
     private Paint mBackgroundPaint = new Paint();
 
     private Drawable mButtonDrawable = null;
-    private Drawable mScrollDrawable = null;
+    private Drawable mScrollVerticalDrawable = null;
+    private Drawable mScrollHorizontalDrawable = null;
+    private Drawable mScrollAllDrawable = null;
 
     private MouseTouchListener mMouseTouchListener = null;
 
@@ -156,7 +164,9 @@ public class TouchpadView extends View
         final Resources res = getResources();
 
         mButtonDrawable = res.getDrawable(R.drawable.btn_touchpad);
-        mScrollDrawable = res.getDrawable(R.drawable.scroll);
+        mScrollVerticalDrawable = res.getDrawable(R.drawable.scroll_vertical);
+        mScrollHorizontalDrawable = res.getDrawable(R.drawable.scroll_horizontal);
+        mScrollAllDrawable = res.getDrawable(R.drawable.scroll_all);
 
         mDisplayDensity = res.getDisplayMetrics().density;
 
@@ -296,7 +306,7 @@ public class TouchpadView extends View
             switch (direction) {
             case TouchpadView.GESTURE_DIRECTION_UP:
             case TouchpadView.GESTURE_DIRECTION_DOWN:
-                mMouseTouchListener.activateScrollMode();
+                mMouseTouchListener.activateScrollMode(SCROLL_MODE_VERTICAL);
                 return true;
             }
             break;
@@ -304,7 +314,7 @@ public class TouchpadView extends View
             switch (direction) {
             case TouchpadView.GESTURE_DIRECTION_UP:
             case TouchpadView.GESTURE_DIRECTION_DOWN:
-                mMouseTouchListener.activateScrollMode();
+                mMouseTouchListener.activateScrollMode(SCROLL_MODE_VERTICAL);
                 return true;
             case TouchpadView.GESTURE_DIRECTION_LEFT:
                 if (mHidMouse != null) {
@@ -432,14 +442,23 @@ public class TouchpadView extends View
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        drawBackgroundDots(canvas);
+        switch (mMouseTouchListener.getScrollMode()) {
+        case SCROLL_MODE_VERTICAL:
+            drawInfoDrawable(canvas, mScrollVerticalDrawable);
+            break;
+        case SCROLL_MODE_HORIZONTAL:
+            drawInfoDrawable(canvas, mScrollHorizontalDrawable);
+            break;
+        case SCROLL_MODE_ALL:
+            drawInfoDrawable(canvas, mScrollAllDrawable);
+            break;
+        default:
+            drawBackgroundDots(canvas);
+            break;
+        }
 
         if (mShowButtons) {
             drawButtons(canvas);
-        }
-
-        if (mMouseTouchListener.getScrollMode() != SCROLL_MODE_NONE) {
-            drawInfoDrawable(canvas, mScrollDrawable);
         }
     }
 
@@ -468,10 +487,23 @@ public class TouchpadView extends View
     }
 
     private void drawInfoDrawable(Canvas canvas, Drawable drawable) {
-        final int drawableWidth = drawable.getIntrinsicWidth();
-        final int drawableHeight = drawable.getIntrinsicHeight();
-        final int left = (getTouchpadAreaWidth() / 2) - (drawableWidth / 2);
-        final int top = (getTouchpadAreaHeight() / 2) - (drawableHeight / 2);
+        final int touchpadWidth = getTouchpadAreaWidth();
+        final int touchpadHeight = getTouchpadAreaHeight();
+
+        int drawableWidth = drawable.getIntrinsicWidth();
+        int drawableHeight = drawable.getIntrinsicHeight();
+        if ((drawableWidth > touchpadWidth) || (drawableHeight > touchpadHeight)) {
+            if (touchpadWidth < touchpadHeight) {
+                drawableWidth = touchpadWidth;
+                drawableHeight = touchpadWidth;
+            } else {
+                drawableWidth = touchpadHeight;
+                drawableHeight = touchpadHeight;
+            }
+        }
+
+        final int left = (touchpadWidth / 2) - (drawableWidth / 2);
+        final int top = (touchpadHeight / 2) - (drawableHeight / 2);
 
         drawable.setBounds(left, top, left + drawableWidth, top + drawableHeight);
         drawable.draw(canvas);

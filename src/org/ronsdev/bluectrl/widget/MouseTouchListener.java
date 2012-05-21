@@ -88,6 +88,9 @@ public class MouseTouchListener implements OnTouchListener {
     /** Intermediate step count of the Smooth Scroll feature. */
     private static final int SMOOTH_SCROLL_STEPS = 16;
 
+    /** Minimum touch move distance per millisecond that is required to change the scroll mode. */
+    private static final float CHANGE_SCROLL_MODE_THRESHOLD_DP = 0.3f;
+
 
     /** Repeat time (in ms) for the fling scroll loop. */
     private static final int FLING_SCROLL_LOOP_TIME = 100;
@@ -121,8 +124,9 @@ public class MouseTouchListener implements OnTouchListener {
     private final float mMaxTapDistanceSquare;
     private final float mMaxMultitouchTapDistanceSquare;
     private final float mMaxTouchEndPredictDistanceSquare;
-    private final float mFlingScrollTreshold;
-    private final float mFlingScrollStopTreshold;
+    private final float mChangeScrollModeThreshold;
+    private final float mFlingScrollThreshold;
+    private final float mFlingScrollStopThreshold;
 
     private IdleSubListener mIdleSubListener = new IdleSubListener();
     private GestureSubListener mGestureSubListener = new GestureSubListener();
@@ -184,8 +188,9 @@ public class MouseTouchListener implements OnTouchListener {
         final float touchEndDistance = (MAX_TOUCH_END_PREDICT_DISTANCE_DP * mDisplayDensity);
         mMaxTouchEndPredictDistanceSquare = touchEndDistance * touchEndDistance;
 
-        mFlingScrollTreshold = FLING_SCROLL_THRESHOLD_DP * mDisplayDensity;
-        mFlingScrollStopTreshold = FLING_SCROLL_STOP_THRESHOLD_DP * mDisplayDensity;
+        mChangeScrollModeThreshold = CHANGE_SCROLL_MODE_THRESHOLD_DP * mDisplayDensity;
+        mFlingScrollThreshold = FLING_SCROLL_THRESHOLD_DP * mDisplayDensity;
+        mFlingScrollStopThreshold = FLING_SCROLL_STOP_THRESHOLD_DP * mDisplayDensity;
     }
 
 
@@ -274,8 +279,9 @@ public class MouseTouchListener implements OnTouchListener {
             return TouchpadView.SCROLL_MODE_NONE;
         }
     }
-    public void activateScrollMode() {
+    public void activateScrollMode(int scrollMode) {
         changeSubListener(mScrollSubListener, null);
+        mScrollSubListener.setScrollMode(scrollMode);
     }
 
     /**
@@ -902,8 +908,14 @@ public class MouseTouchListener implements OnTouchListener {
         /** Stores the next movement on the Y-axis. */
         private float mMoveY;
 
+        /** Stores the next movement on the X-axis. */
+        private float mMoveX;
+
         /** The current fling scroll movement on the Y-axis. */
         private float mFlingScrollMoveY;
+
+        /** The current fling scroll movement on the X-axis. */
+        private float mFlingScrollMoveX;
 
 
         private final Runnable mFlingScrollRunnable = new Runnable()
@@ -911,10 +923,11 @@ public class MouseTouchListener implements OnTouchListener {
              @Override
              public void run() {
                  if (mView.isShown() && isActive() &&
-                         (Math.abs(mFlingScrollMoveY) > mFlingScrollStopTreshold)) {
+                         checkFlingScrollMoveThreshold(mFlingScrollStopThreshold)) {
                      mFlingScrollMoveY -= mFlingScrollMoveY * FLING_SCROLL_FRICTION;
+                     mFlingScrollMoveX -= mFlingScrollMoveX * FLING_SCROLL_FRICTION;
 
-                     scrollWheel(mFlingScrollMoveY);
+                     scrollWheel(mFlingScrollMoveY, mFlingScrollMoveX);
 
                      mView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
                  } else {
@@ -927,8 +940,14 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void resetMembers() {
             mScrollMode = TouchpadView.SCROLL_MODE_VERTICAL;
+            resetMoveValues();
+        }
+
+        private void resetMoveValues() {
             mMoveY = 0.0f;
+            mMoveX = 0.0f;
             mFlingScrollMoveY = 0.0f;
+            mFlingScrollMoveX = 0.0f;
         }
 
         @Override
@@ -955,14 +974,14 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void onTouchPointerDown(View view, MotionEvent event) {
             if (mPointerIdList.size() == 1) {
-                resetMembers();
+                resetMoveValues();
             }
         }
 
         @Override
         protected void onTouchPointerUp(View view, MotionEvent event) {
             if (mPointerIdList.isEmpty()) {
-                if (mFlingScroll && (Math.abs(mFlingScrollMoveY) > mFlingScrollTreshold)) {
+                if (mFlingScroll && checkFlingScrollMoveThreshold(mFlingScrollThreshold)) {
                     startFlingScroll();
                 } else {
                     changeSubListener(mIdleSubListener, event);
@@ -978,56 +997,120 @@ public class MouseTouchListener implements OnTouchListener {
             }
 
             final float deltaY = event.getY(pointerIndex) - mPreviousPoint.y;
+            final float deltaYPerMs = getDeltaPerMs(event, deltaY);
+            final float deltaX = event.getX(pointerIndex) - mPreviousPoint.x;
+            final float deltaXPerMs = getDeltaPerMs(event, deltaX);
 
-            scrollWheel(deltaY);
-            calcFlingScrollMoveValues(event, deltaY);
+            reconsiderScrollMode(deltaYPerMs, deltaXPerMs);
+
+            mFlingScrollMoveY = deltaYPerMs * FLING_SCROLL_LOOP_TIME;
+            mFlingScrollMoveX = deltaXPerMs * FLING_SCROLL_LOOP_TIME;
+
+            scrollWheel(deltaY, deltaX);
         }
 
         public int getScrollMode() {
             return mScrollMode;
         }
-
-        /** Converts the touch move value to the HID Report scroll value. */
-        private int convertTouchDeltaValue(float value, boolean smooth) {
-            float sensitivity = smooth ? mSmoothScrollSensitivity : mStepScrollSensitivity;
-            if (!mInvertScroll) {
-                sensitivity = sensitivity * -1;
+        public void setScrollMode(int value) {
+            if (value != mScrollMode) {
+                final int oldMode = mScrollMode;
+                mScrollMode = value;
+                onScrollModeChanged(mScrollMode, oldMode);
             }
-            return (int)(value / mDisplayDensity * sensitivity);
         }
 
-        /** Converts the HID Report scroll value to the touch move value. */
-        private float convertReportDeltaValue(int value, boolean smooth) {
-            float sensitivity = smooth ? mSmoothScrollSensitivity : mStepScrollSensitivity;
-            if (!mInvertScroll) {
-                sensitivity = sensitivity * -1;
+        private void reconsiderScrollMode(float deltaYPerMs, float deltaXPerMs) {
+            switch (mScrollMode) {
+            case TouchpadView.SCROLL_MODE_VERTICAL:
+                if ((Math.abs(deltaXPerMs) > mChangeScrollModeThreshold) &&
+                        (Math.abs(deltaXPerMs) > Math.abs(deltaYPerMs * 2))) {
+                    setScrollMode(TouchpadView.SCROLL_MODE_ALL);
+                }
+                break;
+            case TouchpadView.SCROLL_MODE_HORIZONTAL:
+                if ((Math.abs(deltaYPerMs) > mChangeScrollModeThreshold) &&
+                        (Math.abs(deltaYPerMs) > Math.abs(deltaXPerMs * 2))) {
+                    setScrollMode(TouchpadView.SCROLL_MODE_ALL);
+                }
+                break;
             }
-            return (value * mDisplayDensity / sensitivity);
         }
 
-        private void scrollWheel(float deltaY) {
-            mMoveY += deltaY;
+        private boolean isVerticalScrollActive() {
+            return ((mScrollMode == TouchpadView.SCROLL_MODE_VERTICAL) ||
+                    (mScrollMode == TouchpadView.SCROLL_MODE_ALL));
+        }
+
+        private boolean isHorizontalScrollActive() {
+            return ((mScrollMode == TouchpadView.SCROLL_MODE_HORIZONTAL) ||
+                    (mScrollMode == TouchpadView.SCROLL_MODE_ALL));
+        }
+
+        /** Gets a movement delta per millisecond value. */
+        private float getDeltaPerMs(MotionEvent event, float deltaValue) {
+            if (mPreviousEventTime > 0) {
+                final long timespan = event.getEventTime() - mPreviousEventTime;
+                if (timespan > 0) {
+                    return deltaValue / timespan;
+                }
+            }
+            return 0.0f;
+        }
+
+        private float getSensitivity(boolean smooth) {
+            if (smooth) {
+                return mSmoothScrollSensitivity;
+            } else {
+                return mStepScrollSensitivity;
+            }
+        }
+
+        /** Converts the Y-axis touch move value to the HID Report scroll value. */
+        private int convertTouchDeltaValueY(float value, boolean smooth) {
+            return -convertTouchDeltaValueX(value, smooth);
+        }
+
+        /** Converts the Y-axis HID Report scroll value to the touch move value. */
+        private float convertReportDeltaValueY(int value, boolean smooth) {
+            return -convertReportDeltaValueX(value, smooth);
+        }
+
+        /** Converts the X-axis touch move value to the HID Report scroll value. */
+        private int convertTouchDeltaValueX(float value, boolean smooth) {
+            final int result = (int)(value / mDisplayDensity * getSensitivity(smooth));
+            return (mInvertScroll ? -result : result);
+        }
+
+        /** Converts the X-axis HID Report scroll value to the touch move value. */
+        private float convertReportDeltaValueX(int value, boolean smooth) {
+            final float result = (value * mDisplayDensity / getSensitivity(smooth));
+            return (mInvertScroll ? -result : result);
+        }
+
+        private void scrollWheel(float deltaY, float deltaX) {
+            mMoveY = (isVerticalScrollActive() ? mMoveY + deltaY : 0.0f);
+            mMoveX = (isHorizontalScrollActive() ? mMoveX + deltaX : 0.0f);
 
             if (mHidMouse != null) {
                 final boolean smoothY = mHidMouse.isSmoothScrollYOn();
-                final int scrollMoveY = convertTouchDeltaValue(mMoveY, smoothY);
-                if (scrollMoveY != 0) {
-                    mHidMouse.scrollWheel(scrollMoveY, 0);
+                final boolean smoothX = mHidMouse.isSmoothScrollXOn();
+                final int reportMoveY = convertTouchDeltaValueY(mMoveY, smoothY);
+                final int reportMoveX = convertTouchDeltaValueX(mMoveX, smoothX);
+                if ((reportMoveY != 0) || (reportMoveX != 0)) {
+                    mHidMouse.scrollWheel(reportMoveY, reportMoveX);
 
                     // Subtract only the actually moved value
-                    mMoveY -= convertReportDeltaValue(scrollMoveY, smoothY);
+                    mMoveY -= convertReportDeltaValueY(reportMoveY, smoothY);
+                    mMoveX -= convertReportDeltaValueX(reportMoveX, smoothX);
                 }
             }
         }
 
-        /** Calculates the move values for the fling scroll loop. */
-        private void calcFlingScrollMoveValues(MotionEvent event, float deltaY) {
-            if (mPreviousEventTime > 0) {
-                final long timespan = event.getEventTime() - mPreviousEventTime;
-                mFlingScrollMoveY = deltaY / timespan * FLING_SCROLL_LOOP_TIME;
-            } else {
-                mFlingScrollMoveY = 0;
-            }
+        /** Returns true if one of the fling scroll move values is bigger than the threshold. */
+        private boolean checkFlingScrollMoveThreshold(float threshold) {
+            return ((isVerticalScrollActive() && (Math.abs(mFlingScrollMoveY) > threshold)) ||
+                    (isHorizontalScrollActive() && (Math.abs(mFlingScrollMoveX) > threshold)));
         }
 
         private void startFlingScroll() {
