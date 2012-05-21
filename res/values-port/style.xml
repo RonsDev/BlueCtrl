@@ -13,7 +13,7 @@
     <style name="info_block_wait" parent="@android:style/Widget.ProgressBar.Large">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_margin">8dp</item>
     </style>
     <style name="info_block_image">
         <item name="android:layout_width">wrap_content</item>
@@ -36,8 +36,10 @@
     <style name="info_block_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">5dp</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:maxWidth">320dp</item>
+    </style>
+    <style name="info_block_text.reconnect">
+        <item name="android:layout_marginTop">5dp</item>
     </style>
 </resources>
