@@ -175,7 +175,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                     Message msg = mHandler.obtainMessage();
                     msg.arg1 = position;
                     mHandler.sendMessage(msg);
-            }
+                }
             }
 
             Message msg = mHandler.obtainMessage();
