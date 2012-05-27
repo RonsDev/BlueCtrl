@@ -67,7 +67,7 @@
 
     <string name="error_root_required">Root permissions required</string>
     <string name="error_bluetooth_required">Bluetooth required</string>
-    <string name="error_daemon_unavailable">Daemon unavailable</string>
+    <string name="error_incompatible">Your Android version isn’t compatible with this app.</string>
     <string name="error_critical">The application encountered a problem and cannot continue (Error %1$d).</string>
 
     <string name="help_mouse_control">Mouse Control</string>

@@ -64,8 +64,8 @@ public class MainActivity extends DaemonListActivity
     private static final int DIALOG_ABOUT = 1;
     private static final int DIALOG_CRITICAL_ERROR = 2;
 
-    private static final String DIALOG_ARG_ERROR_CODE =
-            "org.ronsdev.bluectrl.dialog_arg.ERROR_CODE";
+    private static final String DIALOG_ARG_ERROR_MSG =
+            "org.ronsdev.bluectrl.dialog_arg.ERROR_MSG";
 
 
     private static final String SAVED_STATE_WAS_ENABLE_BT_ASKED = "WasEnableBtAsked";
@@ -160,7 +160,7 @@ public class MainActivity extends DaemonListActivity
         case DIALOG_ABOUT:
             return createAboutDialog();
         case DIALOG_CRITICAL_ERROR:
-            return createCriticalErrorDialog(args.getInt(DIALOG_ARG_ERROR_CODE));
+            return createCriticalErrorDialog(args.getString(DIALOG_ARG_ERROR_MSG));
         default:
             return null;
         }
@@ -240,15 +240,22 @@ public class MainActivity extends DaemonListActivity
     @Override
     protected void onDaemonUnavailable(int errorCode) {
         if (errorCode != 0) {
-            Bundle args = new Bundle();
-            args.putInt(DIALOG_ARG_ERROR_CODE, errorCode);
+            Bundle args;
 
             switch (errorCode) {
             case DaemonService.ERROR_ROOT_REQUIRED:
             case DaemonService.ERROR_BT_REQUIRED:
                 // Do nothing at non critical errors
                 break;
+            case DaemonService.ERROR_INCOMPATIBLE:
+                args = new Bundle();
+                args.putString(DIALOG_ARG_ERROR_MSG, getString(R.string.error_incompatible));
+                showDialog(DIALOG_CRITICAL_ERROR, args);
+                break;
             default:
+                args = new Bundle();
+                args.putString(DIALOG_ARG_ERROR_MSG,
+                        getString(R.string.error_critical, errorCode));
                 showDialog(DIALOG_CRITICAL_ERROR, args);
                 break;
             }
@@ -346,10 +353,10 @@ public class MainActivity extends DaemonListActivity
             .create();
     }
 
-    private Dialog createCriticalErrorDialog(int errorCode) {
+    private Dialog createCriticalErrorDialog(String errorMsg) {
         return new AlertDialog.Builder(this)
             .setCancelable(false)
-            .setMessage(getString(R.string.error_critical, errorCode))
+            .setMessage(errorMsg)
             .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     MainActivity.this.finish();
@@ -370,10 +377,10 @@ public class MainActivity extends DaemonListActivity
             }
         }
 
-        if (!isDaemonAvailable()) {
-            return getString(R.string.error_daemon_unavailable);
-        } else {
+        if (isDaemonAvailable()) {
             return getString(R.string.device_list_empty);
+        } else {
+            return "";
         }
     }
 

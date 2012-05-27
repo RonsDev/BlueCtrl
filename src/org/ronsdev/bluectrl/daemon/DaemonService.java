@@ -150,6 +150,8 @@ public class DaemonService extends Service {
     public static final int ERROR_START = -130;
     /** IPC communication error */
     public static final int ERROR_IPC = -140;
+    /** Incompatible Android version */
+    public static final int ERROR_INCOMPATIBLE = -150;
 
 
     private static final String TAG = "DaemonService";
@@ -521,7 +523,16 @@ public class DaemonService extends Service {
         if ((suResult == 1) || (suResult == 255)) {
             return ERROR_ROOT_REQUIRED;
         } else if (suResult != 0) {
-            return (-suResult);
+            int errorCode = (-suResult);
+            switch (errorCode) {
+            case ERROR_NODEV:
+                // If Android reports that a Bluetooth device is enabled (the daemon wouldn't
+                // start otherwise) but the daemon can't access it, it is a sign of an
+                // incompatible Android version.
+                return ERROR_INCOMPATIBLE;
+            default:
+                return errorCode;
+            }
         } else {
             return 0;
         }
