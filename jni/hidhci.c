@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
@@ -295,4 +296,26 @@ int hidc_reset_device_class()
 	org_device_class = 0;
 
 	return 0;
+}
+
+void hidc_wait_for_empty_service_class(int timeout)
+{
+	int dd;
+	uint32_t cur_cls = 0;  /* current Device Class */
+	time_t timeout_end = time(NULL) + timeout;
+
+	log_d("start waiting for empty service class");
+
+	if ((dd = open_hci_dev()) < 0)
+		return;
+
+	get_device_class(dd, &cur_cls);
+	while (((cur_cls & 0x00fff000) != 0) && (time(NULL) <= timeout_end)) {
+		usleep(10 * 1000);
+		get_device_class(dd, &cur_cls);
+	}
+
+	close_hci_dev(dd);
+
+	log_d("stop waiting for empty service class");
 }

@@ -314,14 +314,19 @@ static const uint8_t hid_descriptor[] = {
 
 
 /*
- * The SDP connection.
+ * The SDP connection for the HID Service Record.
  */
-static sdp_session_t *sdp_con;
+static sdp_session_t *hidsdp_con = NULL;
 
 /*
  * The HID Service Record.
  */
-static sdp_record_t *hidsdp_rec;
+static sdp_record_t *hidsdp_rec = NULL;
+
+/*
+ * A list that contains the deactivated Service Records.
+ */
+static sdp_list_t *deactivated_services = NULL;
 
 
 /*
@@ -779,57 +784,69 @@ static sdp_record_t* create_hid_record()
 }
 
 /*
- * Open a connection to the local SDP.
+ * Get a list of all Service Records except for the HID Service Record.
+ *
+ * Parameters:
+ *     sdp_con: The SDP connection.
+ *     result_list: The resulting list.
  *
  * Returns:
  *     0 on success or a negative error code (defined in error.h) on failure.
  */
-static int sdp_con_open()
+static int get_other_services(sdp_session_t *sdp_con, sdp_list_t **result_list)
 {
 	int errsv;  /* saved errno */
+	uuid_t uuid;
+	uint32_t range;
+	sdp_list_t *search;
+	sdp_list_t *attrid_list;
+	sdp_list_t *seq;
+	sdp_list_t *next;
+	sdp_list_t *rec_list = NULL;
+	sdp_record_t *rec;
 
-	if (!sdp_con) {
-		sdp_con = sdp_connect(hidc_get_app_dev_bdaddr(), BDADDR_LOCAL, 0);
-		if (!sdp_con) {
-			errsv = errno;
-			log_ec(errsv, "Can't connect to the SDP");
-			return hidc_convert_errno(errsv);
-		}
+	sdp_uuid16_create(&uuid, PUBLIC_BROWSE_GROUP);
+	search = sdp_list_append(NULL, &uuid);
+
+	/* get all attributes */
+	range = 0x0000ffff;
+	attrid_list = sdp_list_append(NULL, &range);
+
+	if (sdp_service_search_attr_req(sdp_con,
+					search,
+					SDP_ATTR_REQ_RANGE,
+					attrid_list,
+					&seq) < 0) {
+		errsv = errno;
+		log_ec(errsv, "Can't find SDP Records");
+		return hidc_convert_errno(errsv);
 	}
 
-	return 0;
-}
+	sdp_list_free(search, NULL);
+	sdp_list_free(attrid_list, NULL);
 
-/*
- * Close the connection to the local SDP.
- *
- * Returns:
- *     0 on success or a negative error code (defined in error.h) on failure.
- */
-static int sdp_con_close()
-{
-	int errsv;  /* saved errno */
+	for (; seq; seq = next) {
+		rec = (sdp_record_t *)seq->data;
 
-	if (sdp_con) {
-		if(sdp_close(sdp_con) < 0) {
-			errsv = errno;
-			log_ec(errsv, "Can't close SDP connection");
-			return hidc_convert_errno(errsv);
+		if (!hidsdp_rec || (rec->handle != hidsdp_rec->handle)) {
+			rec_list = sdp_list_append(rec_list, rec);
+		} else {
+			sdp_record_free(rec);
 		}
 
-		/* sdp_con was freed inside sdp_close */
-		sdp_con = NULL;
+		next = seq->next;
+		free(seq);
 	}
 
+	*result_list = rec_list;
 	return 0;
 }
 
 int hidc_sdp_register()
 {
 	int errsv;  /* saved errno */
-	int ec;  /* error code */
 
-	if (sdp_con && hidsdp_rec)
+	if (hidsdp_con && hidsdp_rec)
 		return 0;
 
 	if (!hidsdp_rec) {
@@ -838,15 +855,25 @@ int hidc_sdp_register()
 			return HIDC_EC_UNKNOWN;
 	}
 
-	if ((ec = sdp_con_open()) < 0)
-		return ec;
+	hidsdp_con = sdp_connect(hidc_get_app_dev_bdaddr(),
+					BDADDR_LOCAL,
+					SDP_RETRY_IF_BUSY);
+	if (!hidsdp_con) {
+		errsv = errno;
+		log_ec(errsv, "Can't connect to the SDP");
+		return hidc_convert_errno(errsv);
+	}
 
-	if (sdp_record_register(sdp_con, hidsdp_rec, 0) < 0) {
+	if (sdp_device_record_register(hidsdp_con,
+					hidc_get_app_dev_bdaddr(),
+					hidsdp_rec,
+					0) < 0) {
 		errsv = errno;
 		log_ec(errsv, "Can't register SDP Record");
 		sdp_record_free(hidsdp_rec);
 		hidsdp_rec = NULL;
-		sdp_con_close();
+		sdp_close(hidsdp_con);
+		hidsdp_con = NULL;
 		return hidc_convert_errno(errsv);
 	}
 
@@ -856,10 +883,9 @@ int hidc_sdp_register()
 int hidc_sdp_unregister()
 {
 	int errsv;  /* saved errno */
-	int ec;  /* error code */
 
-	if (sdp_con && hidsdp_rec) {
-		if (sdp_record_unregister(sdp_con, hidsdp_rec) < 0) {
+	if (hidsdp_con && hidsdp_rec) {
+		if (sdp_record_unregister(hidsdp_con, hidsdp_rec) < 0) {
 			errsv = errno;
 			log_ec(errsv, "Can't unregister SDP Record");
 			return hidc_convert_errno(errsv);
@@ -869,8 +895,132 @@ int hidc_sdp_unregister()
 		hidsdp_rec = NULL;
 	}
 
-	if ((ec = sdp_con_close()) < 0)
-		return ec;
+	if (hidsdp_con) {
+		if(sdp_close(hidsdp_con) < 0) {
+			errsv = errno;
+			log_ec(errsv, "Can't close SDP connection");
+			return hidc_convert_errno(errsv);
+		}
+
+		/* hidsdp_con was freed inside sdp_close */
+		hidsdp_con = NULL;
+	}
 
 	return 0;
+}
+
+int hidc_deactivate_other_services()
+{
+	int errsv;  /* saved errno */
+	int ec;  /* error code */
+	sdp_session_t *sdp_con;  /* SDP connection */
+	sdp_list_t *seq;
+	sdp_list_t *next;
+	sdp_record_t *rec;
+
+	if (deactivated_services)
+		return 0;
+
+	sdp_con = sdp_connect(hidc_get_app_dev_bdaddr(),
+				BDADDR_LOCAL,
+				SDP_RETRY_IF_BUSY);
+	if (!sdp_con) {
+		errsv = errno;
+		log_ec(errsv, "Can't connect to the SDP");
+		return hidc_convert_errno(errsv);
+	}
+
+	if ((ec = get_other_services(sdp_con, &deactivated_services)) < 0) {
+		deactivated_services = NULL;
+		sdp_close(sdp_con);
+		return ec;
+	}
+
+	seq = deactivated_services;
+	for (; seq; seq = next) {
+		rec = (sdp_record_t *)seq->data;
+
+		log_d("Deactivate SDP Record (0x%x)", rec->handle);
+
+		if (sdp_device_record_unregister_binary(sdp_con,
+						hidc_get_app_dev_bdaddr(),
+						rec->handle) < 0) {
+			errsv = errno;
+			log_ec(errsv, "Can't unregister SDP Record");
+		}
+
+		next = seq->next;
+	}
+
+	if(sdp_close(sdp_con) < 0) {
+		errsv = errno;
+		log_ec(errsv, "Can't close SDP connection");
+		return hidc_convert_errno(errsv);
+	}
+
+	/*
+	 * The Service part of the Bluetooth adapter Class gets updated
+	 * asynchronously when the SDP Records are unregistered. This could
+	 * lead to a conflict if a method that changes the Device Class is
+	 * executed immediately after this method. Therefore wait until all
+	 * Services of the Bluetooth adapter Class are gone.
+	 */
+	hidc_wait_for_empty_service_class(1);
+
+	return 0;
+}
+
+int hidc_reactivate_other_services()
+{
+	int result = 0;
+	int errsv;  /* saved errno */
+	sdp_session_t *sdp_con;  /* SDP connection */
+	sdp_list_t *seq;
+	sdp_list_t *next;
+	sdp_record_t *rec;
+
+	if (!deactivated_services)
+		return 0;
+
+	sdp_con = sdp_connect(hidc_get_app_dev_bdaddr(),
+				BDADDR_LOCAL,
+				SDP_RETRY_IF_BUSY);
+	if (!sdp_con) {
+		errsv = errno;
+		log_ec(errsv, "Can't connect to the SDP");
+		return hidc_convert_errno(errsv);
+	}
+
+	seq = deactivated_services;
+	for (; seq; seq = next) {
+		rec = (sdp_record_t *)seq->data;
+
+		log_d("Reactivate SDP Record (0x%x)", rec->handle);
+
+		if (sdp_device_record_register(sdp_con,
+						hidc_get_app_dev_bdaddr(),
+						rec,
+						SDP_RECORD_PERSIST) < 0) {
+			errsv = errno;
+			log_ec(errsv,
+				"Can't reactivate SDP Record (0x%x)",
+				rec->handle);
+			if (result == 0)
+				result = hidc_convert_errno(errsv);
+		}
+
+		next = seq->next;
+		free(seq);
+		sdp_record_free(rec);
+	}
+
+	deactivated_services = NULL;
+
+	if(sdp_close(sdp_con) < 0) {
+		errsv = errno;
+		log_ec(errsv, "Can't close SDP connection");
+		return hidc_convert_errno(errsv);
+	}
+
+	return result;
 }

@@ -174,6 +174,8 @@ public class DaemonService extends Service {
     private static final int IPC_CMD_DISCOVERABLE_OFF = 25;
     private static final int IPC_CMD_SET_HID_DEVICE_CLASS = 30;
     private static final int IPC_CMD_RESET_DEVICE_CLASS = 35;
+    private static final int IPC_CMD_DEACTIVATE_OTHER_SERVICES = 40;
+    private static final int IPC_CMD_REACTIVATE_OTHER_SERVICES = 45;
     private static final int IPC_CMD_HID_CONNECT = 90;
     private static final int IPC_CMD_HID_DISCONNECT = 95;
     private static final int IPC_CMD_HID_SEND_KEYS = 110;
@@ -238,6 +240,8 @@ public class DaemonService extends Service {
                 case DaemonCallbackReceiver.IPC_ECB_DISCOVERABLE_ON:
                 case DaemonCallbackReceiver.IPC_ECB_SET_HID_DEVICE_CLASS:
                 case DaemonCallbackReceiver.IPC_ECB_RESET_DEVICE_CLASS:
+                case DaemonCallbackReceiver.IPC_ECB_DEACTIVATE_OTHER_SERVICES:
+                case DaemonCallbackReceiver.IPC_ECB_REACTIVATE_OTHER_SERVICES:
                     if (errorCode == 0) {
                         shutdownDaemon(ERROR_UNKNOWN);
                     } else {
@@ -680,6 +684,20 @@ public class DaemonService extends Service {
     public void resetDeviceClass() {
         if (isRunning()) {
             sendSimpleIpcCmd(IPC_CMD_RESET_DEVICE_CLASS);
+        }
+    }
+
+    /** Deactivates all Service Records except for the HID Service Record. */
+    public void deactivateOtherServices() {
+        if (isRunning()) {
+            sendSimpleIpcCmd(IPC_CMD_DEACTIVATE_OTHER_SERVICES);
+        }
+    }
+
+    /** Reactivates all previously deactivated Service Records. */
+    public void reactivateOtherServices() {
+        if (isRunning()) {
+            sendSimpleIpcCmd(IPC_CMD_REACTIVATE_OTHER_SERVICES);
         }
     }
 

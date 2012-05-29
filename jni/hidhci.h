@@ -95,4 +95,12 @@ int hidc_set_hid_device_class();
  */
 int hidc_reset_device_class();
 
+/*
+ * Wait until the Service part of the Bluetooth adapter Class is empty.
+ *
+ * Parameters:
+ *     timeout: Maximum wait time in seconds.
+ */
+void hidc_wait_for_empty_service_class(int timeout);
+
 #endif

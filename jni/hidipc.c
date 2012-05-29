@@ -186,6 +186,36 @@ static void do_ipc_cmd_reset_device_class()
 }
 
 /*
+ * Called when a "Deactivate other Service Records" command is received.
+ */
+static void do_ipc_cmd_deactivate_other_services()
+{
+	int ec;  /* error code */
+
+	log_d("IPC command: deactivate other Service Records");
+
+	if ((ec = hidc_deactivate_other_services()) < 0) {
+		hidc_send_ipc_ecb(HIDC_IPC_ECB_DEACTIVATE_OTHER_SERVICES, ec);
+		return;
+	}
+}
+
+/*
+ * Called when a "Reactivate other Service Records" command is received.
+ */
+static void do_ipc_cmd_reactivate_other_services()
+{
+	int ec;  /* error code */
+
+	log_d("IPC command: reactivate other Service Records");
+
+	if ((ec = hidc_reactivate_other_services()) < 0) {
+		hidc_send_ipc_ecb(HIDC_IPC_ECB_REACTIVATE_OTHER_SERVICES, ec);
+		return;
+	}
+}
+
+/*
  * Called when a "Connect HID" command is received.
  */
 static void do_ipc_cmd_hid_connect()
@@ -379,6 +409,12 @@ static void pollin_client_ipc_sock()
 		break;
 	case HIDC_IPC_CMD_RESET_DEVICE_CLASS:
 		do_ipc_cmd_reset_device_class();
+		break;
+	case HIDC_IPC_CMD_DEACTIVATE_OTHER_SERVICES:
+		do_ipc_cmd_deactivate_other_services();
+		break;
+	case HIDC_IPC_CMD_REACTIVATE_OTHER_SERVICES:
+		do_ipc_cmd_reactivate_other_services();
 		break;
 	case HIDC_IPC_CMD_HID_CONNECT:
 		do_ipc_cmd_hid_connect();

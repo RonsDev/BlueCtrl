@@ -60,6 +60,14 @@ typedef enum HidcIpcCommand {
 	 */
 	HIDC_IPC_CMD_RESET_DEVICE_CLASS = 35,
 	/*
+	 * Deactivate all Service Records except for the HID Service Record.
+	 */
+	HIDC_IPC_CMD_DEACTIVATE_OTHER_SERVICES = 40,
+	/*
+	 * Reactivate all previously deactivated Service Records.
+	 */
+	HIDC_IPC_CMD_REACTIVATE_OTHER_SERVICES = 45,
+	/*
 	 * Initiate a connection to a HID host.
 	 * Additional data:
 	 *     17 bytes: The destination Bluetooth address of the HID host as
@@ -199,6 +207,14 @@ typedef enum HidcIpcErrorCallback {
 	 * Restore the original Device Class failed.
 	 */
 	HIDC_IPC_ECB_RESET_DEVICE_CLASS = 2035,
+	/*
+	 * Deactivate other Service Records failed.
+	 */
+	HIDC_IPC_ECB_DEACTIVATE_OTHER_SERVICES = 2040,
+	/*
+	 * Reactivate other Service Records failed.
+	 */
+	HIDC_IPC_ECB_REACTIVATE_OTHER_SERVICES = 2045,
 	/*
 	 * Initiate a connection to a HID host failed.
 	 */

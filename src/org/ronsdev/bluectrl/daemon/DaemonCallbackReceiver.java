@@ -88,6 +88,8 @@ public class DaemonCallbackReceiver extends Thread {
     public static final int IPC_ECB_DISCOVERABLE_OFF = 2025;
     public static final int IPC_ECB_SET_HID_DEVICE_CLASS = 2030;
     public static final int IPC_ECB_RESET_DEVICE_CLASS = 2035;
+    public static final int IPC_ECB_DEACTIVATE_OTHER_SERVICES = 2040;
+    public static final int IPC_ECB_REACTIVATE_OTHER_SERVICES = 2045;
     public static final int IPC_ECB_HID_CONNECT = 2090;
 
 
@@ -149,6 +151,8 @@ public class DaemonCallbackReceiver extends Thread {
                 case IPC_ECB_DISCOVERABLE_OFF:
                 case IPC_ECB_SET_HID_DEVICE_CLASS:
                 case IPC_ECB_RESET_DEVICE_CLASS:
+                case IPC_ECB_DEACTIVATE_OTHER_SERVICES:
+                case IPC_ECB_REACTIVATE_OTHER_SERVICES:
                 case IPC_ECB_HID_CONNECT:
                     errorCode = mInStream.readInt();
                     intent.putExtra(EXTRA_ERROR_CODE, errorCode);

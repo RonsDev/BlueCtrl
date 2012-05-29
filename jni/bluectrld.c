@@ -245,6 +245,12 @@ done:
 			result = ec;
 	}
 
+	if ((ec = hidc_reactivate_other_services()) < 0) {
+		log_e("Can't reactivate Service Records");
+		if (result == 0)
+			result = ec;
+	}
+
 	if ((ec = hidc_reset_device_class()) < 0) {
 		log_e("Can't reset Bluetooth Device Class (original class: "
 			"0x%06x)", hidc_get_org_device_class());

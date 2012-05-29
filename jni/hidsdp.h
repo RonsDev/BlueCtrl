@@ -49,4 +49,21 @@ int hidc_sdp_register();
  */
 int hidc_sdp_unregister();
 
+
+/*
+ * Deactivate all Service Records except for the HID Service Record.
+ *
+ * Returns:
+ *     0 on success or a negative error code (defined in error.h) on failure.
+ */
+int hidc_deactivate_other_services();
+
+/*
+ * Reactivate all previously deactivated Service Records.
+ *
+ * Returns:
+ *     0 on success or a negative error code (defined in error.h) on failure.
+ */
+int hidc_reactivate_other_services();
+
 #endif
