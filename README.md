@@ -15,6 +15,8 @@ Because this app is using the Bluetooth input standard, it supports various oper
 
 Microsoft Windows however is one of the operating systems that on most devices won't work. The reason for that is a conflict with the Android Bluetooth input service which is active on most Android systems.
 
+This app requires root permissions because it needs direct access to the Bluetooth adapter. Another important requirement is that your Android version must use the default Bluetooth stack. If it doesn't you will get a incompatible Android version message.
+
 
 
 Build Requirements
