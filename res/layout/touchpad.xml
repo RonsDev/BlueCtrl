@@ -39,9 +39,9 @@
                 <LinearLayout style="@style/info_block_content">
                     <TextView style="@style/info_block_title"
                               android:id="@+id/info_title" />
-                    <TextView style="@style/info_block_text"
+                    <TextView style="@style/info_block_text.first"
                               android:id="@+id/info_text" />
-                    <TextView style="@style/info_block_text.reconnect"
+                    <TextView style="@style/info_block_text"
                               android:id="@+id/info_reconnect"
                               android:text="@string/info_text_reconnect" />
                 </LinearLayout>

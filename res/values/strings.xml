@@ -2,12 +2,19 @@
 <resources>
     <string name="app_name">BlueCtrl</string>
 
-    <string name="continue_text">Continue</string>
     <string name="close">Close</string>
 
     <string name="description_app_icon">Application Icon</string>
     <string name="description_info_image">Info Image</string>
     <string name="description_keyboard">Keyboard</string>
+
+    <string name="os_android">Android</string>
+    <string name="os_ios">iOS</string>
+    <string name="os_linux">Linux</string>
+    <string name="os_osx">Mac OS X</string>
+    <string name="os_playstation3">PlayStation 3</string>
+    <string name="os_windows">Windows</string>
+    <string name="os_undefined">Other</string>
 
     <string name="menu_about">About</string>
     <string name="menu_help">Help</string>
@@ -20,20 +27,13 @@
     <string name="device_list_empty">No device configured</string>
     <string name="device_list_connected_info">Connected with “%1$s”</string>
 
-    <string name="pairing_prepare_title">Add device</string>
-    <string name="pairing_prepare_text1">Before you can use this application with a remote device, you need to pair the devices via Bluetooth.</string>
-    <string name="pairing_prepare_text2">If the devices are already paired, they must be paired again so that the remote device is aware of the new capabilities. In this case please remove this Bluetooth device on the remote device before proceeding.</string>
-    <string name="pairing_wait_title">Waiting for request\u2026</string>
-    <string name="pairing_search_for_device_text"><![CDATA[The device is now visible. Please search on the remote device for a Bluetooth device with the name “<b>%1$s</b>” and pair it.]]></string>
-    <string name="pairing_finish_title">Finish pairing</string>
-    <string name="pairing_confirm_ready_text">Please confirm any Bluetooth pairing request notification and press connect when the remote device is ready.</string>
-    <string name="pairing_connect">Connect</string>
-    <string name="service_conflict_text"><![CDATA[<b>Warning:</b> Another Bluetooth input service is active on this device. This is problematic if you want to pair with an <b>iOS</b> or <b>Windows</b> device.]]></string>
-    <string name="service_conflict_more_info">More information</string>
-    <string name="service_conflict_ios_title">Notes for iOS</string>
-    <string name="service_conflict_ios_text">You might get an “Connection refused” error on connect because iOS has already established a connection and blocks other connection attempts. To fix this close the Bluetooth connection on the iOS device (turn Bluetooth off and on again) and reconnect from BlueCtrl.</string>
-    <string name="service_conflict_windows_title">Notes for Windows</string>
-    <string name="service_conflict_windows_text">Sorry, but you are unable to use this application with a Microsoft Windows device if another Bluetooth input service is active. You can try to pair the devices but you will receive an authorization error on connect even if Windows reports that the device has been successfully added.</string>
+    <string name="pairing_device_os_title">Remote device OS</string>
+    <string name="pairing_title">Add Device</string>
+    <string name="pairing_search_for_device_text"><![CDATA[Search on the remote system for the Bluetooth device “<b>%1$s</b>” and pair it.]]></string>
+    <string name="pairing_remove_if_paired_text">If it is already paired, remove it and pair it again.</string>
+    <string name="pairing_device_title">Pairing\u2026</string>
+    <string name="pairing_failed_title">Pairing failed</string>
+    <string name="pairing_service_conflict_windows_text">Sorry, but you cannot use this app with a Windows system because another Bluetooth input service is active on your device.</string>
 
     <string name="device_preferences">Device settings</string>
     <string name="pref_keymap">Keyboard layout</string>
@@ -59,6 +59,7 @@
     <string name="info_title_authorization_error">Authorization error</string>
     <string name="info_title_connection_timeout">Connection timed out</string>
     <string name="info_title_connection_problem">Connection problem</string>
+    <string name="info_text_ios_bt_off_on">Try again after you have turned Bluetooth off and on again on the remote device.</string>
 
     <string name="about_version">Version %1$s</string>
     <string name="about_app_text">A Bluetooth input device emulator that can control remote devices.</string>

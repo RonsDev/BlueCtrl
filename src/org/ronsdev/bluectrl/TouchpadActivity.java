@@ -724,10 +724,18 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                         true);
                 break;
             case DaemonService.ERROR_CONNREFUSED:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_refused),
-                        getString(R.string.info_text_connection_refused),
-                        true);
+                if (mIsPairingConnect &&
+                        (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS))) {
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_connection_refused),
+                            getString(R.string.info_text_ios_bt_off_on),
+                            true);
+                } else {
+                    showViewInfoImage(R.drawable.problem,
+                            getString(R.string.info_title_connection_refused),
+                            getString(R.string.info_text_connection_refused),
+                            true);
+                }
                 break;
             case DaemonService.ERROR_BADE:
                 showViewInfoImage(R.drawable.problem,

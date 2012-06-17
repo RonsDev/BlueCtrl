@@ -87,8 +87,10 @@ public class MainActivity extends DaemonListActivity
     private OnClickListener mAddDeviceClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, PairingActivity.class);
-            startActivityForResult(intent, REQUEST_PAIRING);
+            if (isDaemonAvailable()) {
+                PairingActivity.startActivityForResult(
+                        MainActivity.this, getDaemon(), REQUEST_PAIRING);
+            }
         }
     };
 
@@ -148,7 +150,8 @@ public class MainActivity extends DaemonListActivity
         case REQUEST_PAIRING:
             if (resultCode == Activity.RESULT_OK) {
                 BluetoothDevice device = data.getParcelableExtra(PairingActivity.EXTRA_DEVICE);
-                onDevicePaired(device);
+                String deviceOs = data.getStringExtra(PairingActivity.EXTRA_DEVICE_OS);
+                onDevicePaired(device, deviceOs);
             }
             break;
         }
@@ -267,7 +270,7 @@ public class MainActivity extends DaemonListActivity
     protected void onHidStateChanged(int hidState, BluetoothDevice btDevice, int errorCode) {
         // If a connection was established by the host
         if ((hidState == DaemonService.HID_STATE_CONNECTED) &&
-                (btDevice != null) && !mIsConnectActivityStarting) {
+                (btDevice != null) && hasWindowFocus() && !mIsConnectActivityStarting) {
             if (btDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
                 Toast.makeText(this,
                         getString(R.string.device_list_connected_info, btDevice.getName()),
@@ -286,8 +289,8 @@ public class MainActivity extends DaemonListActivity
         }
     }
 
-    private void onDevicePaired(BluetoothDevice device) {
-        mDeviceManager.registerDevice(device);
+    private void onDevicePaired(BluetoothDevice device, String deviceOs) {
+        mDeviceManager.registerDevice(device, deviceOs);
         refreshListView();
 
         connectToDevice(device, true);

@@ -36,10 +36,14 @@
     <style name="info_block_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">5dp</item>
         <item name="android:gravity">left</item>
         <item name="android:maxWidth">320dp</item>
     </style>
-    <style name="info_block_text.reconnect">
-        <item name="android:layout_marginTop">5dp</item>
+    <style name="info_block_text.first">
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+    <style name="info_block_text.first_no_title">
+        <item name="android:layout_marginTop">0dp</item>
     </style>
 </resources>

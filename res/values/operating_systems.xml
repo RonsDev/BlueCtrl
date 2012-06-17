@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="operating_system_values">
+        <item>android</item>
+        <item>ios</item>
+        <item>linux</item>
+        <item>osx</item>
+        <item>playstation3</item>
+        <item>windows</item>
+        <item></item>
+    </array>
+    <array name="operating_system_names">
+        <item>@string/os_android</item>
+        <item>@string/os_ios</item>
+        <item>@string/os_linux</item>
+        <item>@string/os_osx</item>
+        <item>@string/os_playstation3</item>
+        <item>@string/os_windows</item>
+        <item>@string/os_undefined</item>
+    </array>
+</resources>

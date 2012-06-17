@@ -29,6 +29,7 @@ import java.util.Locale;
  */
 public class DeviceSettings {
 
+    public static final String PREF_KEY_OS = "os";
     public static final String PREF_KEY_KEYMAP = "keymap";
     public static final String PREF_KEY_TOUCHPAD_BUTTONS = "touchpad_buttons";
     public static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
@@ -37,10 +38,19 @@ public class DeviceSettings {
     public static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
     public static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
 
+    public static final String OS_ANDROID = "android";
+    public static final String OS_IOS = "ios";
+    public static final String OS_LINUX = "linux";
+    public static final String OS_OSX = "osx";
+    public static final String OS_PLAYSTATION3 = "playstation3";
+    public static final String OS_WINDOWS = "windows";
+    public static final String OS_UNDEFINED = "";
+
     public static final String TOUCHPAD_BUTTONS_SHOW = "show";
     public static final String TOUCHPAD_BUTTONS_SHOW_PORTRAIT = "show_portrait";
     public static final String TOUCHPAD_BUTTONS_HIDE = "hide";
 
+    public static final String DEFAULT_OS = OS_UNDEFINED;
     public static final String DEFAULT_KEYMAP = "en_US";
     public static final String DEFAULT_TOUCHPAD_BUTTONS = TOUCHPAD_BUTTONS_SHOW_PORTRAIT;
     public static final float DEFAULT_MOUSE_SENSITIVITY = 3f;
@@ -57,6 +67,7 @@ public class DeviceSettings {
 
     private String mDeviceId;
 
+    private String mOperatingSystem;
     private String mKeyMap;
     private String mTouchpadButtons;
     private float mMouseSensitivity;
@@ -126,6 +137,7 @@ public class DeviceSettings {
     private void loadFromPreferences() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
 
+        mOperatingSystem = preferences.getString(getKey(PREF_KEY_OS), DEFAULT_OS);
         mKeyMap = preferences.getString(getKey(PREF_KEY_KEYMAP), sDefaultKeyMap);
         mTouchpadButtons = preferences.getString(getKey(PREF_KEY_TOUCHPAD_BUTTONS),
                 DEFAULT_TOUCHPAD_BUTTONS);
@@ -147,6 +159,9 @@ public class DeviceSettings {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
         SharedPreferences.Editor editor = preferences.edit();
 
+        if (!mOperatingSystem.equals(oldSettings.mOperatingSystem)) {
+            editor.putString(getKey(PREF_KEY_OS), mOperatingSystem);
+        }
         if (!mKeyMap.equals(oldSettings.mKeyMap)) {
             editor.putString(getKey(PREF_KEY_KEYMAP), mKeyMap);
         }
@@ -176,6 +191,7 @@ public class DeviceSettings {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
         SharedPreferences.Editor editor = preferences.edit();
 
+        editor.remove(getKey(PREF_KEY_OS));
         editor.remove(getKey(PREF_KEY_KEYMAP));
         editor.remove(getKey(PREF_KEY_TOUCHPAD_BUTTONS));
         editor.remove(getKey(PREF_KEY_MOUSE_SENSITIVITY));
@@ -189,6 +205,13 @@ public class DeviceSettings {
         loadFromPreferences();
     }
 
+
+    public String getOperatingSystem() {
+        return mOperatingSystem;
+    }
+    public void setOperatingSystem(String value) {
+        mOperatingSystem = value;
+    }
 
     public String getKeyMap() {
         return mKeyMap;

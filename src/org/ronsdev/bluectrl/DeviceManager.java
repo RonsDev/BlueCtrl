@@ -83,17 +83,21 @@ public class DeviceManager {
         editor.commit();
     }
 
-    public void registerDevice(BluetoothDevice device) {
+    public void registerDevice(BluetoothDevice device, String deviceOs) {
         if (device != null) {
             mDeviceSet.add(device.getAddress());
             saveDeviceSet();
+
+            DeviceSettings deviceSettings = DeviceSettings.get(mContext, device);
+            deviceSettings.setOperatingSystem(deviceOs);
+            deviceSettings.saveToPreferences();
         }
     }
 
     public void unregisterDevice(BluetoothDevice device) {
         if (device != null) {
-            DeviceSettings settings = DeviceSettings.get(mContext, device);
-            settings.resetPreferences();
+            DeviceSettings deviceSettings = DeviceSettings.get(mContext, device);
+            deviceSettings.resetPreferences();
 
             mDeviceSet.remove(device.getAddress());
             saveDeviceSet();
