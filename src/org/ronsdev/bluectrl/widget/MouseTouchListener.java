@@ -820,7 +820,13 @@ public class MouseTouchListener implements OnTouchListener {
 
         /** Converts the touch move value to the HID Report pointer move value. */
         private int convertTouchDeltaValue(float value) {
-            return (int)(value / mDisplayDensity * mMouseSensitivity);
+            final float result = value / mDisplayDensity * mMouseSensitivity;
+            if (Math.abs(result) < 1.0f) {
+                // Don't round small values up to prevent jitter on bad touchscreens
+                return 0;
+            } else {
+                return Math.round(result);
+            }
         }
 
         /** Converts the HID Report pointer move value to the touch move value. */
@@ -1078,8 +1084,15 @@ public class MouseTouchListener implements OnTouchListener {
 
         /** Converts the X-axis touch move value to the HID Report scroll value. */
         private int convertTouchDeltaValueX(float value, boolean smooth) {
-            final int result = (int)(value / mDisplayDensity * getSensitivity(smooth));
-            return (mInvertScroll ? -result : result);
+            final float result = value / mDisplayDensity * getSensitivity(smooth);
+            if (Math.abs(result) < 1.0f) {
+                // Don't round small values up to prevent jitter on bad touchscreens
+                return 0;
+            } else if (mInvertScroll) {
+                return -Math.round(result);
+            } else {
+                return Math.round(result);
+            }
         }
 
         /** Converts the X-axis HID Report scroll value to the touch move value. */
