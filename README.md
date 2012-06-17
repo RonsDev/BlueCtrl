@@ -11,7 +11,7 @@ Because this app is using the Bluetooth input standard, it supports various oper
 * iOS
 * Linux (Fedora, Ubuntu...)
 * Mac OS X
-* Playstation 3
+* PlayStation 3
 
 Microsoft Windows however is one of the operating systems that on most devices won't work. The reason for that is a conflict with the Android Bluetooth input service which is active on most Android systems.
 
