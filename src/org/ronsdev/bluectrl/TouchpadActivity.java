@@ -202,19 +202,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         Bundle extras = getIntent().getExtras();
         mBtDevice = extras.getParcelable(EXTRA_DEVICE);
 
+        mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+
+        mDeviceSettings = DeviceSettings.get(this, mBtDevice);
+
         if (savedInstanceState == null) {
             mIsPairingConnect = extras.getBoolean(EXTRA_IS_NEW_DEVICE);
+
+            if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS)) {
+                // iOS devices don't support mouse control so directly show the keyboard
+                mShowKeyboardOnConnect = true;
+            }
         } else {
             mIsAutoConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_AUTO_CONNECT);
             mIsPairingConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_PAIRING_CONNECT);
             mShowKeyboardOnConnect = savedInstanceState.getBoolean(
                     SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT);
         }
-
-        mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-
-        mDeviceSettings = DeviceSettings.get(this, mBtDevice);
 
         loadLayout();
     }
