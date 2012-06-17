@@ -443,7 +443,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         mActionBarTitle = (TextView)findViewById(R.id.action_bar_title);
         if (mBtDevice != null) {
-            mActionBarTitle.setText(mBtDevice.getName());
+            mActionBarTitle.setText(DeviceManager.getDeviceName(this, mBtDevice));
         }
 
         mButtonKeyboard = (ImageButton)findViewById(R.id.button_keyboard);

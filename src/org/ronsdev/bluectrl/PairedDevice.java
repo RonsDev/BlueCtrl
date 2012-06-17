@@ -35,24 +35,18 @@ public class PairedDevice {
 
 
     private BluetoothDevice mDevice;
+    private String mName;
 
 
-    public PairedDevice(BluetoothDevice device) {
+    public PairedDevice(BluetoothDevice device, String name) {
         mDevice = device;
+        mName = name;
     }
 
 
     @Override
     public String toString() {
-        if (mDevice != null) {
-            String result = mDevice.getName();
-            if (result.isEmpty()) {
-                result = mDevice.getAddress();
-            }
-            return result;
-        } else {
-            return "";
-        }
+        return mName;
     }
 
     public BluetoothDevice getDevice() {

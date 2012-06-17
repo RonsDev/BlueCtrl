@@ -16,6 +16,8 @@
     <string name="os_windows">Windows</string>
     <string name="os_undefined">Other</string>
 
+    <string name="unnamed_device_playstation3">PS3 (%1$s)</string>
+
     <string name="menu_about">About</string>
     <string name="menu_help">Help</string>
     <string name="menu_preferences">Settings</string>

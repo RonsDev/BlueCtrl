@@ -20,6 +20,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
@@ -104,13 +105,28 @@ public class DeviceManager {
         }
     }
 
+    public static String getDeviceName(Context context, BluetoothDevice device) {
+        String result = device.getName();
+        if (result.isEmpty()) {
+            DeviceSettings deviceSettings = DeviceSettings.get(context, device);
+            if (deviceSettings.getOperatingSystem().equals(DeviceSettings.OS_PLAYSTATION3)) {
+                final Resources res = context.getResources();
+                result = res.getString(R.string.unnamed_device_playstation3, device.getAddress());
+            } else {
+                result = device.getAddress();
+            }
+        }
+        return result;
+    }
+
     public List<PairedDevice> getPairedDevices() {
         List<PairedDevice> pairedDeviceList = new ArrayList<PairedDevice>();
 
         if (mBtAdapter != null) {
             for (BluetoothDevice device : mBtAdapter.getBondedDevices()) {
                 if (mDeviceSet.contains(device.getAddress())) {
-                    pairedDeviceList.add(new PairedDevice(device));
+                    pairedDeviceList.add(new PairedDevice(device,
+                            getDeviceName(mContext, device)));
                 }
             }
         }
