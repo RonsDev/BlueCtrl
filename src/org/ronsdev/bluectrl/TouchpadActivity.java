@@ -21,6 +21,7 @@ import org.ronsdev.bluectrl.daemon.DaemonService;
 import org.ronsdev.bluectrl.widget.KeyboardInputView;
 import org.ronsdev.bluectrl.widget.TouchpadView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -182,6 +183,15 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             msg.arg1 = -1;
             mHandler.sendMessage(msg);
         }
+    }
+
+
+    public static void startActivity(Activity curActivity, BluetoothDevice device,
+            Boolean isNewDevice) {
+        Intent intent = new Intent(curActivity, TouchpadActivity.class);
+        intent.putExtra(EXTRA_DEVICE, device);
+        intent.putExtra(EXTRA_IS_NEW_DEVICE, isNewDevice);
+        curActivity.startActivity(intent);
     }
 
 
@@ -395,9 +405,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             pasteClipboard();
             return true;
         case R.id.menu_preferences:
-            Intent prefIntent = new Intent(this, DevicePreferenceActivity.class);
-            prefIntent.putExtra(DevicePreferenceActivity.EXTRA_DEVICE, mBtDevice);
-            startActivity(prefIntent);
+            DevicePreferenceActivity.startActivity(this, mBtDevice);
             return true;
         case R.id.menu_help:
             showDialog(DIALOG_HELP);

@@ -219,10 +219,7 @@ public class MainActivity extends DaemonListActivity
                     connectToDevice(pairedDevice.getDevice(), false);
                     return true;
                 case R.id.menu_preferences:
-                    Intent prefIntent = new Intent(this, DevicePreferenceActivity.class);
-                    prefIntent.putExtra(DevicePreferenceActivity.EXTRA_DEVICE,
-                            pairedDevice.getDevice());
-                    startActivity(prefIntent);
+                    DevicePreferenceActivity.startActivity(this, pairedDevice.getDevice());
                     return true;
                 case R.id.menu_remove_device:
                     mDeviceManager.unregisterDevice(pairedDevice.getDevice());
@@ -316,10 +313,7 @@ public class MainActivity extends DaemonListActivity
         if (!mIsConnectActivityStarting) {
             mIsConnectActivityStarting = true;
 
-            Intent intent = new Intent(this, TouchpadActivity.class);
-            intent.putExtra(TouchpadActivity.EXTRA_DEVICE, device);
-            intent.putExtra(TouchpadActivity.EXTRA_IS_NEW_DEVICE, isNewDevice);
-            startActivity(intent);
+            TouchpadActivity.startActivity(this, device, isNewDevice);
         }
     }
 

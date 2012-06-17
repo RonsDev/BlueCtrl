@@ -20,6 +20,7 @@ import org.ronsdev.bluectrl.daemon.DaemonService;
 import org.ronsdev.bluectrl.daemon.DaemonService.DaemonBinder;
 import org.ronsdev.bluectrl.widget.FloatSliderPreference;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,6 +71,13 @@ public class DevicePreferenceActivity extends PreferenceActivity {
             mDaemon = null;
         }
     };
+
+
+    public static void startActivity(Activity curActivity, BluetoothDevice device) {
+        Intent intent = new Intent(curActivity, DevicePreferenceActivity.class);
+        intent.putExtra(EXTRA_DEVICE, device);
+        curActivity.startActivity(intent);
+    }
 
 
     @Override
