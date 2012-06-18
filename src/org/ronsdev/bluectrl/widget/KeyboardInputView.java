@@ -141,7 +141,8 @@ public class KeyboardInputView extends View {
 
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        outAttrs.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+        outAttrs.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS &
+                InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE;
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI;
 
         return new KeyboardInputConnection(this);
