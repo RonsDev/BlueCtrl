@@ -21,6 +21,9 @@ import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.KeyEventFuture;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.ResultReceiver;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.InputType;
@@ -34,6 +37,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
@@ -46,9 +50,17 @@ public class KeyboardInputView extends View {
     private static final boolean V = false;
 
 
+    private static final String SAVED_STATE_INSTANCE = "InstanceState";
+    private static final String SAVED_STATE_SHOULD_SHOW_KEYBOARD = "ShouldShowKeyboard";
+    private static final String SAVED_STATE_WAS_KEYBOARD_TOGGLED = "WasKeyboardToggled";
+
+
     private HidKeyboard mHidKeyboard = null;
     private String mKeyMap = "";
     private CharKeyReportMap mCharKeyMap = null;
+
+    private boolean mShouldShowKeyboard = false;
+    private boolean mWasKeyboardToggled = false;
 
 
     /**
@@ -133,9 +145,73 @@ public class KeyboardInputView extends View {
         }
     }
 
+    private InputMethodManager getInputManager() {
+        return (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    }
+
+    public void showKeyboard() {
+        boolean success = false;
+        if (isShown()) {
+            requestFocus();
+            success = getInputManager().showSoftInput(this,
+                    InputMethodManager.SHOW_FORCED,
+                    new ResultReceiver(null) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            if (resultCode == InputMethodManager.RESULT_SHOWN) {
+                                mWasKeyboardToggled = true;
+                            }
+                        }
+                    });
+        }
+        mShouldShowKeyboard = !success;
+    }
+
+    public void hideToggledKeyboard() {
+        mShouldShowKeyboard = false;
+        if (mWasKeyboardToggled) {
+            getInputManager().hideSoftInputFromWindow(getWindowToken(), 0);
+        }
+    }
+
+    public void toggleKeyboard() {
+        mWasKeyboardToggled = true;
+        requestFocus();
+
+        /*
+         * We use the SHOW_FORCED flag instead of the preferred SHOW_IMPLICIT flag because the
+         * latter didn't work in the landscape mode.
+         */
+        getInputManager().toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
     public void pasteText(String text) {
         if (isActive()) {
             typeText(text);
+        }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle outState = new Bundle();
+
+        outState.putParcelable(SAVED_STATE_INSTANCE, super.onSaveInstanceState());
+        outState.putBoolean(SAVED_STATE_SHOULD_SHOW_KEYBOARD, mShouldShowKeyboard);
+        outState.putBoolean(SAVED_STATE_WAS_KEYBOARD_TOGGLED, mWasKeyboardToggled);
+
+        return outState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle savedInstanceState = (Bundle)state;
+
+            mShouldShowKeyboard = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_KEYBOARD);
+            mWasKeyboardToggled = savedInstanceState.getBoolean(SAVED_STATE_WAS_KEYBOARD_TOGGLED);
+            super.onRestoreInstanceState(savedInstanceState.getParcelable(SAVED_STATE_INSTANCE));
+        } else {
+            super.onRestoreInstanceState(state);
         }
     }
 
@@ -146,6 +222,37 @@ public class KeyboardInputView extends View {
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI;
 
         return new KeyboardInputConnection(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+
+        if (hasWindowFocus && mShouldShowKeyboard) {
+            showKeyboard();
+        }
+    }
+
+    @Override
+    public void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+
+        if (isShown()) {
+            if (mShouldShowKeyboard) {
+                showKeyboard();
+            }
+        } else if (mWasKeyboardToggled) {
+            getInputManager().hideSoftInputFromWindow(getWindowToken(),
+                    0,
+                    new ResultReceiver(null) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            if (resultCode == InputMethodManager.RESULT_HIDDEN) {
+                                mShouldShowKeyboard = true;
+                            }
+                        }
+                    });
+        }
     }
 
     @Override

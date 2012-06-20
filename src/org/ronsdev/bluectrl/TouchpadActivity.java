@@ -26,17 +26,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.ResultReceiver;
+import android.os.Parcelable;
 import android.text.ClipboardManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,7 +49,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -88,7 +87,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
     private static final String SAVED_STATE_IS_PAIRING_CONNECT = "IsPairingConnect";
-    private static final String SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT = "ShowKeyboardOnConnect";
 
 
     private ImageButton mActionBarHome;
@@ -104,7 +102,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private ProgressDialog mSendTextProgressDlg;
 
     private BluetoothDevice mBtDevice;
-    private InputMethodManager mInputMethodManager;
     private ClipboardManager mClipboard;
     private DeviceSettings mDeviceSettings;
     private HidKeyboard mHidKeyboard;
@@ -113,8 +110,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
     private boolean mIsFullscreen = false;
-    private boolean mShowKeyboardOnConnect = false;
-    private boolean mWasKeyboardToggled = false;
 
     private CharSequence mSendTextValue = "";
     private SendTextThread mSendTextThread;
@@ -130,7 +125,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private OnClickListener mToggleKeyboardClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            toggleKeyboard();
+            if (mKeyboardInputView != null) {
+                mKeyboardInputView.toggleKeyboard();
+            }
         }
     };
 
@@ -202,26 +199,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         Bundle extras = getIntent().getExtras();
         mBtDevice = extras.getParcelable(EXTRA_DEVICE);
 
-        mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
 
         mDeviceSettings = DeviceSettings.get(this, mBtDevice);
 
         if (savedInstanceState == null) {
             mIsPairingConnect = extras.getBoolean(EXTRA_IS_NEW_DEVICE);
-
-            if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS)) {
-                // iOS devices don't support mouse control so directly show the keyboard
-                mShowKeyboardOnConnect = true;
-            }
         } else {
             mIsAutoConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_AUTO_CONNECT);
             mIsPairingConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_PAIRING_CONNECT);
-            mShowKeyboardOnConnect = savedInstanceState.getBoolean(
-                    SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT);
         }
 
         loadLayout();
+
+        if ((savedInstanceState == null) && (mKeyboardInputView != null) &&
+                (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS))) {
+            // iOS devices don't support mouse control so directly show the keyboard
+            mKeyboardInputView.showKeyboard();
+        }
     }
 
     @Override
@@ -242,8 +237,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             daemon.disconnectHid();
         }
 
-        if (mWasKeyboardToggled) {
-            hideKeyboard();
+        if (isFinishing() && (mKeyboardInputView != null)) {
+            mKeyboardInputView.hideToggledKeyboard();
         }
     }
 
@@ -251,7 +246,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(SAVED_STATE_IS_AUTO_CONNECT, mIsAutoConnect);
         outState.putBoolean(SAVED_STATE_IS_PAIRING_CONNECT, mIsPairingConnect);
-        outState.putBoolean(SAVED_STATE_SHOW_KEYBOARD_ON_CONNECT, mShowKeyboardOnConnect);
 
         super.onSaveInstanceState(outState);
     }
@@ -436,6 +430,12 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
 
     private void loadLayout() {
+        // Save some control states before the setContentView method will reset them.
+        SparseArray<Parcelable> stateContainer = new SparseArray<Parcelable>();
+        if (mKeyboardInputView != null) {
+            mKeyboardInputView.saveHierarchyState(stateContainer);
+        }
+
         setContentView(R.layout.touchpad);
 
         mActionBarHome = (ImageButton)findViewById(R.id.action_bar_home);
@@ -450,6 +450,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
 
         mKeyboardInputView = (KeyboardInputView)findViewById(R.id.keyboard_input);
+        mKeyboardInputView.restoreHierarchyState(stateContainer);
         mKeyboardInputView.setHidKeyboard(mHidKeyboard);
         mKeyboardInputView.requestFocus();
 
@@ -580,40 +581,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
     }
 
-    private void showKeyboard() {
-        mKeyboardInputView.requestFocus();
-        mInputMethodManager.showSoftInput(mKeyboardInputView, InputMethodManager.SHOW_FORCED);
-        mWasKeyboardToggled = true;
-    }
-
-    private void hideKeyboard() {
-        mWasKeyboardToggled = false;
-        mInputMethodManager.hideSoftInputFromWindow(
-                mKeyboardInputView.getWindowToken(),
-                0,
-                new ResultReceiver(null) {
-                    @Override
-                    protected void onReceiveResult(int resultCode, Bundle resultData) {
-                        if (resultCode == InputMethodManager.RESULT_HIDDEN) {
-                            mShowKeyboardOnConnect = true;
-                        }
-                    }
-                });
-    }
-
-    private void toggleKeyboard() {
-        mKeyboardInputView.requestFocus();
-
-        /*
-         * If the SoftInput is shown with the SHOW_FORCED option it will stay even when the
-         * Activity stops, so we will hide it manually in onStop. This wouldn't be necessary with
-         * the preferred SHOW_IMPLICIT option which can't be used because it strangely doesn't
-         * work in landscape mode.
-         */
-        mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        mWasKeyboardToggled = true;
-    }
-
     private void startSendTextTask(CharSequence text) {
         mSendTextValue = text;
         showDialog(DIALOG_SEND_TEXT_PROGRESS);
@@ -665,6 +632,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     private void showViewInfoTouchpad() {
+        mKeyboardInputView.setVisibility(View.VISIBLE);
         mTouchpadView.setVisibility(View.VISIBLE);
         mInfoWait.setVisibility(View.GONE);
         mInfoImage.setVisibility(View.GONE);
@@ -672,6 +640,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     private void showViewInfoWait(String title, String text) {
+        mKeyboardInputView.setVisibility(View.GONE);
         mTouchpadView.setVisibility(View.GONE);
         mInfoWait.setVisibility(View.VISIBLE);
         mInfoImage.setVisibility(View.GONE);
@@ -679,6 +648,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     private void showViewInfoImage(int resid, String title, String text, boolean showReconnect) {
+        mKeyboardInputView.setVisibility(View.GONE);
         mTouchpadView.setVisibility(View.GONE);
         mInfoWait.setVisibility(View.GONE);
         mInfoImage.setImageResource(resid);
@@ -715,10 +685,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             break;
         case DaemonService.HID_STATE_DISCONNECTING:
         case DaemonService.HID_STATE_DISCONNECTED:
-            if (mWasKeyboardToggled) {
-                hideKeyboard();
-            }
-
             switch (errorCode) {
             case 0:
                 showViewInfoImage(R.drawable.disconnected,
@@ -775,11 +741,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             break;
         case DaemonService.HID_STATE_CONNECTED:
             showViewInfoTouchpad();
-
-            if (mShowKeyboardOnConnect) {
-                mShowKeyboardOnConnect = false;
-                showKeyboard();
-            }
             break;
         }
     }
