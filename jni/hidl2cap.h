@@ -202,10 +202,10 @@ void hidc_send_hid_report_media_keys(unsigned char keys);
  *
  * Parameters:
  *     buttons: A bitmask with the pressed Mouse buttons.
- *     x: Relative left to right movement of the Mouse (values between -512
- *        and +512 are allowed)
- *     y: Relative far to near movement of the Mouse (values between -512
- *        and +512 are allowed)
+ *     x: Relative left to right movement of the Mouse (values between -2047
+ *        and +2047 are allowed)
+ *     y: Relative far to near movement of the Mouse (values between -2047
+ *        and +2047 are allowed)
  *     scrollY: Relative movement of the vertical Scroll Wheel (values between
  *              -127 and +127 are allowed)
  *     scrollX: Relative movement of the horizontal Scroll Wheel (values

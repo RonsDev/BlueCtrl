@@ -1218,8 +1218,8 @@ void hidc_send_hid_report_mouse(unsigned char buttons, int16_t x, int16_t y,
 	reset_input_report_mouse();
 
 	if (use_report_protocol) {
-		x = htobs((int16_t)limit_int_value(x, -512, 512));
-		y = htobs((int16_t)limit_int_value(y, -512, 512));
+		x = htobs((int16_t)limit_int_value(x, -2047, 2047));
+		y = htobs((int16_t)limit_int_value(y, -2047, 2047));
 
 		scrollY = (signed char)limit_int_value(scrollY, -127, 127);
 		scrollX = (signed char)limit_int_value(scrollX, -127, 127);

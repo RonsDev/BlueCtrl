@@ -99,9 +99,9 @@ typedef enum HidcIpcCommand {
 	 * Additional data:
 	 *     1 byte : A bitmask with the pressed mouse buttons.
 	 *     2 bytes: Relative left to right movement of the mouse (values
-	 *              between -512 and +512 are allowed)
+	 *              between -2047 and +2047 are allowed)
 	 *     2 bytes: Relative far to near movement of the mouse (values
-	 *              between -512 and +512 are allowed)
+	 *              between -2047 and +2047 are allowed)
 	 *     1 byte : Relative movement of the vertical Scroll Wheel (values
 	 *              between -127 and +127 are allowed)
 	 *     1 byte : Relative movement of the horizontal Scroll Wheel

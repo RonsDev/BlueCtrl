@@ -786,8 +786,8 @@ public class DaemonService extends Service {
             try {
                 mOutStream.writeInt(IPC_CMD_HID_SEND_MOUSE);
                 mOutStream.writeByte(buttons);
-                mOutStream.writeShort(limitIntValue(x, -512, 512));
-                mOutStream.writeShort(limitIntValue(y, -512, 512));
+                mOutStream.writeShort(limitIntValue(x, -2047, 2047));
+                mOutStream.writeShort(limitIntValue(y, -2047, 2047));
                 mOutStream.writeByte(limitIntValue(scrollY, -127, 127));
                 mOutStream.writeByte(limitIntValue(scrollX, -127, 127));
                 mOutStream.flush();

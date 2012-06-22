@@ -10,7 +10,7 @@
     <org.ronsdev.bluectrl.widget.FloatSliderPreference
         android:key="mouse_sensitivity"
         android:title="@string/pref_mouse_sensitivity"
-        android:max="8"
+        android:max="5"
         android:summary="%.1f"
         android:persistent="false" />
     <org.ronsdev.bluectrl.widget.SummaryListPreference
