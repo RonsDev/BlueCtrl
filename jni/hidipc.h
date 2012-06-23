@@ -109,6 +109,20 @@ typedef enum HidcIpcCommand {
 	 */
 	HIDC_IPC_CMD_HID_SEND_MOUSE = 120,
 	/*
+	 * Send a System Keys HID Report to the host.
+	 * Additional data:
+	 *     1 byte : A bitmask with the pressed keys:
+	 *              Bit 0 = Power
+	 *              Bit 1 = Sleep
+	 *              Bit 2 = Reserved
+	 *              Bit 3 = Reserved
+	 *              Bit 4 = Reserved
+	 *              Bit 5 = Reserved
+	 *              Bit 6 = Reserved
+	 *              Bit 7 = Reserved
+	 */
+	HIDC_IPC_CMD_HID_SEND_SYSTEM_KEYS = 125,
+	/*
 	 * Send a Hardware Keys HID Report to the host.
 	 * Additional data:
 	 *     1 byte : A bitmask with the pressed keys:

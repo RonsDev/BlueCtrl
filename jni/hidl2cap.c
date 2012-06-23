@@ -82,6 +82,7 @@ static int use_report_protocol = 1;
  */
 static unsigned char input_report_keys[10];
 static unsigned char output_report_keys[3];
+static unsigned char input_report_system_keys[3];
 static unsigned char input_report_hw_keys[3];
 static unsigned char input_report_media_keys[3];
 static unsigned char input_report_mouse[9];
@@ -130,6 +131,28 @@ static void reset_output_report_keys()
 static size_t get_output_report_keys_size()
 {
 	return sizeof(output_report_keys);
+}
+
+/*
+ * Clear and initialize the System Keys Input Report.
+ */
+static void reset_input_report_system_keys()
+{
+	memset(input_report_system_keys, 0, sizeof(input_report_system_keys));
+
+	input_report_system_keys[0] = BTTHT_DATA | BTTHP_DATA_INPUT;
+	input_report_system_keys[1] = HIDC_REPORTID_SYSTEM_KEYS;
+}
+
+/*
+ * Get the actual size of the System Keys Input Report.
+ *
+ * Returns:
+ *     The byte count of the Report.
+ */
+static size_t get_input_report_system_keys_size()
+{
+	return sizeof(input_report_system_keys);
 }
 
 /*
@@ -400,6 +423,7 @@ static void on_hid_connected(bdaddr_t *dst_addr)
 
 	reset_input_report_keys();
 	reset_output_report_keys();
+	reset_input_report_system_keys();
 	reset_input_report_hw_keys();
 	reset_input_report_media_keys();
 	reset_input_report_mouse();
@@ -686,6 +710,10 @@ static void on_cmd_get_report(unsigned char param, unsigned char *data,
 		if (reportid == HIDC_REPORTID_KEYBOARD) {
 			report_data = input_report_keys;
 			report_size = get_input_report_keys_size();
+		}
+		else if (reportid == HIDC_REPORTID_SYSTEM_KEYS) {
+			report_data = input_report_system_keys;
+			report_size = get_input_report_system_keys_size();
 		}
 		else if (reportid == HIDC_REPORTID_HW_KEYS) {
 			report_data = input_report_hw_keys;
@@ -1188,6 +1216,17 @@ void hidc_send_hid_report_keys(unsigned char modifiers,
 	send_data_report(client_intr_sock,
 			input_report_keys,
 			get_input_report_keys_size());
+}
+
+void hidc_send_hid_report_system_keys(unsigned char keys)
+{
+	reset_input_report_system_keys();
+
+	input_report_system_keys[2] = keys;
+
+	send_data_report(client_intr_sock,
+			input_report_system_keys,
+			get_input_report_system_keys_size());
 }
 
 void hidc_send_hid_report_hw_keys(unsigned char keys)

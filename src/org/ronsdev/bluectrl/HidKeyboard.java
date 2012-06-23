@@ -54,6 +54,13 @@ public class HidKeyboard {
     public static final int MODIFIER_RIGHT_GUI = 0x80;
 
 
+    /** Indicates that the system key 'Power' is pressed. */
+    public static final int SYSTEM_KEY_POWER = 0x01;
+
+    /** Indicates that the system key 'Sleep' is pressed. */
+    public static final int SYSTEM_KEY_SLEEP = 0x02;
+
+
     /** Indicates that the hardware key 'Eject' is pressed. */
     public static final int HARDWARE_KEY_EJECT = 0x08;
 
@@ -77,6 +84,7 @@ public class HidKeyboard {
     private DaemonService mDaemon;
 
     private int mPressedModifier = 0;
+    private int mPressedSystemKeys = 0;
     private int mPressedHardwareKeys = 0;
     private int mPressedMediaKeys = 0;
     private IntArrayList mPressedKeys = new IntArrayList(6);
@@ -139,6 +147,28 @@ public class HidKeyboard {
             mDaemon.sendKeyboardReport(mPressedModifier, getPressedKeysArray());
 
             if (V) Log.v(TAG, String.format("key released (%d)", hidKeyCode));
+        }
+    }
+
+    public void pressSystemKey(int key) {
+        final int newKeys = mPressedSystemKeys | key;
+        if (mPressedSystemKeys != newKeys) {
+            mPressedSystemKeys = newKeys;
+
+            mDaemon.sendSystemKeyReport(mPressedSystemKeys);
+
+            if (V) Log.v(TAG, String.format("system key pressed (0x%h)", key));
+        }
+    }
+
+    public void releaseSystemKey(int key) {
+        final int newKeys = mPressedSystemKeys & ~key;
+        if (mPressedSystemKeys != newKeys) {
+            mPressedSystemKeys = newKeys;
+
+            mDaemon.sendSystemKeyReport(mPressedSystemKeys);
+
+            if (V) Log.v(TAG, String.format("system key released (0x%h)", key));
         }
     }
 

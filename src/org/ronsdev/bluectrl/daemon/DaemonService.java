@@ -180,6 +180,7 @@ public class DaemonService extends Service {
     private static final int IPC_CMD_HID_DISCONNECT = 95;
     private static final int IPC_CMD_HID_SEND_KEYS = 110;
     private static final int IPC_CMD_HID_SEND_MOUSE = 120;
+    private static final int IPC_CMD_HID_SEND_SYSTEM_KEYS = 125;
     private static final int IPC_CMD_HID_SEND_HW_KEYS = 130;
     private static final int IPC_CMD_HID_SEND_MEDIA_KEYS = 140;
     private static final int IPC_CMD_HID_CHANGE_MOUSE_FEATURE = 150;
@@ -793,6 +794,20 @@ public class DaemonService extends Service {
                 mOutStream.flush();
             } catch (IOException e) {
                 Log.e(TAG, "send daemon IPC command 'HID Mouse Report' failed", e);
+                stopDaemon(ERROR_IPC);
+            }
+        }
+    }
+
+    /** Sends a System Keys HID Report to the host. */
+    public void sendSystemKeyReport(int keys) {
+        if (isRunning()) {
+            try {
+                mOutStream.writeInt(IPC_CMD_HID_SEND_SYSTEM_KEYS);
+                mOutStream.writeByte(keys);
+                mOutStream.flush();
+            } catch (IOException e) {
+                Log.e(TAG, "send daemon IPC command 'HID System Key Report' failed", e);
                 stopDaemon(ERROR_IPC);
             }
         }
