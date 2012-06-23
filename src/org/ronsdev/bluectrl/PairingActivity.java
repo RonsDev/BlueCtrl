@@ -80,6 +80,12 @@ public class PairingActivity extends DaemonActivity {
      */
     private static final int CONNECTED_PAIRED_DEV_READY_TIMEOUT = 8 * 1000;
 
+    /*
+     * The maximum wait time until a paired device is declared as ready if the HID server is
+     * running. Fallback for the case that the host won't establish a connection after pairing.
+     */
+    private static final int HID_SERVER_PAIRED_DEV_READY_TIMEOUT = 20 * 1000;
+
 
     private ViewFlipper mViewFlipper;
     private View mViewStart;
@@ -407,7 +413,11 @@ public class PairingActivity extends DaemonActivity {
             if (V) Log.v(TAG, String.format("new device has been paired (%s)", device.getAddress()));
             mBondedDevice = device;
             mWasBondedOnConnect = false;
-            startDevicePairedAndReadyTimeout(PAIRED_DEV_READY_TIMEOUT);
+            if (isDaemonAvailable() && getDaemon().isHidServerAvailable()) {
+                startDevicePairedAndReadyTimeout(HID_SERVER_PAIRED_DEV_READY_TIMEOUT);
+            } else {
+                startDevicePairedAndReadyTimeout(PAIRED_DEV_READY_TIMEOUT);
+            }
 
             // Show that the device is pairing even if the state 'bonding' has been bypassed
             onDevicePairing();
@@ -433,7 +443,11 @@ public class PairingActivity extends DaemonActivity {
             if (V) Log.v(TAG, String.format("already paired device got connected (%s)", device.getAddress()));
             mBondedDevice = device;
             mWasBondedOnConnect = true;
-            startDevicePairedAndReadyTimeout(CONNECTED_PAIRED_DEV_READY_TIMEOUT);
+            if (isDaemonAvailable() && getDaemon().isHidServerAvailable()) {
+                startDevicePairedAndReadyTimeout(HID_SERVER_PAIRED_DEV_READY_TIMEOUT);
+            } else {
+                startDevicePairedAndReadyTimeout(CONNECTED_PAIRED_DEV_READY_TIMEOUT);
+            }
 
             onDevicePairing();
         }
@@ -449,7 +463,11 @@ public class PairingActivity extends DaemonActivity {
         if (mWasBondedOnConnect && (mBondedDevice != null) &&
                 (mBondedDevice.getBondState() == BluetoothDevice.BOND_BONDED)) {
             if (V) Log.v(TAG, String.format("already paired device has been paired again (%s)", mBondedDevice.getAddress()));
-            startDevicePairedAndReadyTimeout(PAIRED_DEV_READY_TIMEOUT);
+            if (isDaemonAvailable() && getDaemon().isHidServerAvailable()) {
+                startDevicePairedAndReadyTimeout(HID_SERVER_PAIRED_DEV_READY_TIMEOUT);
+            } else {
+                startDevicePairedAndReadyTimeout(PAIRED_DEV_READY_TIMEOUT);
+            }
         }
     }
 
