@@ -452,7 +452,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mKeyboardInputView = (KeyboardInputView)findViewById(R.id.keyboard_input);
         mKeyboardInputView.restoreHierarchyState(stateContainer);
         mKeyboardInputView.setHidKeyboard(mHidKeyboard);
-        mKeyboardInputView.requestFocus();
 
         mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
         mTouchpadView.setHidMouse(mHidMouse);
@@ -633,6 +632,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private void showViewInfoTouchpad() {
         mKeyboardInputView.setVisibility(View.VISIBLE);
+        mKeyboardInputView.requestFocus();
         mTouchpadView.setVisibility(View.VISIBLE);
         mInfoWait.setVisibility(View.GONE);
         mInfoImage.setVisibility(View.GONE);
