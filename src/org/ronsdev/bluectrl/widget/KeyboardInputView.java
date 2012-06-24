@@ -170,6 +170,7 @@ public class KeyboardInputView extends View {
     public void hideToggledKeyboard() {
         mShouldShowKeyboard = false;
         if (mWasKeyboardToggled) {
+            mWasKeyboardToggled = false;
             getInputManager().hideSoftInputFromWindow(getWindowToken(), 0);
         }
     }
@@ -242,6 +243,7 @@ public class KeyboardInputView extends View {
                 showKeyboard();
             }
         } else if (mWasKeyboardToggled) {
+            mWasKeyboardToggled = false;
             getInputManager().hideSoftInputFromWindow(getWindowToken(),
                     0,
                     new ResultReceiver(null) {
