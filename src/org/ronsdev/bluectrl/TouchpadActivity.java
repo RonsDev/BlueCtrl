@@ -51,8 +51,8 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 /**
  * This Activity is a Touchpad for the Mouse input and also allows Keyboard input.
@@ -89,16 +89,17 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private static final String SAVED_STATE_IS_PAIRING_CONNECT = "IsPairingConnect";
 
 
-    private ImageButton mActionBarHome;
-    private TextView mActionBarTitle;
     private ImageButton mButtonKeyboard;
+    private ViewFlipper mViewFlipper;
+    private View mViewConnected;
     private KeyboardInputView mKeyboardInputView;
     private TouchpadView mTouchpadView;
-    private ProgressBar mInfoWait;
+    private View mViewDisconnected;
     private ImageView mInfoImage;
     private TextView mInfoTitle;
     private TextView mInfoText;
     private TextView mInfoReconnect;
+    private View mViewConnecting;
     private ProgressDialog mSendTextProgressDlg;
 
     private BluetoothDevice mBtDevice;
@@ -336,7 +337,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             }
         }
 
-        refreshViewInfo();
+        updateViews();
     }
 
     @Override
@@ -436,18 +437,26 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             mKeyboardInputView.saveHierarchyState(stateContainer);
         }
 
+
         setContentView(R.layout.touchpad);
 
-        mActionBarHome = (ImageButton)findViewById(R.id.action_bar_home);
-        mActionBarHome.setOnClickListener(mActionBarHomeClickListener);
 
-        mActionBarTitle = (TextView)findViewById(R.id.action_bar_title);
+        ImageButton actionBarHome = (ImageButton)findViewById(R.id.action_bar_home);
+        actionBarHome.setOnClickListener(mActionBarHomeClickListener);
+
+        TextView actionBarTitle = (TextView)findViewById(R.id.action_bar_title);
         if (mBtDevice != null) {
-            mActionBarTitle.setText(DeviceManager.getDeviceName(this, mBtDevice));
+            actionBarTitle.setText(DeviceManager.getDeviceName(this, mBtDevice));
         }
 
         mButtonKeyboard = (ImageButton)findViewById(R.id.button_keyboard);
         mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
+
+
+        mViewFlipper = (ViewFlipper)findViewById(R.id.flipper);
+
+        // View Connected
+        mViewConnected = (View)findViewById(R.id.view_connected);
 
         mKeyboardInputView = (KeyboardInputView)findViewById(R.id.keyboard_input);
         mKeyboardInputView.restoreHierarchyState(stateContainer);
@@ -456,14 +465,20 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
         mTouchpadView.setHidMouse(mHidMouse);
 
-        mInfoWait = (ProgressBar)findViewById(R.id.info_wait);
+        // View Disconnected
+        mViewDisconnected = (View)findViewById(R.id.view_disconnected);
+
         mInfoImage = (ImageView)findViewById(R.id.info_image);
         mInfoTitle = (TextView)findViewById(R.id.info_title);
         mInfoText = (TextView)findViewById(R.id.info_text);
         mInfoReconnect = (TextView)findViewById(R.id.info_reconnect);
 
+        // View Connecting
+        mViewConnecting = (View)findViewById(R.id.view_connecting);
+
+
         updateViewSettings();
-        refreshViewInfo();
+        updateViews();
     }
 
     private void updateViewSettings() {
@@ -630,33 +645,79 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mInfoReconnect.setVisibility(showReconnect ? View.VISIBLE : View.GONE);
     }
 
-    private void showViewInfoTouchpad() {
-        mKeyboardInputView.setVisibility(View.VISIBLE);
+    private void changeFlipperView(View child) {
+        final int childIndex = mViewFlipper.indexOfChild(child);
+        if ((childIndex > -1) && (childIndex != mViewFlipper.getDisplayedChild())) {
+            mViewFlipper.setDisplayedChild(childIndex);
+        }
+    }
+
+    private void showViewConnected() {
+        changeFlipperView(mViewConnected);
+
         mKeyboardInputView.requestFocus();
-        mTouchpadView.setVisibility(View.VISIBLE);
-        mInfoWait.setVisibility(View.GONE);
-        mInfoImage.setVisibility(View.GONE);
-        setViewInfoText("", "", false);
     }
 
-    private void showViewInfoWait(String title, String text) {
-        mKeyboardInputView.setVisibility(View.GONE);
-        mTouchpadView.setVisibility(View.GONE);
-        mInfoWait.setVisibility(View.VISIBLE);
-        mInfoImage.setVisibility(View.GONE);
-        setViewInfoText(title, text, false);
+    private void showViewDisconnected(int errorCode) {
+        switch (errorCode) {
+        case 0:
+            mInfoImage.setImageResource(R.drawable.disconnected);
+            setViewInfoText(getString(R.string.info_title_disconnected), "", true);
+            break;
+        case DaemonService.ERROR_ACCES:
+            mInfoImage.setImageResource(R.drawable.problem);
+            setViewInfoText(getString(R.string.info_title_permission_denied),
+                    getString(R.string.info_text_pair_again),
+                    false);
+            break;
+        case DaemonService.ERROR_HOSTDOWN:
+            mInfoImage.setImageResource(R.drawable.problem);
+            setViewInfoText(getString(R.string.info_title_host_unavailable),
+                    getString(R.string.info_text_host_unavailable),
+                    true);
+            break;
+        case DaemonService.ERROR_CONNREFUSED:
+            if (mIsPairingConnect &&
+                    (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS))) {
+                mInfoImage.setImageResource(R.drawable.problem);
+                setViewInfoText(getString(R.string.info_title_connection_refused),
+                        getString(R.string.info_text_ios_bt_off_on),
+                        true);
+            } else {
+                mInfoImage.setImageResource(R.drawable.problem);
+                setViewInfoText(getString(R.string.info_title_connection_refused),
+                        getString(R.string.info_text_connection_refused),
+                        true);
+            }
+            break;
+        case DaemonService.ERROR_BADE:
+            mInfoImage.setImageResource(R.drawable.problem);
+            setViewInfoText(getString(R.string.info_title_authorization_error),
+                    getString(R.string.info_text_pair_again),
+                    false);
+            break;
+        case DaemonService.ERROR_TIMEDOUT:
+            mInfoImage.setImageResource(R.drawable.problem);
+            setViewInfoText(getString(R.string.info_title_connection_timeout),
+                    getString(R.string.info_text_host_unavailable),
+                    true);
+            break;
+        default:
+            mInfoImage.setImageResource(R.drawable.problem);
+            setViewInfoText(getString(R.string.info_title_connection_problem),
+                    getString(R.string.info_text_host_unavailable),
+                    true);
+            break;
+        }
+
+        changeFlipperView(mViewDisconnected);
     }
 
-    private void showViewInfoImage(int resid, String title, String text, boolean showReconnect) {
-        mKeyboardInputView.setVisibility(View.GONE);
-        mTouchpadView.setVisibility(View.GONE);
-        mInfoWait.setVisibility(View.GONE);
-        mInfoImage.setImageResource(resid);
-        mInfoImage.setVisibility(View.VISIBLE);
-        setViewInfoText(title, text, showReconnect);
+    private void showViewConnecting() {
+        changeFlipperView(mViewConnecting);
     }
 
-    private void refreshViewInfo() {
+    private void updateViews() {
         // No need for update when the Activity is closing
         if (isFinishing()) {
             return;
@@ -681,66 +742,21 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         switch (hidState) {
         case DaemonService.HID_STATE_CONNECTING:
-            showViewInfoWait(getString(R.string.info_title_connecting), "");
+            showViewConnecting();
             break;
         case DaemonService.HID_STATE_DISCONNECTING:
         case DaemonService.HID_STATE_DISCONNECTED:
             switch (errorCode) {
-            case 0:
-                showViewInfoImage(R.drawable.disconnected,
-                        getString(R.string.info_title_disconnected), "", true);
-                break;
-            case DaemonService.ERROR_ACCES:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_permission_denied),
-                        getString(R.string.info_text_pair_again),
-                        false);
-                break;
-            case DaemonService.ERROR_HOSTDOWN:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_host_unavailable),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
-                break;
-            case DaemonService.ERROR_CONNREFUSED:
-                if (mIsPairingConnect &&
-                        (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_IOS))) {
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_connection_refused),
-                            getString(R.string.info_text_ios_bt_off_on),
-                            true);
-                } else {
-                    showViewInfoImage(R.drawable.problem,
-                            getString(R.string.info_title_connection_refused),
-                            getString(R.string.info_text_connection_refused),
-                            true);
-                }
-                break;
-            case DaemonService.ERROR_BADE:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_authorization_error),
-                        getString(R.string.info_text_pair_again),
-                        false);
-                break;
-            case DaemonService.ERROR_TIMEDOUT:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_timeout),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
-                break;
             case DaemonService.ERROR_ALREADY:
-                showViewInfoWait(getString(R.string.info_title_connecting), "");
+                showViewConnecting();
                 break;
             default:
-                showViewInfoImage(R.drawable.problem,
-                        getString(R.string.info_title_connection_problem),
-                        getString(R.string.info_text_host_unavailable),
-                        true);
+                showViewDisconnected(errorCode);
                 break;
             }
             break;
         case DaemonService.HID_STATE_CONNECTED:
-            showViewInfoTouchpad();
+            showViewConnected();
             break;
         }
     }
