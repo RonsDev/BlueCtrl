@@ -214,6 +214,22 @@ void hidc_send_hid_report_hw_keys(unsigned char keys);
 void hidc_send_hid_report_media_keys(unsigned char keys);
 
 /*
+ * Send a Application Control Keys HID Report to the host.
+ *
+ * Parameters:
+ *     keys: A bitmask with the pressed keys:
+ *           Bit 0 = Home
+ *           Bit 1 = Back
+ *           Bit 2 = Forward
+ *           Bit 3 = Reserved
+ *           Bit 4 = Reserved
+ *           Bit 5 = Reserved
+ *           Bit 6 = Reserved
+ *           Bit 7 = Reserved
+ */
+void hidc_send_hid_report_ac_keys(unsigned char keys);
+
+/*
  * Send a Mouse HID Report to the host.
  *
  * Parameters:

@@ -81,12 +81,23 @@ public class HidKeyboard {
     public static final int MEDIA_KEY_SCAN_PREV_TRACK = 0x10;
 
 
+    /** Indicates that the application control key 'Home' is pressed. */
+    public static final int AC_KEY_HOME = 0x01;
+
+    /** Indicates that the application control key 'Back' is pressed. */
+    public static final int AC_KEY_BACK = 0x02;
+
+    /** Indicates that the application control key 'Forward' is pressed. */
+    public static final int AC_KEY_FORWARD = 0x04;
+
+
     private DaemonService mDaemon;
 
     private int mPressedModifier = 0;
     private int mPressedSystemKeys = 0;
     private int mPressedHardwareKeys = 0;
     private int mPressedMediaKeys = 0;
+    private int mPressedAppCtrlKeys = 0;
     private IntArrayList mPressedKeys = new IntArrayList(6);
 
 
@@ -213,6 +224,28 @@ public class HidKeyboard {
             mDaemon.sendMediaKeyReport(mPressedMediaKeys);
 
             if (V) Log.v(TAG, String.format("media key released (0x%h)", key));
+        }
+    }
+
+    public void pressAppCtrlKey(int key) {
+        final int newKeys = mPressedAppCtrlKeys | key;
+        if (mPressedAppCtrlKeys != newKeys) {
+            mPressedAppCtrlKeys = newKeys;
+
+            mDaemon.sendAppCtrlKeyReport(mPressedAppCtrlKeys);
+
+            if (V) Log.v(TAG, String.format("application control key pressed (0x%h)", key));
+        }
+    }
+
+    public void releaseAppCtrlKey(int key) {
+        final int newKeys = mPressedAppCtrlKeys & ~key;
+        if (mPressedAppCtrlKeys != newKeys) {
+            mPressedAppCtrlKeys = newKeys;
+
+            mDaemon.sendAppCtrlKeyReport(mPressedAppCtrlKeys);
+
+            if (V) Log.v(TAG, String.format("application control key released (0x%h)", key));
         }
     }
 }

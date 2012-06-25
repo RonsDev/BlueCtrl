@@ -345,6 +345,21 @@ static void do_ipc_cmd_hid_send_media_keys()
 }
 
 /*
+ * Called when a "Send Application Control Keys HID Report" command is
+ * received.
+ */
+static void do_ipc_cmd_hid_send_ac_keys()
+{
+	unsigned char keys;
+
+	if (receive_ipc_data(&keys, sizeof(keys)) < 0)
+		return;
+
+	if (hidc_is_hid_connected())
+		hidc_send_hid_report_ac_keys(keys);
+}
+
+/*
  * Called when a "Change Mouse Feature Report" command is received.
  */
 static void do_ipc_cmd_hid_change_mouse_feature()
@@ -449,6 +464,9 @@ static void pollin_client_ipc_sock()
 		break;
 	case HIDC_IPC_CMD_HID_SEND_MEDIA_KEYS:
 		do_ipc_cmd_hid_send_media_keys();
+		break;
+	case HIDC_IPC_CMD_HID_SEND_AC_KEYS:
+		do_ipc_cmd_hid_send_ac_keys();
 		break;
 	case HIDC_IPC_CMD_HID_CHANGE_MOUSE_FEATURE:
 		do_ipc_cmd_hid_change_mouse_feature();

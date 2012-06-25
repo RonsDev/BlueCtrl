@@ -151,6 +151,20 @@ typedef enum HidcIpcCommand {
 	 */
 	HIDC_IPC_CMD_HID_SEND_MEDIA_KEYS = 140,
 	/*
+	 * Send a Application Control Keys HID Report to the host.
+	 * Additional data:
+	 *     1 byte : A bitmask with the pressed keys:
+	 *              Bit 0 = Home
+	 *              Bit 1 = Back
+	 *              Bit 2 = Forward
+	 *              Bit 3 = Reserved
+	 *              Bit 4 = Reserved
+	 *              Bit 5 = Reserved
+	 *              Bit 6 = Reserved
+	 *              Bit 7 = Reserved
+	 */
+	HIDC_IPC_CMD_HID_SEND_AC_KEYS = 145,
+	/*
 	 * Change the Mouse Feature Report.
 	 * Additional data:
 	 *     1 byte: Boolean value that defines if Smooth Scrolling is

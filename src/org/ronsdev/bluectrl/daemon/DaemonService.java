@@ -183,6 +183,7 @@ public class DaemonService extends Service {
     private static final int IPC_CMD_HID_SEND_SYSTEM_KEYS = 125;
     private static final int IPC_CMD_HID_SEND_HW_KEYS = 130;
     private static final int IPC_CMD_HID_SEND_MEDIA_KEYS = 140;
+    private static final int IPC_CMD_HID_SEND_AC_KEYS = 145;
     private static final int IPC_CMD_HID_CHANGE_MOUSE_FEATURE = 150;
 
 
@@ -836,6 +837,20 @@ public class DaemonService extends Service {
                 mOutStream.flush();
             } catch (IOException e) {
                 Log.e(TAG, "send daemon IPC command 'HID Media Key Report' failed", e);
+                stopDaemon(ERROR_IPC);
+            }
+        }
+    }
+
+    /** Sends a Application Control Keys HID Report to the host. */
+    public void sendAppCtrlKeyReport(int keys) {
+        if (isRunning()) {
+            try {
+                mOutStream.writeInt(IPC_CMD_HID_SEND_AC_KEYS);
+                mOutStream.writeByte(keys);
+                mOutStream.flush();
+            } catch (IOException e) {
+                Log.e(TAG, "send daemon IPC command 'HID Application Control Key Report' failed", e);
                 stopDaemon(ERROR_IPC);
             }
         }

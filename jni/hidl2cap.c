@@ -85,6 +85,7 @@ static unsigned char output_report_keys[3];
 static unsigned char input_report_system_keys[3];
 static unsigned char input_report_hw_keys[3];
 static unsigned char input_report_media_keys[3];
+static unsigned char input_report_ac_keys[3];
 static unsigned char input_report_mouse[9];
 static unsigned char feature_report_mouse[3];
 
@@ -197,6 +198,28 @@ static void reset_input_report_media_keys()
 static size_t get_input_report_media_keys_size()
 {
 	return sizeof(input_report_media_keys);
+}
+
+/*
+ * Clear and initialize the Application Control Keys Input Report.
+ */
+static void reset_input_report_ac_keys()
+{
+	memset(input_report_ac_keys, 0, sizeof(input_report_ac_keys));
+
+	input_report_ac_keys[0] = BTTHT_DATA | BTTHP_DATA_INPUT;
+	input_report_ac_keys[1] = HIDC_REPORTID_AC_KEYS;
+}
+
+/*
+ * Get the actual size of the Application Control Keys Input Report.
+ *
+ * Returns:
+ *     The byte count of the Report.
+ */
+static size_t get_input_report_ac_keys_size()
+{
+	return sizeof(input_report_ac_keys);
 }
 
 /*
@@ -426,6 +449,7 @@ static void on_hid_connected(bdaddr_t *dst_addr)
 	reset_input_report_system_keys();
 	reset_input_report_hw_keys();
 	reset_input_report_media_keys();
+	reset_input_report_ac_keys();
 	reset_input_report_mouse();
 	reset_feature_report_mouse();
 
@@ -722,6 +746,10 @@ static void on_cmd_get_report(unsigned char param, unsigned char *data,
 		else if (reportid == HIDC_REPORTID_MEDIA_KEYS) {
 			report_data = input_report_media_keys;
 			report_size = get_input_report_media_keys_size();
+		}
+		else if (reportid == HIDC_REPORTID_AC_KEYS) {
+			report_data = input_report_ac_keys;
+			report_size = get_input_report_ac_keys_size();
 		}
 		else if (reportid == HIDC_REPORTID_MOUSE) {
 			report_data = input_report_mouse;
@@ -1249,6 +1277,17 @@ void hidc_send_hid_report_media_keys(unsigned char keys)
 	send_data_report(client_intr_sock,
 			input_report_media_keys,
 			get_input_report_media_keys_size());
+}
+
+void hidc_send_hid_report_ac_keys(unsigned char keys)
+{
+	reset_input_report_ac_keys();
+
+	input_report_ac_keys[2] = keys;
+
+	send_data_report(client_intr_sock,
+			input_report_ac_keys,
+			get_input_report_ac_keys_size());
 }
 
 void hidc_send_hid_report_mouse(unsigned char buttons, int16_t x, int16_t y,
