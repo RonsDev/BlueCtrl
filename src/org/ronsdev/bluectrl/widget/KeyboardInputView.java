@@ -444,119 +444,119 @@ public class KeyboardInputView extends View {
     private static int convertToHidKeyCode(int keyCode) {
         switch (keyCode) {
         case KeyEventFuture.KEYCODE_BREAK:
-            return 72;
+            return HidKeyboard.KEYCODE_PAUSE;
         case KeyEventFuture.KEYCODE_CAPS_LOCK:
-            return 57;
+            return HidKeyboard.KEYCODE_CAPS_LOCK;
         case KeyEvent.KEYCODE_CLEAR:
-            return 156;
+            return HidKeyboard.KEYCODE_CLEAR;
         case KeyEvent.KEYCODE_DEL:
-            return 42;
+            return HidKeyboard.KEYCODE_DEL;
         case KeyEvent.KEYCODE_DPAD_CENTER:
-            return 40;
+            return HidKeyboard.KEYCODE_ENTER;
         case KeyEvent.KEYCODE_DPAD_DOWN:
-            return 81;
+            return HidKeyboard.KEYCODE_DOWN_ARROW;
         case KeyEvent.KEYCODE_DPAD_LEFT:
-            return 80;
+            return HidKeyboard.KEYCODE_LEFT_ARROW;
         case KeyEvent.KEYCODE_DPAD_RIGHT:
-            return 79;
+            return HidKeyboard.KEYCODE_RIGHT_ARROW;
         case KeyEvent.KEYCODE_DPAD_UP:
-            return 82;
+            return HidKeyboard.KEYCODE_UP_ARROW;
         case KeyEvent.KEYCODE_ENTER:
-            return 40;
+            return HidKeyboard.KEYCODE_ENTER;
         case KeyEventFuture.KEYCODE_ESCAPE:
-            return 41;
+            return HidKeyboard.KEYCODE_ESCAPE;
         case KeyEventFuture.KEYCODE_F1:
-            return 58;
+            return HidKeyboard.KEYCODE_F1;
         case KeyEventFuture.KEYCODE_F10:
-            return 67;
+            return HidKeyboard.KEYCODE_F10;
         case KeyEventFuture.KEYCODE_F11:
-            return 68;
+            return HidKeyboard.KEYCODE_F11;
         case KeyEventFuture.KEYCODE_F12:
-            return 69;
+            return HidKeyboard.KEYCODE_F12;
         case KeyEventFuture.KEYCODE_F2:
-            return 59;
+            return HidKeyboard.KEYCODE_F2;
         case KeyEventFuture.KEYCODE_F3:
-            return 60;
+            return HidKeyboard.KEYCODE_F3;
         case KeyEventFuture.KEYCODE_F4:
-            return 61;
+            return HidKeyboard.KEYCODE_F4;
         case KeyEventFuture.KEYCODE_F5:
-            return 62;
+            return HidKeyboard.KEYCODE_F5;
         case KeyEventFuture.KEYCODE_F6:
-            return 63;
+            return HidKeyboard.KEYCODE_F6;
         case KeyEventFuture.KEYCODE_F7:
-            return 64;
+            return HidKeyboard.KEYCODE_F7;
         case KeyEventFuture.KEYCODE_F8:
-            return 65;
+            return HidKeyboard.KEYCODE_F8;
         case KeyEventFuture.KEYCODE_F9:
-            return 66;
+            return HidKeyboard.KEYCODE_F9;
         case KeyEventFuture.KEYCODE_FORWARD_DEL:
-            return 76;
+            return HidKeyboard.KEYCODE_FORWARD_DEL;
         case KeyEventFuture.KEYCODE_INSERT:
-            return 73;
+            return HidKeyboard.KEYCODE_INSERT;
         case KeyEventFuture.KEYCODE_MOVE_END:
-            return 77;
+            return HidKeyboard.KEYCODE_END;
         case KeyEventFuture.KEYCODE_MOVE_HOME:
-            return 74;
+            return HidKeyboard.KEYCODE_HOME;
         case KeyEventFuture.KEYCODE_NUMPAD_0:
-            return 98;
+            return HidKeyboard.KEYCODE_NUMPAD_0;
         case KeyEventFuture.KEYCODE_NUMPAD_1:
-            return 89;
+            return HidKeyboard.KEYCODE_NUMPAD_1;
         case KeyEventFuture.KEYCODE_NUMPAD_2:
-            return 90;
+            return HidKeyboard.KEYCODE_NUMPAD_2;
         case KeyEventFuture.KEYCODE_NUMPAD_3:
-            return 91;
+            return HidKeyboard.KEYCODE_NUMPAD_3;
         case KeyEventFuture.KEYCODE_NUMPAD_4:
-            return 92;
+            return HidKeyboard.KEYCODE_NUMPAD_4;
         case KeyEventFuture.KEYCODE_NUMPAD_5:
-            return 93;
+            return HidKeyboard.KEYCODE_NUMPAD_5;
         case KeyEventFuture.KEYCODE_NUMPAD_6:
-            return 94;
+            return HidKeyboard.KEYCODE_NUMPAD_6;
         case KeyEventFuture.KEYCODE_NUMPAD_7:
-            return 95;
+            return HidKeyboard.KEYCODE_NUMPAD_7;
         case KeyEventFuture.KEYCODE_NUMPAD_8:
-            return 96;
+            return HidKeyboard.KEYCODE_NUMPAD_8;
         case KeyEventFuture.KEYCODE_NUMPAD_9:
-            return 97;
+            return HidKeyboard.KEYCODE_NUMPAD_9;
         case KeyEventFuture.KEYCODE_NUMPAD_ADD:
-            return 87;
+            return HidKeyboard.KEYCODE_NUMPAD_ADD;
         case KeyEventFuture.KEYCODE_NUMPAD_COMMA:
-            return 133;
+            return HidKeyboard.KEYCODE_NUMPAD_COMMA;
         case KeyEventFuture.KEYCODE_NUMPAD_DIVIDE:
-            return 84;
+            return HidKeyboard.KEYCODE_NUMPAD_DIVIDE;
         case KeyEventFuture.KEYCODE_NUMPAD_DOT:
-            return 99;
+            return HidKeyboard.KEYCODE_NUMPAD_DOT;
         case KeyEventFuture.KEYCODE_NUMPAD_ENTER:
-            return 88;
+            return HidKeyboard.KEYCODE_NUMPAD_ENTER;
         case KeyEventFuture.KEYCODE_NUMPAD_EQUALS:
-            return 103;
+            return HidKeyboard.KEYCODE_NUMPAD_EQUALS;
         case KeyEventFuture.KEYCODE_NUMPAD_LEFT_PAREN:
-            return 182;
+            return HidKeyboard.KEYCODE_NUMPAD_LEFT_PAREN;
         case KeyEventFuture.KEYCODE_NUMPAD_MULTIPLY:
-            return 85;
+            return HidKeyboard.KEYCODE_NUMPAD_MULTIPLY;
         case KeyEventFuture.KEYCODE_NUMPAD_RIGHT_PAREN:
-            return 183;
+            return HidKeyboard.KEYCODE_NUMPAD_RIGHT_PAREN;
         case KeyEventFuture.KEYCODE_NUMPAD_SUBTRACT:
-            return 86;
+            return HidKeyboard.KEYCODE_NUMPAD_SUBTRACT;
         case KeyEventFuture.KEYCODE_NUM_LOCK:
-            return 83;
+            return HidKeyboard.KEYCODE_NUM_LOCK;
         case KeyEvent.KEYCODE_PAGE_DOWN:
-            return 78;
+            return HidKeyboard.KEYCODE_PAGE_DOWN;
         case KeyEvent.KEYCODE_PAGE_UP:
-            return 75;
+            return HidKeyboard.KEYCODE_PAGE_UP;
         case KeyEventFuture.KEYCODE_SCROLL_LOCK:
-            return 71;
+            return HidKeyboard.KEYCODE_SCROLL_LOCK;
         case KeyEvent.KEYCODE_SPACE:
-            return 44;
+            return HidKeyboard.KEYCODE_SPACE;
         case KeyEventFuture.KEYCODE_SYSRQ:
-            return 70;
+            return HidKeyboard.KEYCODE_SYSRQ;
         case KeyEvent.KEYCODE_TAB:
-            return 43;
+            return HidKeyboard.KEYCODE_TAB;
         case KeyEvent.KEYCODE_VOLUME_DOWN:
-            return 129;
+            return HidKeyboard.KEYCODE_VOLUME_DOWN;
         case KeyEventFuture.KEYCODE_VOLUME_MUTE:
-            return 127;
+            return HidKeyboard.KEYCODE_MUTE;
         case KeyEvent.KEYCODE_VOLUME_UP:
-            return 128;
+            return HidKeyboard.KEYCODE_VOLUME_UP;
         default:
             return 0;
         }
