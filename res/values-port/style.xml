@@ -18,7 +18,6 @@
     <style name="info_block_image">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@android:color/black</item>
     </style>
     <style name="info_block_content">
         <item name="android:layout_width">wrap_content</item>
