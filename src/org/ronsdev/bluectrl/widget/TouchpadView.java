@@ -23,7 +23,6 @@ import org.ronsdev.bluectrl.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -83,13 +82,13 @@ public class TouchpadView extends View
     public static final int SCROLL_MODE_ALL = 30;
 
 
-    private static final int BG_DOT_COLOR = Color.rgb(80, 84, 89);
-    private static final int BG_DOT_DIAMETER_DP = 2;
-    private static final int BG_DOT_MARGIN_DP = 25;
+    private static final int TOUCHPAD_AREA_PADDING_DP = 16;
 
     private static final int BUTTON_BAR_HEIGHT_DP = 48;
+    private static final float BUTTON_BAR_STROKE_WIDTH_DP = 1.5f;
+    private static final float BUTTON_SEP_STROKE_WIDTH_DP = 0.8f;
+    private static final int BUTTON_SEP_MARGIN_DP = 12;
     private static final int MIDDLE_BUTTON_WIDTH_DP = 48;
-    private static final int MAX_BUTTON_WIDTH_DP = 300;
     private static final int BUTTON_CLICK_DURATION = 100;
 
     private static final int BUTTON_INDEX_FIRST = 0;
@@ -98,8 +97,9 @@ public class TouchpadView extends View
     private static final int BUTTON_COUNT = 3;
 
 
-    private Paint mBackgroundPaint = new Paint();
+    private Paint mButtonBarPaint = new Paint();
 
+    private Drawable mBackgroundDrawable = null;
     private Drawable mButtonDrawable = null;
     private Drawable mScrollVerticalDrawable = null;
     private Drawable mScrollHorizontalDrawable = null;
@@ -113,12 +113,14 @@ public class TouchpadView extends View
 
     private float mDisplayDensity;
 
-    private int mBgDotDiameter;
-    private int mBgDotMargin;
+    private int mTouchpadAreaPadding;
 
+    private int mButtonBarColor;
     private int mButtonBarHeight;
+    private int mButtonBarStrokeWidth;
+    private int mButtonSepStrokeWidth;
+    private int mButtonSepMargin;
     private int mMiddleButtonWidth;
-    private int mMaxButtonWidth;
 
     /**
      * Array with the rectangles for the buttons (see 'BUTTON_INDEX_*' constants for index
@@ -159,10 +161,9 @@ public class TouchpadView extends View
 
 
     private final void initView() {
-        mBackgroundPaint.setColor(BG_DOT_COLOR);
-
         final Resources res = getResources();
 
+        mBackgroundDrawable = res.getDrawable(R.drawable.touchpad_background);
         mButtonDrawable = res.getDrawable(R.drawable.btn_touchpad);
         mScrollVerticalDrawable = res.getDrawable(R.drawable.scroll_vertical);
         mScrollHorizontalDrawable = res.getDrawable(R.drawable.scroll_horizontal);
@@ -170,12 +171,14 @@ public class TouchpadView extends View
 
         mDisplayDensity = res.getDisplayMetrics().density;
 
-        mBgDotDiameter = (int)(BG_DOT_DIAMETER_DP * mDisplayDensity + 0.5f);
-        mBgDotMargin = (int)(BG_DOT_MARGIN_DP * mDisplayDensity + 0.5f);
+        mTouchpadAreaPadding = (int)(TOUCHPAD_AREA_PADDING_DP * mDisplayDensity + 0.5f);
 
+        mButtonBarColor = res.getColor(R.color.btn_touchpad_border);
         mButtonBarHeight = (int)(BUTTON_BAR_HEIGHT_DP * mDisplayDensity + 0.5f);
+        mButtonBarStrokeWidth = (int)(BUTTON_BAR_STROKE_WIDTH_DP * mDisplayDensity + 0.5f);
+        mButtonSepStrokeWidth = (int)(BUTTON_SEP_STROKE_WIDTH_DP * mDisplayDensity + 0.5f);
+        mButtonSepMargin = (int)(BUTTON_SEP_MARGIN_DP * mDisplayDensity + 0.5f);
         mMiddleButtonWidth = (int)(MIDDLE_BUTTON_WIDTH_DP * mDisplayDensity + 0.5f);
-        mMaxButtonWidth = (int)(MAX_BUTTON_WIDTH_DP * mDisplayDensity + 0.5f);
 
         mMouseTouchListener = new MouseTouchListener(this);
         mMouseTouchListener.setOnTouchpadGestureListener(this);
@@ -192,20 +195,15 @@ public class TouchpadView extends View
         final int width = getWidth();
         final int height = getHeight();
         final int buttonBarTop = getTouchpadAreaHeight();
-        final int middleButtonLeft = (width / 2) - (mMiddleButtonWidth / 2);
+        final int centerHorizontal = (width / 2);
+        final int middleButtonLeft = centerHorizontal - (mMiddleButtonWidth / 2);
         final int middleButtonRight = middleButtonLeft + mMiddleButtonWidth;
 
-        Rect firstButtonRect = new Rect(0, buttonBarTop, middleButtonLeft, height);
-        if (firstButtonRect.width() > mMaxButtonWidth){
-            firstButtonRect.left = firstButtonRect.right - mMaxButtonWidth;
-        }
-        mButtonRects[BUTTON_INDEX_FIRST] = firstButtonRect;
+        mButtonRects[BUTTON_INDEX_FIRST] =
+                new Rect(0, buttonBarTop, centerHorizontal, height);
 
-        Rect secondButtonRect = new Rect(middleButtonRight, buttonBarTop, width, height);
-        if (secondButtonRect.width() > mMaxButtonWidth){
-            secondButtonRect.right = secondButtonRect.left + mMaxButtonWidth;
-        }
-        mButtonRects[BUTTON_INDEX_SECOND] = secondButtonRect;
+        mButtonRects[BUTTON_INDEX_SECOND] =
+                new Rect(centerHorizontal, buttonBarTop, width, height);
 
         mButtonRects[BUTTON_INDEX_MIDDLE] =
                 new Rect(middleButtonLeft, buttonBarTop, middleButtonRight, height);
@@ -367,7 +365,7 @@ public class TouchpadView extends View
             final int downX = (int)event.getX(downPointerIndex);
             final int downY = (int)event.getY(downPointerIndex);
 
-            for (int i = 0; i < mButtonRects.length; i++) {
+            for (int i = (mButtonRects.length - 1); i >= 0; i--) {
                 if (mButtonRects[i].contains(downX, downY)) {
                     if (mButtonPointerIds[i].isEmpty()) {
                         mHidMouse.pressButton(convertBtIndexToHidMouseBt(i));
@@ -427,6 +425,12 @@ public class TouchpadView extends View
         }
     }
 
+    private boolean isButtonPressed(int btIndex) {
+        final int hidMouseBt = convertBtIndexToHidMouseBt(btIndex);
+        return (mClickedButtons[btIndex] ||
+                ((mHidMouse != null) && mHidMouse.isButtonPressed(hidMouseBt)));
+    }
+
     private void releaseAllButtons() {
         for (int i = 0; i < mButtonPointerIds.length; i++) {
             if (!mButtonPointerIds[i].isEmpty()) {
@@ -442,6 +446,9 @@ public class TouchpadView extends View
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        mBackgroundDrawable.setBounds(0, 0, getWidth(), getHeight());
+        mBackgroundDrawable.draw(canvas);
+
         switch (mMouseTouchListener.getScrollMode()) {
         case SCROLL_MODE_VERTICAL:
             drawInfoDrawable(canvas, mScrollVerticalDrawable);
@@ -452,9 +459,6 @@ public class TouchpadView extends View
         case SCROLL_MODE_ALL:
             drawInfoDrawable(canvas, mScrollAllDrawable);
             break;
-        default:
-            drawBackgroundDots(canvas);
-            break;
         }
 
         if (mShowButtons) {
@@ -462,43 +466,21 @@ public class TouchpadView extends View
         }
     }
 
-    private void drawBackgroundDots(Canvas canvas) {
-        final int width = getTouchpadAreaWidth();
-        final int height = getTouchpadAreaHeight();
-        final int totalDotWidth = mBgDotMargin + mBgDotDiameter + mBgDotMargin;
-        final int leftOffset = (width % totalDotWidth) / 2;
-        final int topOffset = (height % totalDotWidth) / 2;
-
-        int topPos = topOffset + mBgDotMargin;
-        while (topPos < height) {
-            int leftPos = leftOffset + mBgDotMargin;
-            while (leftPos < width) {
-                canvas.drawRect(leftPos,
-                        topPos,
-                        leftPos + mBgDotDiameter,
-                        topPos + mBgDotDiameter,
-                        mBackgroundPaint);
-
-                leftPos += totalDotWidth;
-            }
-
-            topPos += totalDotWidth;
-        }
-    }
-
     private void drawInfoDrawable(Canvas canvas, Drawable drawable) {
         final int touchpadWidth = getTouchpadAreaWidth();
         final int touchpadHeight = getTouchpadAreaHeight();
+        final int maxWidth = touchpadWidth - (mTouchpadAreaPadding * 2);
+        final int maxHeight = touchpadHeight - (mTouchpadAreaPadding * 2);
 
         int drawableWidth = drawable.getIntrinsicWidth();
         int drawableHeight = drawable.getIntrinsicHeight();
-        if ((drawableWidth > touchpadWidth) || (drawableHeight > touchpadHeight)) {
-            if (touchpadWidth < touchpadHeight) {
-                drawableWidth = touchpadWidth;
-                drawableHeight = touchpadWidth;
+        if ((drawableWidth > maxWidth) || (drawableHeight > maxHeight)) {
+            if (maxWidth < maxHeight) {
+                drawableWidth = maxWidth;
+                drawableHeight = maxWidth;
             } else {
-                drawableWidth = touchpadHeight;
-                drawableHeight = touchpadHeight;
+                drawableWidth = maxHeight;
+                drawableHeight = maxHeight;
             }
         }
 
@@ -510,16 +492,42 @@ public class TouchpadView extends View
     }
 
     private void drawButtons(Canvas canvas) {
-        for (int i = 0; i < mButtonRects.length; i++) {
-            final int hidMouseBt = convertBtIndexToHidMouseBt(i);
-            if (mClickedButtons[i] ||
-                    ((mHidMouse != null) && mHidMouse.isButtonPressed(hidMouseBt))) {
-                mButtonDrawable.setState(PRESSED_ENABLED_STATE_SET);
-            } else {
-                mButtonDrawable.setState(EMPTY_STATE_SET);
-            }
-            mButtonDrawable.setBounds(mButtonRects[i]);
-            mButtonDrawable.draw(canvas);
+        final Rect firstButtonRect = mButtonRects[BUTTON_INDEX_FIRST];
+        final Rect secondButtonRect = mButtonRects[BUTTON_INDEX_SECOND];
+
+        mButtonDrawable.setBounds(firstButtonRect);
+        if (isButtonPressed(BUTTON_INDEX_FIRST) || isButtonPressed(BUTTON_INDEX_MIDDLE)) {
+            mButtonDrawable.setState(PRESSED_ENABLED_STATE_SET);
+        } else {
+            mButtonDrawable.setState(EMPTY_STATE_SET);
         }
+        mButtonDrawable.draw(canvas);
+
+        mButtonDrawable.setBounds(secondButtonRect);
+        if (isButtonPressed(BUTTON_INDEX_SECOND) || isButtonPressed(BUTTON_INDEX_MIDDLE)) {
+            mButtonDrawable.setState(PRESSED_ENABLED_STATE_SET);
+        } else {
+            mButtonDrawable.setState(EMPTY_STATE_SET);
+        }
+        mButtonDrawable.draw(canvas);
+
+
+        final int buttonBarY = firstButtonRect.top - (mButtonBarStrokeWidth / 2);
+        mButtonBarPaint.setColor(mButtonBarColor);
+        mButtonBarPaint.setStrokeWidth(mButtonBarStrokeWidth);
+        canvas.drawLine(firstButtonRect.left,
+                buttonBarY,
+                secondButtonRect.right,
+                buttonBarY,
+                mButtonBarPaint);
+
+        final int buttonSepX = firstButtonRect.right - (mButtonSepStrokeWidth / 2);
+        mButtonBarPaint.setColor(mButtonBarColor);
+        mButtonBarPaint.setStrokeWidth(mButtonSepStrokeWidth);
+        canvas.drawLine(buttonSepX,
+                firstButtonRect.top + mButtonSepMargin,
+                buttonSepX,
+                firstButtonRect.bottom - mButtonSepMargin,
+                mButtonBarPaint);
     }
 }

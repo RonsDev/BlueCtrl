@@ -2,5 +2,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/btn_touchpad_pressed"
           android:state_pressed="true" />
-    <item android:drawable="@drawable/btn_touchpad_normal" />
+    <item android:drawable="@android:color/transparent" />
 </selector>

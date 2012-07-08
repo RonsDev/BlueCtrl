@@ -10,8 +10,8 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="640"
-   height="640"
+   width="480"
+   height="480"
    id="svg3290"
    version="1.1"
    inkscape:version="0.48.1 r9760"
@@ -28,11 +28,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="38.56733"
-     inkscape:cy="342.57737"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="154.00188"
+     inkscape:cy="213.11673"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1022"
@@ -48,22 +48,6 @@
        visible="true"
        enabled="true"
        snapvisiblegridlinesonly="true" />
-    <sodipodi:guide
-       orientation="0,1"
-       position="320,565"
-       id="guide3806" />
-    <sodipodi:guide
-       orientation="0,1"
-       position="320,75"
-       id="guide3808" />
-    <sodipodi:guide
-       orientation="1,0"
-       position="75,320"
-       id="guide3810" />
-    <sodipodi:guide
-       orientation="1,0"
-       position="565,320"
-       id="guide3812" />
   </sodipodi:namedview>
   <metadata
      id="metadata3295">
@@ -73,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -82,21 +66,22 @@
      id="layer2"
      inkscape:label="Background"
      style="display:none"
-     transform="translate(0,352)"
+     transform="translate(0,192)"
      sodipodi:insensitive="true">
     <rect
-       style="fill:#000000;stroke:none"
+       style="fill:#000000;fill-opacity:1;stroke:none"
        id="rect4340"
-       width="640"
-       height="640"
+       width="480"
+       height="480"
        x="0"
-       y="-352" />
+       y="-192" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Base"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(0,-160)">
     <path
        sodipodi:type="arc"
        style="opacity:0.7;fill:#33b5e5;fill-opacity:1;stroke:none;display:inline"
@@ -105,12 +90,12 @@
        sodipodi:cy="144.78572"
        sodipodi:rx="17.142857"
        sodipodi:ry="17.142857"
-       d="m 161.42858,144.78572 a 17.142857,17.142857 0 1 1 -34.28572,0 17.142857,17.142857 0 1 1 34.28572,0 z"
-       transform="matrix(1.6302257,0,0,1.6302257,84.78171,83.966597)" />
+       d="m 161.42858,144.78572 c 0,9.46774 -7.67512,17.14286 -17.14286,17.14286 -9.46774,0 -17.14286,-7.67512 -17.14286,-17.14286 0,-9.46774 7.67512,-17.14286 17.14286,-17.14286 9.46774,0 17.14286,7.67512 17.14286,17.14286 z"
+       transform="matrix(1.6302257,0,0,1.6302257,4.78171,163.9666)" />
     <g
        style="display:inline"
        id="g4791"
-       transform="matrix(1.7848929,0,0,1.7848929,62.975422,-1294.5428)">
+       transform="matrix(1.7848929,0,0,1.7848929,-17.024578,-1214.5428)">
       <path
          inkscape:connector-curvature="0"
          id="rect4661"
@@ -128,23 +113,17 @@
       <use
          height="288"
          width="288"
-         transform="translate(0,-20.266304)"
+         transform="translate(0,-22.507334)"
          id="use4755"
          xlink:href="#use4753"
          y="0"
          x="0" />
-      <path
-         sodipodi:nodetypes="ccccccccc"
-         style="opacity:0.3;fill:#ffffff;fill-opacity:1;stroke:none"
-         d="M 180.21732,803.5142 152.48588,775.78274 144,767.29688 l -8.48586,8.48586 -27.73146,27.73146 4.48517,4.48515 L 144,776.2672 l 31.73217,31.73215 z"
-         id="use4755-1"
-         inkscape:connector-curvature="0" />
       <use
          x="0"
          y="0"
          xlink:href="#rect4661"
          id="use3764"
-         transform="translate(0,-64.981886)"
+         transform="translate(0,-67.222916)"
          width="640"
          height="640" />
     </g>
@@ -153,7 +132,7 @@
        y="0"
        xlink:href="#g4791"
        id="use3775"
-       transform="matrix(0,1,-1,0,639.99995,4.0000009e-7)"
+       transform="matrix(0,1,-1,0,639.99995,160)"
        width="640"
        height="640" />
     <use
@@ -161,7 +140,7 @@
        y="0"
        xlink:href="#g4791"
        id="use3777"
-       transform="matrix(-1,0,0,-1,640,639.99995)"
+       transform="matrix(-1,0,0,-1,480,799.99995)"
        width="640"
        height="640" />
     <use
@@ -169,7 +148,7 @@
        y="0"
        xlink:href="#g4791"
        id="use3779"
-       transform="matrix(0,-1,1,0,4.6695848e-5,640)"
+       transform="matrix(0,-1,1,0,-159.99995,640)"
        width="640"
        height="640" />
   </g>
@@ -177,11 +156,12 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Vertical"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(0,-160)">
     <path
        sodipodi:nodetypes="ccccccccc"
        style="fill:#33b5e5;fill-opacity:1;stroke:none;display:inline"
-       d="M 384.64404,139.64404 335.14639,90.14635 320,75 l -15.14635,15.14635 -49.4977,49.49769 8.00556,8.0055 L 320,91.01106 l 56.63852,56.63848 z"
+       d="M 298.64404,219.64404 255.14639,176.14635 240,161 l -15.14635,15.14635 -43.4977,43.49769 8.00556,8.0055 L 240,177.01106 l 50.63852,50.63848 z"
        id="use4755-1-1"
        inkscape:connector-curvature="0" />
     <use
@@ -189,7 +169,7 @@
        y="0"
        xlink:href="#use4755-1-1"
        id="use3802"
-       transform="matrix(-1,0,0,-1,640,640)"
+       transform="matrix(-1,0,0,-1,480,800)"
        width="640"
        height="640" />
   </g>
@@ -197,7 +177,7 @@
      inkscape:label="Horizontal"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-412.36218)"
+     transform="translate(0,-572.36218)"
      style="display:inline">
     <use
        style="display:inline"
@@ -205,7 +185,7 @@
        y="0"
        xlink:href="#use4755-1-1"
        id="use3825"
-       transform="matrix(0,1,-1,0,640,412.36218)"
+       transform="matrix(0,1,-1,0,640,572.36218)"
        width="640"
        height="640" />
     <use
@@ -214,7 +194,7 @@
        y="0"
        xlink:href="#use4755-1-1"
        id="use3828"
-       transform="matrix(0,-1,1,0,0,1052.3622)"
+       transform="matrix(0,-1,1,0,-160,1052.3622)"
        width="640"
        height="640" />
   </g>
