@@ -2,4 +2,6 @@
 <resources>
     <color name="btn_touchpad_border">#a0a6b3</color>
     <color name="btn_touchpad_pressed">#7533b5e5</color>
+    <color name="icon_btn_touchpad_pressed_start">#7533b5e5</color>
+    <color name="icon_btn_touchpad_pressed_end">#3033b5e5</color>
 </resources>

@@ -27,14 +27,34 @@
         <!-- Connected -->
         <RelativeLayout style="@style/touchpad_content"
                         android:id="@+id/view_connected">
+
             <org.ronsdev.bluectrl.widget.KeyboardInputView
                 android:id="@+id/keyboard_input"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent" />
+
             <org.ronsdev.bluectrl.widget.TouchpadView
                 android:id="@+id/touchpad"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent" />
+
+            <LinearLayout style="@style/touchpad_android_controls"
+                          android:id="@+id/touchpad_android_controls"
+                          android:visibility="gone">
+                <ImageButton style="@style/touchpad_android_button"
+                             android:id="@+id/btn_android_back"
+                             android:src="@drawable/btn_android_back"
+                             android:contentDescription="@string/description_android_back" />
+                <ImageButton style="@style/touchpad_android_button"
+                             android:id="@+id/btn_android_home"
+                             android:src="@drawable/btn_android_home"
+                             android:contentDescription="@string/description_android_home" />
+                <ImageButton style="@style/touchpad_android_button"
+                             android:id="@+id/btn_android_menu"
+                             android:src="@drawable/btn_android_menu"
+                             android:contentDescription="@string/description_android_menu" />
+            </LinearLayout>
+
         </RelativeLayout>
 
         <!-- Disconnected -->

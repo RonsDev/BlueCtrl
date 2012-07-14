@@ -45,6 +45,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -81,6 +82,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private static final int DIALOG_SEND_TEXT_PROGRESS = 2;
 
 
+    private static final int TOUCHPAD_AREA_ICON_BUTTON_PADDING_DP = 48;
+
     private static final int SEND_TEXT_PROGRESS_MIN_SIZE = 300;
     private static final int SEND_TEXT_CHUNK_SIZE = 30;
 
@@ -94,6 +97,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private View mViewConnected;
     private KeyboardInputView mKeyboardInputView;
     private TouchpadView mTouchpadView;
+    private ViewGroup mAndroidControls;
     private View mViewDisconnected;
     private ImageView mInfoImage;
     private TextView mInfoTitle;
@@ -101,6 +105,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private TextView mInfoReconnect;
     private View mViewConnecting;
     private ProgressDialog mSendTextProgressDlg;
+
+    private int mTouchpadAreaIconButtonPadding;
 
     private BluetoothDevice mBtDevice;
     private ClipboardManager mClipboard;
@@ -196,6 +202,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final float displayDensity = getResources().getDisplayMetrics().density;
+
+        mTouchpadAreaIconButtonPadding =
+                (int)(TOUCHPAD_AREA_ICON_BUTTON_PADDING_DP * displayDensity + 0.5f);
 
         Bundle extras = getIntent().getExtras();
         mBtDevice = extras.getParcelable(EXTRA_DEVICE);
@@ -455,6 +466,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         mViewFlipper = (ViewFlipper)findViewById(R.id.flipper);
 
+
         // View Connected
         mViewConnected = (View)findViewById(R.id.view_connected);
 
@@ -465,6 +477,18 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
         mTouchpadView.setHidMouse(mHidMouse);
 
+        mAndroidControls = (ViewGroup)findViewById(R.id.touchpad_android_controls);
+
+        ImageButton btnAndroidBack = (ImageButton)findViewById(R.id.btn_android_back);
+        initKeyboardAppCtrlIconButton(btnAndroidBack, HidKeyboard.AC_KEY_BACK);
+
+        ImageButton btnAndroidHome = (ImageButton)findViewById(R.id.btn_android_home);
+        initKeyboardAppCtrlIconButton(btnAndroidHome, HidKeyboard.AC_KEY_HOME);
+
+        ImageButton btnAndroidMenu = (ImageButton)findViewById(R.id.btn_android_menu);
+        initKeyboardIconButton(btnAndroidMenu, HidKeyboard.KEYCODE_APPLICATION);
+
+
         // View Disconnected
         mViewDisconnected = (View)findViewById(R.id.view_disconnected);
 
@@ -472,6 +496,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mInfoTitle = (TextView)findViewById(R.id.info_title);
         mInfoText = (TextView)findViewById(R.id.info_text);
         mInfoReconnect = (TextView)findViewById(R.id.info_reconnect);
+
 
         // View Connecting
         mViewConnecting = (View)findViewById(R.id.view_connecting);
@@ -481,7 +506,50 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         updateViews();
     }
 
+    private void initKeyboardIconButton(ImageButton button, final int hidKeyCode) {
+        button.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    onKeyboardIconButtonDown(v);
+                    mHidKeyboard.pressKey(hidKeyCode);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mHidKeyboard.releaseKey(hidKeyCode);
+                    break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void initKeyboardAppCtrlIconButton(ImageButton button, final int key) {
+        button.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    onKeyboardIconButtonDown(v);
+                    mHidKeyboard.pressAppCtrlKey(key);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mHidKeyboard.releaseAppCtrlKey(key);
+                    break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void onKeyboardIconButtonDown(View v) {
+        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+    }
+
     private void updateViewSettings() {
+        int touchpadButtonBarHeight = 0;
+        int touchpadAreaPadding = 0;
+
         if (mKeyboardInputView != null) {
             mKeyboardInputView.setKeyMap(mDeviceSettings.getKeyMap());
         }
@@ -492,6 +560,26 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             mTouchpadView.setInvertScroll(mDeviceSettings.getInvertScroll());
             mTouchpadView.setScrollSensitivity(mDeviceSettings.getScrollSensitivity());
             mTouchpadView.setFlingScroll(mDeviceSettings.getFlingScroll());
+
+            touchpadButtonBarHeight = mTouchpadView.getVisibleButtonBarHeight();
+        }
+
+        if (mAndroidControls != null) {
+            if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_ANDROID)) {
+                mAndroidControls.setVisibility(View.VISIBLE);
+                mAndroidControls.setPadding(0, 0, 0, touchpadButtonBarHeight);
+                touchpadAreaPadding = mTouchpadAreaIconButtonPadding;
+            } else {
+                mAndroidControls.setVisibility(View.GONE);
+            }
+        }
+
+        if (mTouchpadView != null) {
+            if (touchpadAreaPadding > 0) {
+                mTouchpadView.setTouchpadAreaPadding(touchpadAreaPadding);
+            } else {
+                mTouchpadView.resetTouchpadAreaPadding();
+            }
         }
     }
 

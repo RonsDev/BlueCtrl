@@ -82,7 +82,7 @@ public class TouchpadView extends View
     public static final int SCROLL_MODE_ALL = 30;
 
 
-    private static final int TOUCHPAD_AREA_PADDING_DP = 16;
+    private static final int DEFAULT_TOUCHPAD_AREA_PADDING_DP = 16;
 
     private static final int BUTTON_BAR_HEIGHT_DP = 48;
     private static final float BUTTON_BAR_STROKE_WIDTH_DP = 1.5f;
@@ -111,8 +111,7 @@ public class TouchpadView extends View
 
     private boolean mShowButtons = true;
 
-    private float mDisplayDensity;
-
+    private int mDefaultTouchpadAreaPadding;
     private int mTouchpadAreaPadding;
 
     private int mButtonBarColor;
@@ -169,16 +168,18 @@ public class TouchpadView extends View
         mScrollHorizontalDrawable = res.getDrawable(R.drawable.scroll_horizontal);
         mScrollAllDrawable = res.getDrawable(R.drawable.scroll_all);
 
-        mDisplayDensity = res.getDisplayMetrics().density;
+        final float displayDensity = res.getDisplayMetrics().density;
 
-        mTouchpadAreaPadding = (int)(TOUCHPAD_AREA_PADDING_DP * mDisplayDensity + 0.5f);
+        mDefaultTouchpadAreaPadding =
+                (int)(DEFAULT_TOUCHPAD_AREA_PADDING_DP * displayDensity + 0.5f);
+        mTouchpadAreaPadding = mDefaultTouchpadAreaPadding;
 
         mButtonBarColor = res.getColor(R.color.btn_touchpad_border);
-        mButtonBarHeight = (int)(BUTTON_BAR_HEIGHT_DP * mDisplayDensity + 0.5f);
-        mButtonBarStrokeWidth = (int)(BUTTON_BAR_STROKE_WIDTH_DP * mDisplayDensity + 0.5f);
-        mButtonSepStrokeWidth = (int)(BUTTON_SEP_STROKE_WIDTH_DP * mDisplayDensity + 0.5f);
-        mButtonSepMargin = (int)(BUTTON_SEP_MARGIN_DP * mDisplayDensity + 0.5f);
-        mMiddleButtonWidth = (int)(MIDDLE_BUTTON_WIDTH_DP * mDisplayDensity + 0.5f);
+        mButtonBarHeight = (int)(BUTTON_BAR_HEIGHT_DP * displayDensity + 0.5f);
+        mButtonBarStrokeWidth = (int)(BUTTON_BAR_STROKE_WIDTH_DP * displayDensity + 0.5f);
+        mButtonSepStrokeWidth = (int)(BUTTON_SEP_STROKE_WIDTH_DP * displayDensity + 0.5f);
+        mButtonSepMargin = (int)(BUTTON_SEP_MARGIN_DP * displayDensity + 0.5f);
+        mMiddleButtonWidth = (int)(MIDDLE_BUTTON_WIDTH_DP * displayDensity + 0.5f);
 
         mMouseTouchListener = new MouseTouchListener(this);
         mMouseTouchListener.setOnTouchpadGestureListener(this);
@@ -260,16 +261,26 @@ public class TouchpadView extends View
         mMouseTouchListener.setFlingScroll(value);
     }
 
+    public int getTouchpadAreaPadding() {
+        return mTouchpadAreaPadding;
+    }
+    public void setTouchpadAreaPadding(int value) {
+        mTouchpadAreaPadding = value;
+    }
+    public void resetTouchpadAreaPadding() {
+        mTouchpadAreaPadding = mDefaultTouchpadAreaPadding;
+    }
+
     public int getTouchpadAreaWidth() {
         return getWidth();
     }
 
     public int getTouchpadAreaHeight() {
-        if (mShowButtons) {
-            return getHeight() - mButtonBarHeight;
-        } else {
-            return getHeight();
-        }
+        return getHeight() - getVisibleButtonBarHeight();
+    }
+
+    public int getVisibleButtonBarHeight() {
+        return (mShowButtons ? mButtonBarHeight : 0);
     }
 
     @Override

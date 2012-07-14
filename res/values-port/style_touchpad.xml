@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="touchpad_android_controls">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="touchpad_android_button">
+        <item name="android:layout_width">96dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:focusable">false</item>
+        <item name="android:background">@drawable/icon_btn_touchpad</item>
+    </style>
+</resources>

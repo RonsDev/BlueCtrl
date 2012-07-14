@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+    <gradient android:startColor="@color/icon_btn_touchpad_pressed_start"
+              android:endColor="@color/icon_btn_touchpad_pressed_end"
+              android:gradientRadius="54"
+              android:type="radial" />
+    <stroke android:width="4dp"
+            android:color="@android:color/transparent" />
+</shape>
