@@ -30,8 +30,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.text.ClipboardManager;
 import android.util.DisplayMetrics;
@@ -139,26 +137,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     };
 
 
-    private final Handler mSendTextProgressHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            if (mSendTextProgressDlg.isShowing()) {
-                int total = msg.arg1;
-                if (total >= 0) {
-                    mSendTextProgressDlg.setProgress(total);
-                } else {
-                    mSendTextProgressDlg.dismiss();
-                }
-            }
-        }
-    };
-
     private class SendTextThread extends Thread {
-        Handler mHandler;
         CharSequence mText;
 
 
-        SendTextThread(Handler handler, CharSequence text) {
-            mHandler = handler;
+        SendTextThread(CharSequence text) {
             mText = text;
         }
 
@@ -177,15 +160,22 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                     localKIV.pasteText(chunk.toString());
                     position = endPosition;
 
-                    Message msg = mHandler.obtainMessage();
-                    msg.arg1 = position;
-                    mHandler.sendMessage(msg);
+                    final int progress = position;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSendTextProgressDlg.setProgress(progress);
+                        }
+                    });
                 }
             }
 
-            Message msg = mHandler.obtainMessage();
-            msg.arg1 = -1;
-            mHandler.sendMessage(msg);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendTextProgressDlg.dismiss();
+                }
+            });
         }
     }
 
@@ -631,7 +621,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mSendTextProgressDlg.setProgress(0);
         mSendTextProgressDlg.setMax(mSendTextValue.length());
 
-        mSendTextThread = new SendTextThread(mSendTextProgressHandler, mSendTextValue);
+        mSendTextThread = new SendTextThread(mSendTextValue);
         mSendTextThread.start();
 
         mSendTextValue = "";
