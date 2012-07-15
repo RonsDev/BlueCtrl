@@ -77,20 +77,6 @@ public class DeviceSettings {
     private boolean mForceSmoothScroll;
 
 
-    private static String getDefaultKeyMap() {
-        final Locale locale = Locale.getDefault();
-        final String localeId = String.format("%s_%s", locale.getLanguage(), locale.getCountry());
-
-        String[] keyMapList = sContext.getResources().getStringArray(R.array.keymap_values);
-        for (String keyMap : keyMapList) {
-            if (keyMap.equals(localeId)) {
-                return keyMap;
-            }
-        }
-
-        return DEFAULT_KEYMAP;
-    }
-
     private static void initStaticMembers(Context context) {
         if (sContext == null) {
             sContext = context.getApplicationContext();
@@ -101,7 +87,7 @@ public class DeviceSettings {
         }
 
         if (sDefaultKeyMap == null) {
-            sDefaultKeyMap = getDefaultKeyMap();
+            sDefaultKeyMap = getDefaultKeyMap(sContext);
         }
     }
 
@@ -121,11 +107,33 @@ public class DeviceSettings {
         return sDeviceSettingsList.get(deviceId);
     }
 
+    public static String getDefaultKeyMap(Context context) {
+        final Locale locale = Locale.getDefault();
+        final String localeId = String.format("%s_%s", locale.getLanguage(), locale.getCountry());
+
+        String[] keyMapList = context.getResources().getStringArray(R.array.keymap_values);
+        for (String keyMap : keyMapList) {
+            if (keyMap.equals(localeId)) {
+                return keyMap;
+            }
+        }
+
+        return DEFAULT_KEYMAP;
+    }
+
+    public static String getDefaultTouchpadButtons(String operatingSystem) {
+        if (operatingSystem.equals(OS_ANDROID) || operatingSystem.equals(OS_IOS)) {
+            return TOUCHPAD_BUTTONS_HIDE;
+        } else {
+            return DEFAULT_TOUCHPAD_BUTTONS;
+        }
+    }
+
 
     private DeviceSettings(String deviceId) {
         mDeviceId = deviceId;
 
-        loadFromPreferences();
+        loadFromPreferences(PreferenceManager.getDefaultSharedPreferences(sContext));
     }
 
 
@@ -134,13 +142,12 @@ public class DeviceSettings {
         return String.format("device_%s_%s", mDeviceId, key);
     }
 
-    private void loadFromPreferences() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
-
+    private void loadFromPreferences(SharedPreferences preferences) {
         mOperatingSystem = preferences.getString(getKey(PREF_KEY_OS), DEFAULT_OS);
+
         mKeyMap = preferences.getString(getKey(PREF_KEY_KEYMAP), sDefaultKeyMap);
         mTouchpadButtons = preferences.getString(getKey(PREF_KEY_TOUCHPAD_BUTTONS),
-                DEFAULT_TOUCHPAD_BUTTONS);
+                getDefaultTouchpadButtons(mOperatingSystem));
         mMouseSensitivity = preferences.getFloat(getKey(PREF_KEY_MOUSE_SENSITIVITY),
                 DEFAULT_MOUSE_SENSITIVITY);
         mScrollSensitivity = preferences.getFloat(getKey(PREF_KEY_SCROLL_SENSITIVITY),
@@ -153,15 +160,27 @@ public class DeviceSettings {
                 DEFAULT_FORCE_SMOOTH_SCROLL);
     }
 
+    /** Initializes the preferences for a newly paired device. */
+    public void initPreferences(String operatingSystem) {
+        mOperatingSystem = operatingSystem;
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(getKey(PREF_KEY_OS), operatingSystem);
+
+        editor.commit();
+
+        // Reload the preferences to get OS specific defaults
+        loadFromPreferences(preferences);
+    }
+
     public void saveToPreferences() {
         DeviceSettings oldSettings = new DeviceSettings(mDeviceId);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(sContext);
         SharedPreferences.Editor editor = preferences.edit();
 
-        if (!mOperatingSystem.equals(oldSettings.mOperatingSystem)) {
-            editor.putString(getKey(PREF_KEY_OS), mOperatingSystem);
-        }
         if (!mKeyMap.equals(oldSettings.mKeyMap)) {
             editor.putString(getKey(PREF_KEY_KEYMAP), mKeyMap);
         }
@@ -202,15 +221,12 @@ public class DeviceSettings {
 
         editor.commit();
 
-        loadFromPreferences();
+        loadFromPreferences(preferences);
     }
 
 
     public String getOperatingSystem() {
         return mOperatingSystem;
-    }
-    public void setOperatingSystem(String value) {
-        mOperatingSystem = value;
     }
 
     public String getKeyMap() {

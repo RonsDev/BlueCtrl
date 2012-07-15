@@ -90,8 +90,7 @@ public class DeviceManager {
             saveDeviceSet();
 
             DeviceSettings deviceSettings = DeviceSettings.get(mContext, device);
-            deviceSettings.setOperatingSystem(deviceOs);
-            deviceSettings.saveToPreferences();
+            deviceSettings.initPreferences(deviceOs);
         }
     }
 
