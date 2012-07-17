@@ -93,16 +93,16 @@ public class MouseTouchListener implements OnTouchListener {
 
 
     /** Repeat time (in ms) for the fling scroll loop. */
-    private static final int FLING_SCROLL_LOOP_TIME = 100;
+    private static final int FLING_SCROLL_LOOP_TIME = 20;
 
     /** Minimum scroll distance that is required to start a fling scroll action. */
-    private static final float FLING_SCROLL_THRESHOLD_DP = 30.0f;
+    private static final float FLING_SCROLL_THRESHOLD_DP = 6.0f;
 
-    /** Minimum scroll distance that is required to continue the fling scroll loop. */
-    private static final float FLING_SCROLL_STOP_THRESHOLD_DP = 2.0f;
+    /** Minimum scroll distance that is required to retain the previous fling scroll speed. */
+    private static final float MULTIPLE_FLING_SCROLL_THRESHOLD_DP = 24.0f;
 
-    /** The amount of friction applied to scroll flings. */
-    private static final float FLING_SCROLL_FRICTION = 0.15f;
+    /** The amount of friction applied to the fling scroll movement. */
+    private static final float FLING_SCROLL_MOVE_FRICTION_DP = 0.4f;
 
 
     private View mView;
@@ -126,7 +126,8 @@ public class MouseTouchListener implements OnTouchListener {
     private final float mMaxTouchEndPredictDistanceSquare;
     private final float mChangeScrollModeThreshold;
     private final float mFlingScrollThreshold;
-    private final float mFlingScrollStopThreshold;
+    private final float mMultipleFlingScrollThreshold;
+    private final float mFlingScrollMoveFriction;
 
     private IdleSubListener mIdleSubListener = new IdleSubListener();
     private GestureSubListener mGestureSubListener = new GestureSubListener();
@@ -190,7 +191,8 @@ public class MouseTouchListener implements OnTouchListener {
 
         mChangeScrollModeThreshold = CHANGE_SCROLL_MODE_THRESHOLD_DP * mDisplayDensity;
         mFlingScrollThreshold = FLING_SCROLL_THRESHOLD_DP * mDisplayDensity;
-        mFlingScrollStopThreshold = FLING_SCROLL_STOP_THRESHOLD_DP * mDisplayDensity;
+        mMultipleFlingScrollThreshold = MULTIPLE_FLING_SCROLL_THRESHOLD_DP * mDisplayDensity;
+        mFlingScrollMoveFriction = FLING_SCROLL_MOVE_FRICTION_DP * mDisplayDensity;
     }
 
 
@@ -917,15 +919,21 @@ public class MouseTouchListener implements OnTouchListener {
         /** The current fling scroll movement on the X-axis. */
         private float mFlingScrollMoveX;
 
+        /** The retained fling scroll movement on the Y-axis from the previous fling scroll. */
+        private float mRetainedFlingScrollMoveY;
+
+        /** The retained fling scroll movement on the X-axis from the previous fling scroll. */
+        private float mRetainedFlingScrollMoveX;
+
 
         private final Runnable mFlingScrollRunnable = new Runnable()
         {
              @Override
              public void run() {
                  if (mView.isShown() && isActive() &&
-                         checkFlingScrollMoveThreshold(mFlingScrollStopThreshold)) {
-                     mFlingScrollMoveY -= mFlingScrollMoveY * FLING_SCROLL_FRICTION;
-                     mFlingScrollMoveX -= mFlingScrollMoveX * FLING_SCROLL_FRICTION;
+                         checkFlingScrollMoveThreshold(0)) {
+                     mFlingScrollMoveY = subtractFlingScrollMoveFriction(mFlingScrollMoveY);
+                     mFlingScrollMoveX = subtractFlingScrollMoveFriction(mFlingScrollMoveX);
 
                      scrollWheel(mFlingScrollMoveY, mFlingScrollMoveX);
 
@@ -940,6 +948,8 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void resetMembers() {
             mScrollMode = TouchpadView.SCROLL_MODE_VERTICAL;
+            mRetainedFlingScrollMoveY = 0.0f;
+            mRetainedFlingScrollMoveX = 0.0f;
             resetMoveValues();
         }
 
@@ -974,6 +984,8 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void onTouchPointerDown(View view, MotionEvent event) {
             if (mPointerIdList.size() == 1) {
+                mRetainedFlingScrollMoveY = mFlingScrollMoveY;
+                mRetainedFlingScrollMoveX = mFlingScrollMoveX;
                 resetMoveValues();
             }
         }
@@ -1078,14 +1090,20 @@ public class MouseTouchListener implements OnTouchListener {
 
         /** Converts the X-axis touch move value to the HID Report scroll value. */
         private int convertTouchDeltaValueX(float value, boolean smooth) {
-            final int result = (int)(value / mDisplayDensity * getSensitivity(smooth));
+            final float sensitivity = getSensitivity(smooth);
+            final int result = (int)(value / mDisplayDensity * sensitivity);
             return (mInvertScroll ? -result : result);
         }
 
         /** Converts the X-axis HID Report scroll value to the touch move value. */
         private float convertReportDeltaValueX(int value, boolean smooth) {
-            final float result = (value * mDisplayDensity / getSensitivity(smooth));
-            return (mInvertScroll ? -result : result);
+            final float sensitivity = getSensitivity(smooth);
+            if (sensitivity != 0) {
+                final float result = (value * mDisplayDensity / sensitivity);
+                return (mInvertScroll ? -result : result);
+            } else {
+                return 0.0f;
+            }
         }
 
         private void scrollWheel(float deltaY, float deltaX) {
@@ -1114,11 +1132,32 @@ public class MouseTouchListener implements OnTouchListener {
         }
 
         private void startFlingScroll() {
+            if (checkFlingScrollMoveThreshold(mMultipleFlingScrollThreshold)) {
+                if (((mFlingScrollMoveY > 0) && (mRetainedFlingScrollMoveY > 0)) ||
+                        ((mFlingScrollMoveY < 0) && (mRetainedFlingScrollMoveY < 0))) {
+                    mFlingScrollMoveY += mRetainedFlingScrollMoveY;
+                }
+                if (((mFlingScrollMoveX > 0) && (mRetainedFlingScrollMoveX > 0)) ||
+                        ((mFlingScrollMoveX < 0) && (mRetainedFlingScrollMoveX < 0))) {
+                    mFlingScrollMoveX += mRetainedFlingScrollMoveX;
+                }
+            }
+
             mView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
         }
 
         private void stopFlingScroll() {
             mView.removeCallbacks(mFlingScrollRunnable);
+        }
+
+        private float subtractFlingScrollMoveFriction(float moveValue) {
+            if (Math.abs(moveValue) <= mFlingScrollMoveFriction) {
+                return 0.0f;
+            } else if (moveValue < 0) {
+                return (moveValue + mFlingScrollMoveFriction);
+            } else {
+                return (moveValue - mFlingScrollMoveFriction);
+            }
         }
     }
 }
