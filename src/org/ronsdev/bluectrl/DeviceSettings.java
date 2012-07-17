@@ -54,7 +54,7 @@ public class DeviceSettings {
     public static final String DEFAULT_KEYMAP = "en_US";
     public static final String DEFAULT_TOUCHPAD_BUTTONS = TOUCHPAD_BUTTONS_SHOW_PORTRAIT;
     public static final float DEFAULT_MOUSE_SENSITIVITY = 2.5f;
-    public static final float DEFAULT_SCROLL_SENSITIVITY = 2.5f;
+    public static final float DEFAULT_SCROLL_SENSITIVITY = 1.0f;
     public static final boolean DEFAULT_INVERT_SCROLL = false;
     public static final boolean DEFAULT_FLING_SCROLL = true;
     public static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
