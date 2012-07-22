@@ -13,7 +13,9 @@ Because this app is using the Bluetooth input standard, it supports various oper
 * Mac OS X
 * PlayStation 3
 
-Microsoft Windows however is one of the operating systems that on most devices won't work. The reason for that is a conflict with the Android Bluetooth input service which is active on most Android systems.
+One of the problematic operating systems is Microsoft Windows because it doesn't work if another Bluetooth input service is active which is the case on most Android systems. For more information look at:
+
+  https://github.com/RonsDev/BlueCtrl/wiki/Bluetooth-input-service-conflict  
 
 This app requires root permissions because it needs direct access to the Bluetooth adapter. Another restriction is that it is only compatible with the default Android Bluetooth stack (BlueZ). Especially older Android versions from Samsung and HTC don't meet this requirement.
 
