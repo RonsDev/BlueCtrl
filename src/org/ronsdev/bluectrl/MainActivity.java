@@ -62,7 +62,8 @@ public class MainActivity extends DaemonListActivity
 
 
     private static final int DIALOG_ABOUT = 1;
-    private static final int DIALOG_CRITICAL_ERROR = 2;
+    private static final int DIALOG_CHANGELOG = 2;
+    private static final int DIALOG_CRITICAL_ERROR = 3;
 
     private static final String DIALOG_ARG_ERROR_MSG =
             "org.ronsdev.bluectrl.dialog_arg.ERROR_MSG";
@@ -162,6 +163,8 @@ public class MainActivity extends DaemonListActivity
         switch(id) {
         case DIALOG_ABOUT:
             return createAboutDialog();
+        case DIALOG_CHANGELOG:
+            return ChangelogDialog.createDialog(this);
         case DIALOG_CRITICAL_ERROR:
             return createCriticalErrorDialog(args.getString(DIALOG_ARG_ERROR_MSG));
         default:
@@ -345,6 +348,11 @@ public class MainActivity extends DaemonListActivity
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.cancel();
+                }
+            })
+            .setNeutralButton(R.string.changelog, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    showDialog(DIALOG_CHANGELOG);
                 }
             })
             .create();

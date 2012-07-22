@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            style="@style/changelog_dialog"
+            android:id="@+id/view_changelog">
+    <TextView style="@style/changelog_text"
+              android:id="@+id/changelog_text" />
+</ScrollView>

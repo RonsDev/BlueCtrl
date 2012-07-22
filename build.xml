@@ -79,6 +79,7 @@
 <!-- extension targets. Uncomment the ones where you want to do custom work
      in between standard targets -->
     <target name="-pre-build" depends="build-daemon">
+        <copy file="CHANGELOG.md" todir="${asset.absolute.dir}" />
     </target>
 <!--
     <target name="-pre-compile">
