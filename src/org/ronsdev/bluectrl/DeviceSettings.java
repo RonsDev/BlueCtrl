@@ -122,7 +122,8 @@ public class DeviceSettings {
     }
 
     public static String getDefaultTouchpadButtons(String operatingSystem) {
-        if (operatingSystem.equals(OS_ANDROID) || operatingSystem.equals(OS_IOS)) {
+        if (operatingSystem.equals(OS_ANDROID) || operatingSystem.equals(OS_IOS) ||
+                operatingSystem.equals(OS_PLAYSTATION3)) {
             return TOUCHPAD_BUTTONS_HIDE;
         } else {
             return DEFAULT_TOUCHPAD_BUTTONS;

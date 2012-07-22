@@ -11,6 +11,11 @@
     <string name="description_android_back">Back</string>
     <string name="description_android_home">Home</string>
     <string name="description_android_menu">Menu</string>
+    <string name="description_ps3_circle">Circle</string>
+    <string name="description_ps3_square">Square</string>
+    <string name="description_ps3_triangle">Triangle</string>
+    <string name="description_ps3_x">X</string>
+    <string name="description_ps3_start">Start</string>
 
     <string name="os_android">Android</string>
     <string name="os_ios">iOS</string>

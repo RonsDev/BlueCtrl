@@ -55,6 +55,41 @@
                              android:contentDescription="@string/description_android_menu" />
             </LinearLayout>
 
+            <RelativeLayout style="@style/touchpad_ps3_controls"
+                            android:id="@+id/touchpad_ps3_controls"
+                            android:visibility="gone">
+                <ImageButton style="@style/touchpad_ps3_button"
+                             android:layout_alignParentTop="true"
+                             android:layout_alignParentLeft="true"
+                             android:id="@+id/btn_ps3_triangle"
+                             android:src="@drawable/btn_ps3_triangle"
+                             android:contentDescription="@string/description_ps3_triangle" />
+                <ImageButton style="@style/touchpad_ps3_button"
+                             android:layout_alignParentTop="true"
+                             android:layout_alignParentRight="true"
+                             android:id="@+id/btn_ps3_circle"
+                             android:src="@drawable/btn_ps3_circle"
+                             android:contentDescription="@string/description_ps3_circle" />
+                <ImageButton style="@style/touchpad_ps3_button"
+                             android:layout_alignParentBottom="true"
+                             android:layout_alignParentLeft="true"
+                             android:id="@+id/btn_ps3_square"
+                             android:src="@drawable/btn_ps3_square"
+                             android:contentDescription="@string/description_ps3_square" />
+                <ImageButton style="@style/touchpad_ps3_button"
+                             android:layout_alignParentBottom="true"
+                             android:layout_alignParentRight="true"
+                             android:id="@+id/btn_ps3_x"
+                             android:src="@drawable/btn_ps3_x"
+                             android:contentDescription="@string/description_ps3_x" />
+                <ImageButton style="@style/touchpad_ps3_button"
+                             android:layout_alignParentBottom="true"
+                             android:layout_centerHorizontal="true"
+                             android:id="@+id/btn_ps3_start"
+                             android:src="@drawable/btn_ps3_start"
+                             android:contentDescription="@string/description_ps3_start" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
         <!-- Disconnected -->

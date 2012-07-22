@@ -96,6 +96,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private KeyboardInputView mKeyboardInputView;
     private TouchpadView mTouchpadView;
     private ViewGroup mAndroidControls;
+    private ViewGroup mPs3Controls;
     private View mViewDisconnected;
     private ImageView mInfoImage;
     private TextView mInfoTitle;
@@ -478,6 +479,23 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         ImageButton btnAndroidMenu = (ImageButton)findViewById(R.id.btn_android_menu);
         initKeyboardIconButton(btnAndroidMenu, HidKeyboard.KEYCODE_APPLICATION);
 
+        mPs3Controls = (ViewGroup)findViewById(R.id.touchpad_ps3_controls);
+
+        ImageButton btnPs3Triangle = (ImageButton)findViewById(R.id.btn_ps3_triangle);
+        initKeyboardIconButton(btnPs3Triangle, HidKeyboard.KEYCODE_F1);
+
+        ImageButton btnPs3Circle = (ImageButton)findViewById(R.id.btn_ps3_circle);
+        initKeyboardIconButton(btnPs3Circle, HidKeyboard.KEYCODE_ESCAPE);
+
+        ImageButton btnPs3Square = (ImageButton)findViewById(R.id.btn_ps3_square);
+        initKeyboardIconButton(btnPs3Square, HidKeyboard.KEYCODE_F2);
+
+        ImageButton btnPs3X = (ImageButton)findViewById(R.id.btn_ps3_x);
+        initKeyboardIconButton(btnPs3X, HidKeyboard.KEYCODE_ENTER);
+
+        ImageButton btnPs3Start = (ImageButton)findViewById(R.id.btn_ps3_start);
+        initKeyboardIconButton(btnPs3Start, HidKeyboard.KEYCODE_F4);
+
 
         // View Disconnected
         mViewDisconnected = (View)findViewById(R.id.view_disconnected);
@@ -561,6 +579,16 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                 touchpadAreaPadding = mTouchpadAreaIconButtonPadding;
             } else {
                 mAndroidControls.setVisibility(View.GONE);
+            }
+        }
+
+        if (mPs3Controls != null) {
+            if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_PLAYSTATION3)) {
+                mPs3Controls.setVisibility(View.VISIBLE);
+                mPs3Controls.setPadding(0, 0, 0, touchpadButtonBarHeight);
+                touchpadAreaPadding = mTouchpadAreaIconButtonPadding;
+            } else {
+                mPs3Controls.setVisibility(View.GONE);
             }
         }
 
