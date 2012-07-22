@@ -3,6 +3,7 @@
     <string name="app_name">BlueCtrl</string>
 
     <string name="close">Close</string>
+    <string name="more_info">More info\u2026</string>
 
     <string name="description_app_icon">Application Icon</string>
     <string name="description_info_image">Info Image</string>

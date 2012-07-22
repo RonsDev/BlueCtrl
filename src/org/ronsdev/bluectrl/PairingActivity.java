@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -66,6 +67,9 @@ public class PairingActivity extends DaemonActivity {
 
 
     private static final int REQUEST_DISCOVERABLE = 1;
+
+    private static final String SERVICE_CONFLICT_MORE_INFO_URL =
+            "https://github.com/RonsDev/BlueCtrl/wiki/Bluetooth-input-service-conflict";
 
     /*
      * The maximum wait time until a newly paired device is declared as ready. Necessary if the
@@ -167,12 +171,18 @@ public class PairingActivity extends DaemonActivity {
         dlg.show();
     }
 
-    private static void showServiceConflictDialog(Activity curActivity, int messageId) {
+    private static void showServiceConflictDialog(final Activity curActivity, int messageId) {
         Dialog dlg = new AlertDialog.Builder(curActivity)
             .setMessage(messageId)
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.cancel();
+                }
+            })
+            .setNeutralButton(R.string.more_info, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Uri moreInfoUri = Uri.parse(SERVICE_CONFLICT_MORE_INFO_URL);
+                    curActivity.startActivity(new Intent(Intent.ACTION_VIEW, moreInfoUri));
                 }
             })
             .create();
