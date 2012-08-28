@@ -500,10 +500,10 @@ public class DaemonService extends Service {
             return ERROR_START;
         }
 
-        final String cmd = String.format("killall %1$s; %2$s%3$s",
-                BINARY_NAME,
-                file.getAbsolutePath(),
-                DEBUG_DAEMON ? " --debug" : "");
+        String cmd = file.getAbsolutePath();
+        if (DEBUG_DAEMON) {
+            cmd += " --debug";
+        }
         final String[] progArray = { "su", "-c", cmd };
 
         Process proc;
@@ -617,10 +617,13 @@ public class DaemonService extends Service {
         if (errorCode == 0) {
             errorCode = installDaemonBinary();
         }
+
         if (errorCode == 0) {
             errorCode = startDaemonProcess();
         }
-        if (errorCode == 0) {
+
+        // Only connect if the daemon could be started or if it is already running
+        if ((errorCode == 0) || (errorCode == ERROR_ADDRINUSE)) {
             errorCode = connectToDaemon();
         }
 
