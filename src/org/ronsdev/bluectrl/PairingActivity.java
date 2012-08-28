@@ -370,6 +370,12 @@ public class PairingActivity extends DaemonActivity {
                  * won't pair if they are active.
                  */
                 daemon.deactivateOtherServices();
+
+                /*
+                 * Change the Bluetooth Device Class to a Keyboard Class. Otherwise the
+                 * PlayStation 3 won't find the input device.
+                 */
+                daemon.setHidDeviceClass();
             }
 
             if (mBtAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
@@ -392,6 +398,7 @@ public class PairingActivity extends DaemonActivity {
             if (mDeviceOs.equals(DeviceSettings.OS_IOS)) {
                 daemon.resetDeviceClass();
             } else if (mDeviceOs.equals(DeviceSettings.OS_PLAYSTATION3)) {
+                daemon.resetDeviceClass();
                 daemon.reactivateOtherServices();
             }
 
