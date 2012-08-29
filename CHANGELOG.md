@@ -1,3 +1,9 @@
+Version 2.1
+-----------
+* Fixed PlayStation 3 pairing problem
+
+
+
 Version 2.0
 -----------
 * Fixed PlayStation 3 support
