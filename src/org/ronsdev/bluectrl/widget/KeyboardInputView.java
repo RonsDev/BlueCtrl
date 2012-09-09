@@ -551,12 +551,6 @@ public class KeyboardInputView extends View {
             return HidKeyboard.KEYCODE_SYSRQ;
         case KeyEvent.KEYCODE_TAB:
             return HidKeyboard.KEYCODE_TAB;
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            return HidKeyboard.KEYCODE_VOLUME_DOWN;
-        case KeyEventFuture.KEYCODE_VOLUME_MUTE:
-            return HidKeyboard.KEYCODE_MUTE;
-        case KeyEvent.KEYCODE_VOLUME_UP:
-            return HidKeyboard.KEYCODE_VOLUME_UP;
         default:
             return 0;
         }
@@ -609,6 +603,12 @@ public class KeyboardInputView extends View {
             return HidKeyboard.MEDIA_KEY_SCAN_NEXT_TRACK;
         case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
             return HidKeyboard.MEDIA_KEY_SCAN_PREV_TRACK;
+        case KeyEvent.KEYCODE_MUTE:
+            return HidKeyboard.MEDIA_KEY_MUTE;
+        case KeyEvent.KEYCODE_VOLUME_UP:
+            return HidKeyboard.MEDIA_KEY_VOLUME_INC;
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+            return HidKeyboard.MEDIA_KEY_VOLUME_DEC;
         default:
             return 0;
         }

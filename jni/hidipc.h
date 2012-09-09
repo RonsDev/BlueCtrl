@@ -145,9 +145,9 @@ typedef enum HidcIpcCommand {
 	 *              Bit 2 = Rewind
 	 *              Bit 3 = Scan Next Track
 	 *              Bit 4 = Scan Previous Track
-	 *              Bit 5 = Reserved
-	 *              Bit 6 = Reserved
-	 *              Bit 7 = Reserved
+	 *              Bit 5 = Mute
+	 *              Bit 6 = Volume Increment
+	 *              Bit 7 = Volume Decrement
 	 */
 	HIDC_IPC_CMD_HID_SEND_MEDIA_KEYS = 140,
 	/*

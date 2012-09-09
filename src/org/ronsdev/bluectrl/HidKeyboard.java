@@ -218,6 +218,15 @@ public class HidKeyboard {
     /** Indicates that the media key 'Scan Previous Track' is pressed. */
     public static final int MEDIA_KEY_SCAN_PREV_TRACK = 0x10;
 
+    /** Indicates that the media key 'Mute' is pressed. */
+    public static final int MEDIA_KEY_MUTE = 0x20;
+
+    /** Indicates that the media key 'Volume Increment' is pressed. */
+    public static final int MEDIA_KEY_VOLUME_INC = 0x40;
+
+    /** Indicates that the media key 'Volume Decrement' is pressed. */
+    public static final int MEDIA_KEY_VOLUME_DEC = 0x80;
+
 
     /** Indicates that the application control key 'Home' is pressed. */
     public static final int AC_KEY_HOME = 0x01;

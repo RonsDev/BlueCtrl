@@ -207,9 +207,9 @@ void hidc_send_hid_report_hw_keys(unsigned char keys);
  *           Bit 2 = Rewind
  *           Bit 3 = Scan Next Track
  *           Bit 4 = Scan Previous Track
- *           Bit 5 = Reserved
- *           Bit 6 = Reserved
- *           Bit 7 = Reserved
+ *           Bit 5 = Mute
+ *           Bit 6 = Volume Increment
+ *           Bit 7 = Volume Decrement
  */
 void hidc_send_hid_report_media_keys(unsigned char keys);
 
