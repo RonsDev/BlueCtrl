@@ -493,6 +493,12 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         ImageButton btnPs3X = (ImageButton)findViewById(R.id.btn_ps3_x);
         initKeyboardIconButton(btnPs3X, HidKeyboard.KEYCODE_ENTER);
 
+        ImageButton btnPs3Select = (ImageButton)findViewById(R.id.btn_ps3_select);
+        initKeyboardIconButton(btnPs3Select, HidKeyboard.KEYCODE_F3);
+
+        ImageButton btnPs3Ps = (ImageButton)findViewById(R.id.btn_ps3_ps);
+        initKeyboardModifierIconButton(btnPs3Ps, HidKeyboard.MODIFIER_LEFT_GUI);
+
         ImageButton btnPs3Start = (ImageButton)findViewById(R.id.btn_ps3_start);
         initKeyboardIconButton(btnPs3Start, HidKeyboard.KEYCODE_F4);
 
@@ -525,6 +531,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                     break;
                 case MotionEvent.ACTION_UP:
                     mHidKeyboard.releaseKey(hidKeyCode);
+                    break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void initKeyboardModifierIconButton(ImageButton button, final int hidModifier) {
+        button.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    onKeyboardIconButtonDown(v);
+                    mHidKeyboard.pressModifierKey(hidModifier);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mHidKeyboard.releaseModifierKey(hidModifier);
                     break;
                 }
                 return false;

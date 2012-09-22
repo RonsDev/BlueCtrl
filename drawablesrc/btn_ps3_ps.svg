@@ -14,8 +14,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="btn_ps3_start.svg"
-   inkscape:export-filename="btn_ps3_start.png"
+   sodipodi:docname="btn_ps3_ps.svg"
+   inkscape:export-filename="btn_ps3_ps.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -27,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="27.938275"
-     inkscape:cy="31.162543"
+     inkscape:zoom="11.313709"
+     inkscape:cx="27.602691"
+     inkscape:cy="31.314705"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -58,7 +58,11 @@
        id="guide2993" />
     <inkscape:grid
        type="xygrid"
-       id="grid2989" />
+       id="grid2989"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -93,21 +97,15 @@
      transform="translate(0,-988.3622)"
      style="opacity:1">
     <path
-       style="opacity:0.5;fill:#ffffff;fill-opacity:1;stroke:none"
-       d="m 12,1017.2215 44,12.5715 -44,12.5714 z"
-       id="path2991"
-       inkscape:connector-curvature="0" />
-    <text
-       xml:space="preserve"
-       style="font-size:16px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.5;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
-       x="5.1884766"
-       y="1009.2037"
-       id="text3761"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan3763"
-         x="5.1884766"
-         y="1009.2037"
-         style="font-size:17px">START</tspan></text>
+       inkscape:connector-curvature="0"
+       clip-rule="evenodd"
+       d="m 34.212545,1007.95 -0.0367,33.6622 -9.01908,-2.9333 0,-39.5667 11.51234,3.0437 c 7.369136,1.9805 11.878843,5.8304 11.805454,12.5776 -0.07328,7.8476 -3.702972,11.0008 -10.778994,8.9473 l 0,-15.4747 c 0,-1.8702 -3.48302,-1.9797 -3.48302,-0.2561 l 0,0 z"
+       id="path7"
+       style="opacity:0.50000000000000000;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-opacity:1;marker-start:none" />
+    <path
+       style="opacity:0.5;fill:#ffffff;fill-opacity:1;fill-rule:evenodd"
+       d="M 24.75 34.34375 L 21.59375 35.4375 L 8.6875 39.78125 C 8.6508 39.78125 8.57328 39.84375 8.5 39.84375 C 6.11671 40.65075 3.88423 42.36095 4.03125 44.78125 C 4.17791 47.23785 9.79832 47.83445 14.125 48.53125 C 17.998376 49.164874 21.520004 48.815518 24.75 47.75 L 24.75 42.53125 L 21 43.78125 L 16.75 45.21875 C 13.99986 46.17235 11.65777 43.94855 14.1875 43.03125 L 16.25 42.28125 L 24.75 39.25 L 24.75 34.34375 z M 46.875 36.75 C 42.817396 36.746641 38.820134 37.715 34.90625 39.0625 L 34.5625 39.1875 L 34.5625 44.4375 L 42.21875 41.8125 L 46.90625 40.21875 C 51.819272 39.30235 53.792383 40.9339 49.0625 42.4375 L 46.71875 43.25 L 34.5625 47.40625 L 34.5625 53.125 L 42.125 50.5 L 55.21875 45.875 L 55.375 45.84375 C 58.821447 44.63405 60.272643 42.9513 59.90625 41.375 C 59.319578 38.735 55.114683 37.2894 48.625 36.8125 C 48.042981 36.771287 47.454658 36.75048 46.875 36.75 z "
+       transform="translate(0,988.3622)"
+       id="path13-0" />
   </g>
 </svg>

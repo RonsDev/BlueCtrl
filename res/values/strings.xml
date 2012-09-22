@@ -16,6 +16,8 @@
     <string name="description_ps3_square">Square</string>
     <string name="description_ps3_triangle">Triangle</string>
     <string name="description_ps3_x">X</string>
+    <string name="description_ps3_select">Select</string>
+    <string name="description_ps3_ps">PlayStation</string>
     <string name="description_ps3_start">Start</string>
 
     <string name="os_android">Android</string>

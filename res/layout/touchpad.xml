@@ -82,12 +82,20 @@
                              android:id="@+id/btn_ps3_x"
                              android:src="@drawable/btn_ps3_x"
                              android:contentDescription="@string/description_ps3_x" />
-                <ImageButton style="@style/touchpad_ps3_button"
-                             android:layout_alignParentBottom="true"
-                             android:layout_centerHorizontal="true"
-                             android:id="@+id/btn_ps3_start"
-                             android:src="@drawable/btn_ps3_start"
-                             android:contentDescription="@string/description_ps3_start" />
+                <LinearLayout style="@style/touchpad_ps3_center_buttons">
+                    <ImageButton style="@style/touchpad_ps3_button"
+                                 android:id="@+id/btn_ps3_select"
+                                 android:src="@drawable/btn_ps3_select"
+                                 android:contentDescription="@string/description_ps3_select" />
+                    <ImageButton style="@style/touchpad_ps3_button"
+                                 android:id="@+id/btn_ps3_ps"
+                                 android:src="@drawable/btn_ps3_ps"
+                                 android:contentDescription="@string/description_ps3_ps" />
+                    <ImageButton style="@style/touchpad_ps3_button"
+                                 android:id="@+id/btn_ps3_start"
+                                 android:src="@drawable/btn_ps3_start"
+                                 android:contentDescription="@string/description_ps3_start" />
+                </LinearLayout>
             </RelativeLayout>
 
         </RelativeLayout>
