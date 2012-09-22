@@ -1,7 +1,7 @@
 Version 2.2
 -----------
 * Select and "PS" buttons for PlayStation 3
-* Compatibility improvements for the volume controls
+* Compatibility improvements for the volume buttons
 
 
 
