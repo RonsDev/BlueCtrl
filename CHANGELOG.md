@@ -1,3 +1,10 @@
+Version 2.2
+-----------
+* Select and "PS" buttons for PlayStation 3
+* Compatibility improvements for the volume controls
+
+
+
 Version 2.1
 -----------
 * Fixed PlayStation 3 pairing problem
