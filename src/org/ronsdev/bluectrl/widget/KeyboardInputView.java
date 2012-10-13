@@ -34,8 +34,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.ExtractedText;
-import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
@@ -75,11 +73,6 @@ public class KeyboardInputView extends View {
         @Override
         public Editable getEditable() {
             return null;
-        }
-
-        @Override
-        public ExtractedText getExtractedText(ExtractedTextRequest request, int flags) {
-            return new ExtractedText();
         }
 
         @Override
