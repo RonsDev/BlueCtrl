@@ -517,7 +517,11 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void onTouchPointerUp(View view, MotionEvent event) {
             if (mPointerIdList.isEmpty()) {
-                changeSubListener(mTapSubListener, event);
+                if (mWasHandled) {
+                    changeSubListener(mIdleSubListener, event);
+                } else {
+                    changeSubListener(mTapSubListener, event);
+                }
             }
         }
 
