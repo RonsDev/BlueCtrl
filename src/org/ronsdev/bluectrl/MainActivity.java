@@ -46,7 +46,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -264,23 +263,6 @@ public class MainActivity extends DaemonListActivity
             }
         }
         refreshListView();
-    }
-
-    @Override
-    protected void onHidStateChanged(int hidState, BluetoothDevice btDevice, int errorCode) {
-        // If a connection was established by the host
-        if ((hidState == DaemonService.HID_STATE_CONNECTED) &&
-                (btDevice != null) && hasWindowFocus() && !mIsConnectActivityStarting) {
-            if (btDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
-                Toast.makeText(this,
-                        getString(R.string.device_list_connected_info, btDevice.getName()),
-                        Toast.LENGTH_SHORT).show();
-                connectToDevice(btDevice, false);
-            } else {
-                // The device is unknown and will be disconnected
-                getDaemon().disconnectHid();
-            }
-        }
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

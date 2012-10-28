@@ -39,7 +39,6 @@
 
     <string name="device_list_add_device">Add Device</string>
     <string name="device_list_empty">No device configured</string>
-    <string name="device_list_connected_info">Connected with “%1$s”</string>
 
     <string name="pairing_device_os_title">Remote device OS</string>
     <string name="pairing_title">Add Device</string>
