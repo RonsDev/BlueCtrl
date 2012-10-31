@@ -1377,27 +1377,29 @@ void hidc_handle_l2cap_poll(struct pollfd *scpollfd, struct pollfd *sipollfd,
 	if (sipollfd->revents & POLLIN)
 		pollin_server_intr_sock();
 
-	if ((ccpollfd->revents & POLLIN) && (client_ctrl_sock > -1)) {
-		pollin_client_ctrl_sock();
-	}
-	if ((ccpollfd->revents & POLLERR) && (client_ctrl_sock > -1)) {
-		log_e("Error on HID control socket");
-		close_client_sockets(HIDC_EC_UNKNOWN);
-	}
-	if ((ccpollfd->revents & POLLHUP) && (client_ctrl_sock > -1)) {
-		log_d("Remote closed HID control connection");
-		close_client_sockets(0);
-	}
+	if (hidc_is_hid_connected()) {
+		if (ccpollfd->revents & POLLIN) {
+			pollin_client_ctrl_sock();
+		}
+		if (ccpollfd->revents & POLLERR) {
+			log_e("Error on HID control socket");
+			close_client_sockets(HIDC_EC_UNKNOWN);
+		}
+		if (ccpollfd->revents & POLLHUP) {
+			log_d("Remote closed HID control connection");
+			close_client_sockets(0);
+		}
 
-	if ((cipollfd->revents & POLLIN) && (client_intr_sock > -1)) {
-		pollin_client_intr_sock();
-	}
-	if ((cipollfd->revents & POLLERR) && (client_intr_sock > -1)) {
-		log_e("Error on HID interrupt socket");
-		close_client_sockets(HIDC_EC_UNKNOWN);
-	}
-	if ((cipollfd->revents & POLLHUP) && (client_intr_sock > -1)) {
-		log_d("Remote closed HID interrupt connection");
-		close_client_sockets(0);
+		if (cipollfd->revents & POLLIN) {
+			pollin_client_intr_sock();
+		}
+		if (cipollfd->revents & POLLERR) {
+			log_e("Error on HID interrupt socket");
+			close_client_sockets(HIDC_EC_UNKNOWN);
+		}
+		if (cipollfd->revents & POLLHUP) {
+			log_d("Remote closed HID interrupt connection");
+			close_client_sockets(0);
+		}
 	}
 }
