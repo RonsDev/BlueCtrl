@@ -16,6 +16,7 @@
 
 package org.ronsdev.bluectrl.widget;
 
+import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.HidMouse;
 import org.ronsdev.bluectrl.IntArrayList;
 import org.ronsdev.bluectrl.R;
@@ -108,6 +109,7 @@ public class TouchpadView extends View
     private MouseTouchListener mMouseTouchListener = null;
 
     private HidMouse mHidMouse = null;
+    private HidKeyboard mHidKeyboard = null;
 
     private boolean mShowButtons = true;
 
@@ -222,6 +224,14 @@ public class TouchpadView extends View
         mMouseTouchListener.setHidMouse(hidMouse);
     }
 
+    public HidKeyboard getHidKeyboard() {
+        return mHidKeyboard;
+    }
+    public void setHidKeyboard(HidKeyboard hidKeyboard) {
+        mHidKeyboard = hidKeyboard;
+        mMouseTouchListener.setHidKeyboard(hidKeyboard);
+    }
+
     public boolean getShowButtons() {
         return mShowButtons;
     }
@@ -245,6 +255,13 @@ public class TouchpadView extends View
     }
     public void setScrollSensitivity(float value) {
         mMouseTouchListener.setScrollSensitivity(value);
+    }
+
+    public float getPinchZoomSensitivity() {
+        return mMouseTouchListener.getPinchZoomSensitivity();
+    }
+    public void setPinchZoomSensitivity(float value) {
+        mMouseTouchListener.setPinchZoomSensitivity(value);
     }
 
     public boolean getInvertScroll() {

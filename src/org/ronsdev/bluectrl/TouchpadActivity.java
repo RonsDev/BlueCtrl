@@ -275,6 +275,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         if (mTouchpadView != null) {
             mTouchpadView.setHidMouse(mHidMouse);
+            mTouchpadView.setHidKeyboard(mHidKeyboard);
         }
 
         onHidStateChanged(daemon.getHidState(),
@@ -467,6 +468,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
         mTouchpadView.setHidMouse(mHidMouse);
+        mTouchpadView.setHidKeyboard(mHidKeyboard);
 
         mAndroidControls = (ViewGroup)findViewById(R.id.touchpad_android_controls);
 
@@ -589,8 +591,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         if (mTouchpadView != null) {
             mTouchpadView.setShowButtons(getShowTouchpadButtons());
             mTouchpadView.setMouseSensitivity(mDeviceSettings.getMouseSensitivity());
-            mTouchpadView.setInvertScroll(mDeviceSettings.getInvertScroll());
             mTouchpadView.setScrollSensitivity(mDeviceSettings.getScrollSensitivity());
+            mTouchpadView.setPinchZoomSensitivity(mDeviceSettings.getPinchZoomSensitivity());
+            mTouchpadView.setInvertScroll(mDeviceSettings.getInvertScroll());
             mTouchpadView.setFlingScroll(mDeviceSettings.getFlingScroll());
 
             touchpadButtonBarHeight = mTouchpadView.getVisibleButtonBarHeight();

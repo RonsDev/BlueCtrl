@@ -34,6 +34,7 @@ public class DeviceSettings {
     public static final String PREF_KEY_TOUCHPAD_BUTTONS = "touchpad_buttons";
     public static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
     public static final String PREF_KEY_SCROLL_SENSITIVITY = "scroll_sensitivity";
+    public static final String PREF_KEY_PINCH_ZOOM_SENSITIVITY = "pinch_zoom_sensitivity";
     public static final String PREF_KEY_INVERT_SCROLL = "invert_scroll";
     public static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
     public static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
@@ -55,6 +56,7 @@ public class DeviceSettings {
     public static final String DEFAULT_TOUCHPAD_BUTTONS = TOUCHPAD_BUTTONS_SHOW_PORTRAIT;
     public static final float DEFAULT_MOUSE_SENSITIVITY = 2.5f;
     public static final float DEFAULT_SCROLL_SENSITIVITY = 1.0f;
+    public static final float DEFAULT_PINCH_ZOOM_SENSITIVITY = 0.8f;
     public static final boolean DEFAULT_INVERT_SCROLL = false;
     public static final boolean DEFAULT_FLING_SCROLL = true;
     public static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
@@ -72,6 +74,7 @@ public class DeviceSettings {
     private String mTouchpadButtons;
     private float mMouseSensitivity;
     private float mScrollSensitivity;
+    private float mPinchZoomSensitivity;
     private boolean mInvertScroll;
     private boolean mFlingScroll;
     private boolean mForceSmoothScroll;
@@ -153,6 +156,8 @@ public class DeviceSettings {
                 DEFAULT_MOUSE_SENSITIVITY);
         mScrollSensitivity = preferences.getFloat(getKey(PREF_KEY_SCROLL_SENSITIVITY),
                 DEFAULT_SCROLL_SENSITIVITY);
+        mPinchZoomSensitivity = preferences.getFloat(getKey(PREF_KEY_PINCH_ZOOM_SENSITIVITY),
+                DEFAULT_PINCH_ZOOM_SENSITIVITY);
         mInvertScroll = preferences.getBoolean(getKey(PREF_KEY_INVERT_SCROLL),
                 DEFAULT_INVERT_SCROLL);
         mFlingScroll = preferences.getBoolean(getKey(PREF_KEY_FLING_SCROLL),
@@ -194,6 +199,9 @@ public class DeviceSettings {
         if (mScrollSensitivity != oldSettings.mScrollSensitivity) {
             editor.putFloat(getKey(PREF_KEY_SCROLL_SENSITIVITY), mScrollSensitivity);
         }
+        if (mPinchZoomSensitivity != oldSettings.mPinchZoomSensitivity) {
+            editor.putFloat(getKey(PREF_KEY_PINCH_ZOOM_SENSITIVITY), mPinchZoomSensitivity);
+        }
         if (mInvertScroll != oldSettings.mInvertScroll) {
             editor.putBoolean(getKey(PREF_KEY_INVERT_SCROLL), mInvertScroll);
         }
@@ -216,6 +224,7 @@ public class DeviceSettings {
         editor.remove(getKey(PREF_KEY_TOUCHPAD_BUTTONS));
         editor.remove(getKey(PREF_KEY_MOUSE_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_SCROLL_SENSITIVITY));
+        editor.remove(getKey(PREF_KEY_PINCH_ZOOM_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_INVERT_SCROLL));
         editor.remove(getKey(PREF_KEY_FLING_SCROLL));
         editor.remove(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL));
@@ -256,6 +265,13 @@ public class DeviceSettings {
     }
     public void setScrollSensitivity(float value) {
         mScrollSensitivity = value;
+    }
+
+    public float getPinchZoomSensitivity() {
+        return mPinchZoomSensitivity;
+    }
+    public void setPinchZoomSensitivity(float value) {
+        mPinchZoomSensitivity = value;
     }
 
     public boolean getInvertScroll() {

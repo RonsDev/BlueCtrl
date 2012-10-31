@@ -17,9 +17,11 @@
 package org.ronsdev.bluectrl.widget;
 
 import org.ronsdev.bluectrl.DeviceSettings;
+import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.HidMouse;
 import org.ronsdev.bluectrl.IntArrayList;
 
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,6 +49,9 @@ public class MouseTouchListener implements OnTouchListener {
      * with multiple touch points.
      */
     private static final float MIN_MT_GESTURE_DISTANCE_DP = 35.0f;
+
+    /** Minimum span distance to detect a pinch-to-zoom gesture. */
+    private static final float MIN_PINCH_ZOOM_DISTANCE_DP = 35.0f;
 
 
     /** Maximum time (in ms) for a tap to be considered a click. */
@@ -107,11 +112,13 @@ public class MouseTouchListener implements OnTouchListener {
 
     private View mView;
     private HidMouse mHidMouse;
+    private HidKeyboard mHidKeyboard;
 
     private float mMouseSensitivity;
-    private boolean mInvertScroll;
     private float mSmoothScrollSensitivity;
     private float mStepScrollSensitivity;
+    private float mPinchZoomSensitivity;
+    private boolean mInvertScroll;
     private boolean mFlingScroll;
 
 
@@ -121,6 +128,7 @@ public class MouseTouchListener implements OnTouchListener {
     private final float mPointerEdgeMoveThreshold;
     private final float mMinGestureDistance;
     private final float mMinMultitouchGestureDistance;
+    private final float mMinPinchZoomDistance;
     private final float mMaxTapDistanceSquare;
     private final float mMaxMultitouchTapDistanceSquare;
     private final float mMaxTouchEndPredictDistanceSquare;
@@ -134,6 +142,7 @@ public class MouseTouchListener implements OnTouchListener {
     private TapSubListener mTapSubListener = new TapSubListener();
     private PointerSubListener mPointerSubListener = new PointerSubListener();
     private ScrollSubListener mScrollSubListener = new ScrollSubListener();
+    private PinchZoomSubListener mPinchZoomSubListener = new PinchZoomSubListener();
 
     /** The current internal touch event listener that handles the touch events. */
     private SubListener mSubListener;
@@ -143,6 +152,9 @@ public class MouseTouchListener implements OnTouchListener {
 
     /** The touched point from the first touch down event. */
     private PointerCoords mFirstPoint = new PointerCoords();
+
+    /** The touched point from the second touch down event. */
+    private PointerCoords mSecondPoint = new PointerCoords();
 
     /** The event time of the first touch down event. */
     private long mFirstEventTime = 0;
@@ -164,8 +176,9 @@ public class MouseTouchListener implements OnTouchListener {
         mSubListener = mIdleSubListener;
 
         setMouseSensitivity(DeviceSettings.DEFAULT_MOUSE_SENSITIVITY);
-        setInvertScroll(DeviceSettings.DEFAULT_INVERT_SCROLL);
         setScrollSensitivity(DeviceSettings.DEFAULT_SCROLL_SENSITIVITY);
+        setPinchZoomSensitivity(DeviceSettings.DEFAULT_PINCH_ZOOM_SENSITIVITY);
+        setInvertScroll(DeviceSettings.DEFAULT_INVERT_SCROLL);
         setFlingScroll(DeviceSettings.DEFAULT_FLING_SCROLL);
 
         mDisplayDensity = mView.getResources().getDisplayMetrics().density;
@@ -177,6 +190,8 @@ public class MouseTouchListener implements OnTouchListener {
 
         final float multitouchGestureDistance = (MIN_MT_GESTURE_DISTANCE_DP * mDisplayDensity);
         mMinMultitouchGestureDistance = multitouchGestureDistance * multitouchGestureDistance;
+
+        mMinPinchZoomDistance = (MIN_PINCH_ZOOM_DISTANCE_DP * mDisplayDensity);
 
         final float tapDistance = (MAX_TAP_DISTANCE_DP * mDisplayDensity);
         mMaxTapDistanceSquare = tapDistance * tapDistance;
@@ -220,6 +235,16 @@ public class MouseTouchListener implements OnTouchListener {
         return ((view.getWidth() - event.getX(pointerIndex)) < threshold);
     }
 
+    private static float getSpan(PointerCoords pointA, PointerCoords pointB) {
+        return getSpan(pointA.x, pointA.y, pointB.x, pointB.y);
+    }
+
+    private static float getSpan(float aX, float aY, float bX, float bY) {
+        final float diffX = aX - bX;
+        final float diffY = aY - bY;
+        return FloatMath.sqrt((diffX * diffX) + (diffY * diffY));
+    }
+
     private static int convertPointerCountToButtonMask(int pointerCount) {
         switch (pointerCount) {
         case 1:
@@ -245,6 +270,13 @@ public class MouseTouchListener implements OnTouchListener {
         mHidMouse = hidMouse;
     }
 
+    public HidKeyboard getHidKeyboard() {
+        return mHidKeyboard;
+    }
+    public void setHidKeyboard(HidKeyboard hidKeyboard) {
+        mHidKeyboard = hidKeyboard;
+    }
+
     public float getMouseSensitivity() {
         return mMouseSensitivity;
     }
@@ -258,6 +290,13 @@ public class MouseTouchListener implements OnTouchListener {
     public void setScrollSensitivity(float value) {
         mSmoothScrollSensitivity = value;
         mStepScrollSensitivity = value / SMOOTH_SCROLL_STEPS;
+    }
+
+    public float getPinchZoomSensitivity() {
+        return mPinchZoomSensitivity;
+    }
+    public void setPinchZoomSensitivity(float value) {
+        mPinchZoomSensitivity = value;
     }
 
     public boolean getInvertScroll() {
@@ -363,7 +402,10 @@ public class MouseTouchListener implements OnTouchListener {
             if (mPointerIdList.isEmpty()) {
                 setFirstEventData(event, downPointerIndex);
                 setPreviousEventData(event, downPointerIndex);
+            } else if (mPointerIdList.size() == 1) {
+                event.getPointerCoords(downPointerIndex, mSecondPoint);
             }
+
             if (!mPointerIdList.containsValue(downPointerId)) {
                 mPointerIdList.addValue(downPointerId);
             }
@@ -482,12 +524,14 @@ public class MouseTouchListener implements OnTouchListener {
      */
     private class GestureSubListener extends SubListener {
 
+        private float mFirstSpan;
         private int mEdgeGestureType;
         private boolean mWasHandled;
 
 
         @Override
         protected void resetMembers() {
+            mFirstSpan = -1f;
             mEdgeGestureType = 0;
             mWasHandled = false;
         }
@@ -531,49 +575,107 @@ public class MouseTouchListener implements OnTouchListener {
                 return;
             }
 
-            final int pointerIndex = getMainPointerIndex(event);
-            if (pointerIndex < 0) {
-                return;
-            }
-
             if (mPointerIdList.size() > 1) {
                 mEdgeGestureType = 0;
             }
 
-            final float deltaX = mFirstPoint.x - event.getX(pointerIndex);
-            final float deltaY = mFirstPoint.y - event.getY(pointerIndex);
-            float maxDistanceSquare;
-            if (mEdgeGestureType != 0) {
-                maxDistanceSquare = mMinGestureDistance;
-            } else {
-                maxDistanceSquare = mMinMultitouchGestureDistance;
+            if (checkEdgeGesture(event) ||
+                    checkPinchZoomGesture(event) ||
+                    checkMultiTouchGesture(event)) {
+                mWasHandled = true;
+            }
+        }
+
+        private boolean checkEdgeGesture(MotionEvent event) {
+            if (mEdgeGestureType == 0) {
+                return false;
             }
 
-            if (isDistanceReached(deltaX, deltaY, maxDistanceSquare)) {
+            final int pointerIndex = getMainPointerIndex(event);
+            if (pointerIndex < 0) {
+                return false;
+            }
+
+            final float deltaX = mFirstPoint.x - event.getX(pointerIndex);
+            final float deltaY = mFirstPoint.y - event.getY(pointerIndex);
+
+            if (isDistanceReached(deltaX, deltaY, mMinGestureDistance)) {
                 final int direction = getGestureDirection(deltaX, deltaY);
 
-                if (mEdgeGestureType != 0) {
-                    if (V) Log.v(TAG, String.format("edge gesture detected (%d, %d)", mEdgeGestureType, direction));
+                if (V) Log.v(TAG, String.format("edge gesture detected (%d, %d)", mEdgeGestureType, direction));
 
-                    if (onTouchpadGesture(mEdgeGestureType, direction)) {
-                        mWasHandled = true;
-                    } else {
-                        changeSubListener(mPointerSubListener, event);
-                    }
-                } else if (mPointerIdList.size() == 2) {
+                if (onTouchpadGesture(mEdgeGestureType, direction)) {
+                    return true;
+                } else {
+                    changeSubListener(mPointerSubListener, event);
+                }
+            }
+
+            return false;
+        }
+
+        private boolean checkPinchZoomGesture(MotionEvent event) {
+            if (mPointerIdList.size() != 2) {
+                return false;
+            }
+
+            final int firstPointerIndex = getMainPointerIndex(event);
+            final int secondPointerIndex = event.findPointerIndex(mPointerIdList.getValue(1));
+            if ((firstPointerIndex < 0) || (secondPointerIndex < 0)) {
+                return false;
+            }
+
+            if (mFirstSpan < 0) {
+                mFirstSpan = getSpan(mFirstPoint, mSecondPoint);
+            }
+
+            final float currentSpan = getSpan(event.getX(firstPointerIndex),
+                    event.getY(firstPointerIndex),
+                    event.getX(secondPointerIndex),
+                    event.getY(secondPointerIndex));
+
+            if (Math.abs(currentSpan - mFirstSpan) > mMinPinchZoomDistance) {
+                if (V) Log.v(TAG, String.format("pinch-to-zoom gesture detected (%f)", (currentSpan - mFirstSpan)));
+
+                changeSubListener(mPinchZoomSubListener, event);
+                return true;
+            }
+
+            return false;
+        }
+
+        private boolean checkMultiTouchGesture(MotionEvent event) {
+            if (mPointerIdList.size() < 2) {
+                return false;
+            }
+
+            final int pointerIndex = getMainPointerIndex(event);
+            if (pointerIndex < 0) {
+                return false;
+            }
+
+            final float deltaX = mFirstPoint.x - event.getX(pointerIndex);
+            final float deltaY = mFirstPoint.y - event.getY(pointerIndex);
+
+            if (isDistanceReached(deltaX, deltaY, mMinMultitouchGestureDistance)) {
+                final int direction = getGestureDirection(deltaX, deltaY);
+
+                if (mPointerIdList.size() == 2) {
                     if (V) Log.v(TAG, String.format("two finger gesture detected (%d)", direction));
 
                     if (onTouchpadGesture(TouchpadView.GESTURE_2FINGER, direction)) {
-                        mWasHandled = true;
+                        return true;
                     }
                 } else if (mPointerIdList.size() == 3) {
                     if (V) Log.v(TAG, String.format("three finger gesture detected (%d)", direction));
 
                     if (onTouchpadGesture(TouchpadView.GESTURE_3FINGER, direction)) {
-                        mWasHandled = true;
+                        return true;
                     }
                 }
             }
+
+            return false;
         }
 
         private int getGestureDirection(float deltaX, float deltaY) {
@@ -1161,6 +1263,115 @@ public class MouseTouchListener implements OnTouchListener {
                 return (moveValue + mFlingScrollMoveFriction);
             } else {
                 return (moveValue - mFlingScrollMoveFriction);
+            }
+        }
+    }
+
+
+    /**
+     * Touchpad event listener for a pinch-to-zoom gesture.
+     */
+    private class PinchZoomSubListener extends SubListener {
+
+        /** The previous span of the touch points. */
+        private float mPreviousSpan;
+
+        /** Stores the unprocessed span delta. */
+        private float mSpanDelta;
+
+
+        @Override
+        protected void resetMembers() {
+            mPreviousSpan = -1f;
+            mSpanDelta = 0f;
+        }
+
+        @Override
+        protected void start() {
+            super.start();
+
+            if (mHidKeyboard != null) {
+                mHidKeyboard.pressModifierKey(HidKeyboard.MODIFIER_LEFT_CTRL);
+            }
+        }
+
+        @Override
+        protected void stop() {
+            super.stop();
+
+            if (mHidKeyboard != null) {
+                mHidKeyboard.releaseModifierKey(HidKeyboard.MODIFIER_LEFT_CTRL);
+            }
+        }
+
+        @Override
+        protected void onTouchPointerDown(View view, MotionEvent event) {
+        }
+
+        @Override
+        protected void onTouchPointerUp(View view, MotionEvent event) {
+            if (mPointerIdList.isEmpty()) {
+                changeSubListener(mIdleSubListener, event);
+            }
+        }
+
+        @Override
+        protected void onTouchMove(View view, MotionEvent event) {
+            if (mPointerIdList.size() != 2) {
+                resetMembers();
+                return;
+            }
+
+            final int firstPointerIndex = getMainPointerIndex(event);
+            final int secondPointerIndex = event.findPointerIndex(mPointerIdList.getValue(1));
+            if ((firstPointerIndex < 0) || (secondPointerIndex < 0)) {
+                return;
+            }
+
+            final float currentSpan = getSpan(event.getX(firstPointerIndex),
+                    event.getY(firstPointerIndex),
+                    event.getX(secondPointerIndex),
+                    event.getY(secondPointerIndex));
+
+            if (mPreviousSpan < 0) {
+                mPreviousSpan = currentSpan;
+                return;
+            }
+
+            mSpanDelta += currentSpan - mPreviousSpan;
+
+            if (mHidMouse != null) {
+                int reportScroll = convertTouchDeltaValue(mSpanDelta);
+                if ((reportScroll != 0)) {
+                    if (mHidMouse.isSmoothScrollYOn()) {
+                        /*
+                         * Report only complete scroll steps and ignore the intermediate steps of
+                         * the Smooth Scroll feature. Otherwise most programs would zoom too fast.
+                         */
+                        mHidMouse.scrollWheel(reportScroll * SMOOTH_SCROLL_STEPS, 0);
+                    } else {
+                        mHidMouse.scrollWheel(reportScroll, 0);
+                    }
+
+                    // Subtract only the actually reported value
+                    mSpanDelta -= convertReportDeltaValue(reportScroll);
+                }
+            }
+
+            mPreviousSpan = currentSpan;
+        }
+
+        /** Converts the touch span value to a HID Report scroll value. */
+        private int convertTouchDeltaValue(float value) {
+            return (int)(value / mDisplayDensity * mPinchZoomSensitivity / SMOOTH_SCROLL_STEPS);
+        }
+
+        /** Converts the HID Report scroll value to a touch span value. */
+        private float convertReportDeltaValue(int value) {
+            if (mPinchZoomSensitivity != 0) {
+                return (value * mDisplayDensity / mPinchZoomSensitivity * SMOOTH_SCROLL_STEPS);
+            } else {
+                return 0.0f;
             }
         }
     }
