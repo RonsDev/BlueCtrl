@@ -766,7 +766,12 @@ public class MouseTouchListener implements OnTouchListener {
         protected void onTouchMove(View view, MotionEvent event) {
             if (!isTap(event)) {
                 if (mTapCount == 1) {
-                    changeSubListener(mPointerSubListener, event);
+                    /*
+                     * Don't pass the current MotionEvent to the pointer event listener. Otherwise
+                     * the pointer can move before the drag button is pressed.
+                     */
+                    changeSubListener(mPointerSubListener, null);
+
                     mPointerSubListener.setDragButton(
                             convertPointerCountToButtonMask(mMaxTouchPoints));
                 } else {
