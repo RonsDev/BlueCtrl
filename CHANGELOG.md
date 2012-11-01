@@ -1,3 +1,10 @@
+Version 2.3
+-----------
+* Fixed a problem with the SwiftKey Keyboard
+* New pinch-to-zoom gesture
+
+
+
 Version 2.2
 -----------
 * Select and "PS" buttons for PlayStation 3
