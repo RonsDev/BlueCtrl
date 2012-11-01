@@ -35,6 +35,7 @@
 #define	HIDC_REPORTID_AC_KEYS           0x13
 #define	HIDC_REPORTID_MOUSE             0x02
 #define	HIDC_REPORTID_MOUSE_FEATURE     0x22
+#define	HIDC_REPORTID_MOUSE_ABSOLUTE    0x23
 
 
 /*
@@ -102,6 +103,8 @@
 
 #define	HIDDESC_UNIT_EXPONENT_1B        0x55
 #define	HIDDESC_UNIT_1B                 0x65
+
+#define	HIDDESC_UNIT_INCH               0x13
 
 #define	HIDDESC_REPORT_SIZE             0x75
 #define	HIDDESC_REPORT_ID               0x85

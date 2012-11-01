@@ -185,6 +185,7 @@ public class DaemonService extends Service {
     private static final int IPC_CMD_HID_SEND_MEDIA_KEYS = 140;
     private static final int IPC_CMD_HID_SEND_AC_KEYS = 145;
     private static final int IPC_CMD_HID_CHANGE_MOUSE_FEATURE = 150;
+    private static final int IPC_CMD_HID_SEND_MOUSE_ABSOLUTE = 160;
 
 
     public class DaemonBinder extends Binder {
@@ -869,6 +870,22 @@ public class DaemonService extends Service {
                 mOutStream.flush();
             } catch (IOException e) {
                 Log.e(TAG, "send daemon IPC command 'Change Mouse Feature Report' failed", e);
+                stopDaemon(ERROR_IPC);
+            }
+        }
+    }
+
+    /** Sends a Mouse (Absolute) HID Report to the host. */
+    public void sendMouseAbsoluteReport(int buttons, int x, int y) {
+        if (isRunning()) {
+            try {
+                mOutStream.writeInt(IPC_CMD_HID_SEND_MOUSE_ABSOLUTE);
+                mOutStream.writeByte(buttons);
+                mOutStream.writeShort(limitIntValue(x, 0, 2047));
+                mOutStream.writeShort(limitIntValue(y, 0, 2047));
+                mOutStream.flush();
+            } catch (IOException e) {
+                Log.e(TAG, "send daemon IPC command 'HID Mouse (Absolute) Report' failed", e);
                 stopDaemon(ERROR_IPC);
             }
         }

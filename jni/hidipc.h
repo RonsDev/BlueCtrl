@@ -173,6 +173,16 @@ typedef enum HidcIpcCommand {
 	 *             active for the horizontal scroll wheel.
 	 */
 	HIDC_IPC_CMD_HID_CHANGE_MOUSE_FEATURE = 150,
+	/*
+	 * Send a Mouse (Absolute) HID Report to the host.
+	 * Additional data:
+	 *     1 byte : A bitmask with the pressed mouse buttons.
+	 *     2 bytes: Absolute X position of the Mouse (values between 0 and
+	 *              2047 are allowed)
+	 *     2 bytes: Absolute Y position of the Mouse (values between 0 and
+	 *              2047 are allowed)
+	 */
+	HIDC_IPC_CMD_HID_SEND_MOUSE_ABSOLUTE = 160,
 } HidcIpcCommand;
 
 /*

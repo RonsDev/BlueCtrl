@@ -380,6 +380,32 @@ static void do_ipc_cmd_hid_change_mouse_feature()
 }
 
 /*
+ * Called when a "Send Mouse (Absolute) HID Report" command is received.
+ */
+static void do_ipc_cmd_hid_send_mouse_abs()
+{
+	unsigned char buttons;
+	uint16_t x;
+	uint16_t y;
+
+	if (receive_ipc_data(&buttons, sizeof(buttons)) < 0)
+		return;
+
+	if (receive_ipc_data(&x, sizeof(x)) < 0)
+		return;
+
+	x = ntohs(x);
+
+	if (receive_ipc_data(&y, sizeof(y)) < 0)
+		return;
+
+	y = ntohs(y);
+
+	if (hidc_is_hid_connected())
+		hidc_send_hid_report_mouse_abs(buttons, x, y);
+}
+
+/*
  * Handle a poll input event on the server IPC socket.
  */
 static void pollin_server_ipc_sock()
@@ -470,6 +496,9 @@ static void pollin_client_ipc_sock()
 		break;
 	case HIDC_IPC_CMD_HID_CHANGE_MOUSE_FEATURE:
 		do_ipc_cmd_hid_change_mouse_feature();
+		break;
+	case HIDC_IPC_CMD_HID_SEND_MOUSE_ABSOLUTE:
+		do_ipc_cmd_hid_send_mouse_abs();
 		break;
 	}
 }

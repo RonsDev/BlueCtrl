@@ -247,6 +247,19 @@ void hidc_send_hid_report_mouse(unsigned char buttons, int16_t x, int16_t y,
 				signed char scrollY, signed char scrollX);
 
 /*
+ * Send a Mouse (Absolute) HID Report to the host.
+ *
+ * Parameters:
+ *     buttons: A bitmask with the pressed Mouse buttons.
+ *     x: Absolute X position of the Mouse (values between 0 and 2047 are
+ *        allowed)
+ *     y: Absolute Y position of the Mouse (values between 0 and 2047 are
+ *        allowed)
+ */
+void hidc_send_hid_report_mouse_abs(unsigned char buttons, uint16_t x,
+				uint16_t y);
+
+/*
  * Change the Mouse Feature Report.
  *
  * Parameters:

@@ -55,6 +55,13 @@ public class HidMouse {
     public static final int CLICK_TYPE_CLICK = 30;
 
 
+    /** The maximum absolute pointer position on the X-axis. */
+    public static final int MAX_ABSOLUTE_VALUE_X = 2047;
+
+    /** The maximum absolute pointer position on the Y-axis. */
+    public static final int MAX_ABSOLUTE_VALUE_Y = 2047;
+
+
     private DaemonService mDaemon;
 
     private int mPressedButtons = 0;
@@ -136,6 +143,10 @@ public class HidMouse {
 
     public void movePointer(int x, int y) {
         mDaemon.sendMouseReport(mPressedButtons, x, y, 0, 0);
+    }
+
+    public void movePointerAbsolute(int x, int y) {
+        mDaemon.sendMouseAbsoluteReport(mPressedButtons, x, y);
     }
 
     public boolean isSmoothScrollYOn() {

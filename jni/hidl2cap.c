@@ -88,6 +88,7 @@ static unsigned char input_report_media_keys[3];
 static unsigned char input_report_ac_keys[3];
 static unsigned char input_report_mouse[9];
 static unsigned char feature_report_mouse[3];
+static unsigned char input_report_mouse_abs[7];
 
 
 /*
@@ -242,6 +243,28 @@ static void reset_input_report_mouse()
 static size_t get_input_report_mouse_size()
 {
 	return (use_report_protocol ? sizeof(input_report_mouse) : 5);
+}
+
+/*
+ * Clear and initialize the Mouse (Absolute) Input Report.
+ */
+static void reset_input_report_mouse_abs()
+{
+	memset(input_report_mouse_abs, 0, sizeof(input_report_mouse_abs));
+
+	input_report_mouse_abs[0] = BTTHT_DATA | BTTHP_DATA_INPUT;
+	input_report_mouse_abs[1] = HIDC_REPORTID_MOUSE_ABSOLUTE;
+}
+
+/*
+ * Get the actual size of the Mouse (Absolute) Input Report.
+ *
+ * Returns:
+ *     The byte count of the Report.
+ */
+static size_t get_input_report_mouse_abs_size()
+{
+	return sizeof(input_report_mouse_abs);
 }
 
 /*
@@ -451,6 +474,7 @@ static void on_hid_connected(bdaddr_t *dst_addr)
 	reset_input_report_media_keys();
 	reset_input_report_ac_keys();
 	reset_input_report_mouse();
+	reset_input_report_mouse_abs();
 	reset_feature_report_mouse();
 
 	ba2str(dst_addr, str_addr);
@@ -754,6 +778,10 @@ static void on_cmd_get_report(unsigned char param, unsigned char *data,
 		else if (reportid == HIDC_REPORTID_MOUSE) {
 			report_data = input_report_mouse;
 			report_size = get_input_report_mouse_size();
+		}
+		else if (reportid == HIDC_REPORTID_MOUSE_ABSOLUTE) {
+			report_data = input_report_mouse_abs;
+			report_size = get_input_report_mouse_abs_size();
 		}
 		break;
 	case BTTHP_GET_REPORT_OUTPUT:
@@ -1328,6 +1356,23 @@ void hidc_send_hid_report_mouse(unsigned char buttons, int16_t x, int16_t y,
 	send_data_report(client_intr_sock,
 			input_report_mouse,
 			get_input_report_mouse_size());
+}
+
+void hidc_send_hid_report_mouse_abs(unsigned char buttons, uint16_t x,
+				uint16_t y)
+{
+	reset_input_report_mouse_abs();
+
+	x = htobs((uint16_t)limit_int_value(x, 0, 2047));
+	y = htobs((uint16_t)limit_int_value(y, 0, 2047));
+
+	input_report_mouse_abs[2] = buttons;
+	memcpy(input_report_mouse_abs + 3, &x, 2);
+	memcpy(input_report_mouse_abs + 5, &y, 2);
+
+	send_data_report(client_intr_sock,
+			input_report_mouse_abs,
+			get_input_report_mouse_abs_size());
 }
 
 void hidc_change_mouse_feature(int smooth_scroll_y, int smooth_scroll_x)
