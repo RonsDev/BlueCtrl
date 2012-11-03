@@ -38,8 +38,11 @@ public class MouseTouchListener implements OnTouchListener {
     private static final boolean V = false;
 
 
-    /** Distance from an edge of the view where a gesture is detected. */
-    private static final float GESTURE_EDGE_THRESHOLD_DP = 30.0f;
+    /** Distance in percent from an edge of the touchpad where a gesture is detected. */
+    private static final int GESTURE_EDGE_THRESHOLD_P = 10;
+
+    /** Maximum distance from an edge of the touchpad where a gesture is detected. */
+    private static final float MAX_GESTURE_EDGE_THRESHOLD_DP = 72.0f;
 
     /** Minimum distance to detect a gesture with a single touch point. */
     private static final float MIN_GESTURE_DISTANCE_DP = 10.0f;
@@ -72,10 +75,12 @@ public class MouseTouchListener implements OnTouchListener {
     private static final float MAX_MT_TAP_DISTANCE_DP = 30.0f;
 
 
-    /** Distance from an edge of the view where the pointer movement is continued automatically. */
+    /**
+     * Distance from an edge of the touchpad where the pointer movement is continued automatically.
+     */
     private static final float POINTER_EDGE_MOVE_THRESHOLD_DP = 18.0f;
 
-    /** Pointer movement speed when the touch point is at the edge of the view. */
+    /** Pointer movement speed when the touch point is at the edge of the touchpad. */
     private static final float POINTER_EDGE_MOVE_STEP = 4.0f;
 
 
@@ -126,7 +131,7 @@ public class MouseTouchListener implements OnTouchListener {
 
     private final float mDisplayDensity;
 
-    private final float mGestureEdgeThreshold;
+    private final float mMaxGestureEdgeThreshold;
     private final float mPointerEdgeMoveThreshold;
     private final float mMinGestureDistance;
     private final float mMinMultitouchGestureDistance;
@@ -189,7 +194,7 @@ public class MouseTouchListener implements OnTouchListener {
 
         mDisplayDensity = mView.getResources().getDisplayMetrics().density;
 
-        mGestureEdgeThreshold = GESTURE_EDGE_THRESHOLD_DP * mDisplayDensity;
+        mMaxGestureEdgeThreshold = (MAX_GESTURE_EDGE_THRESHOLD_DP * mDisplayDensity);
 
         final float gestureDistance = (MIN_GESTURE_DISTANCE_DP * mDisplayDensity);
         mMinGestureDistance = gestureDistance * gestureDistance;
@@ -555,15 +560,16 @@ public class MouseTouchListener implements OnTouchListener {
                 final int pointerIndex = getMainPointerIndex(event);
                 if (pointerIndex >= 0) {
                     final Rect rect = mTouchpadAreaRect;
-                    final float threshold = mGestureEdgeThreshold;
+                    final float thresholdY = getEdgeThreshold(rect.height());
+                    final float thresholdX = getEdgeThreshold(rect.width());
 
-                    if (isTopEdge(rect, event, pointerIndex, threshold)) {
+                    if (isTopEdge(rect, event, pointerIndex, thresholdY)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_TOP;
-                    } else if (isBottomEdge(rect, event, pointerIndex, threshold)) {
+                    } else if (isBottomEdge(rect, event, pointerIndex, thresholdY)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_BOTTOM;
-                    } else if (isLeftEdge(rect, event, pointerIndex, threshold)) {
+                    } else if (isLeftEdge(rect, event, pointerIndex, thresholdX)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_LEFT;
-                    } else if (isRightEdge(rect, event, pointerIndex, threshold)) {
+                    } else if (isRightEdge(rect, event, pointerIndex, thresholdX)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_RIGHT;
                     }
                 }
@@ -599,6 +605,15 @@ public class MouseTouchListener implements OnTouchListener {
                     checkPinchZoomGesture(event) ||
                     checkMultiTouchGesture(event)) {
                 mWasHandled = true;
+            }
+        }
+
+        private float getEdgeThreshold(int totalSize) {
+            final float result = (totalSize * GESTURE_EDGE_THRESHOLD_P / 100);
+            if (result > mMaxGestureEdgeThreshold) {
+                return mMaxGestureEdgeThreshold;
+            } else {
+                return result;
             }
         }
 
