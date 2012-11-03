@@ -21,6 +21,7 @@ import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.HidMouse;
 import org.ronsdev.bluectrl.IntArrayList;
 
+import android.graphics.Rect;
 import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -114,6 +115,7 @@ public class MouseTouchListener implements OnTouchListener {
     private HidMouse mHidMouse;
     private HidKeyboard mHidKeyboard;
 
+    private Rect mTouchpadAreaRect;
     private float mMouseSensitivity;
     private float mSmoothScrollSensitivity;
     private float mStepScrollSensitivity;
@@ -175,6 +177,10 @@ public class MouseTouchListener implements OnTouchListener {
 
         mSubListener = mIdleSubListener;
 
+        setTouchpadAreaRect(new Rect(mView.getLeft(),
+                mView.getTop(),
+                mView.getRight(),
+                mView.getBottom()));
         setMouseSensitivity(DeviceSettings.DEFAULT_MOUSE_SENSITIVITY);
         setScrollSensitivity(DeviceSettings.DEFAULT_SCROLL_SENSITIVITY);
         setPinchZoomSensitivity(DeviceSettings.DEFAULT_PINCH_ZOOM_SENSITIVITY);
@@ -215,24 +221,24 @@ public class MouseTouchListener implements OnTouchListener {
         return (x * x) + (y * y) > maxDistanceSquare;
     }
 
-    private static boolean isTopEdge(View view, MotionEvent event, int pointerIndex,
+    private static boolean isTopEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return (event.getY(pointerIndex) < threshold);
+        return ((rect.top + event.getY(pointerIndex)) < threshold);
     }
 
-    private static boolean isBottomEdge(View view, MotionEvent event, int pointerIndex,
+    private static boolean isBottomEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return ((view.getHeight() - event.getY(pointerIndex)) < threshold);
+        return ((rect.bottom - event.getY(pointerIndex)) < threshold);
     }
 
-    private static boolean isLeftEdge(View view, MotionEvent event, int pointerIndex,
+    private static boolean isLeftEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return (event.getX(pointerIndex) < threshold);
+        return ((rect.left + event.getX(pointerIndex)) < threshold);
     }
 
-    private static boolean isRightEdge(View view, MotionEvent event, int pointerIndex,
+    private static boolean isRightEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return ((view.getWidth() - event.getX(pointerIndex)) < threshold);
+        return ((rect.right - event.getX(pointerIndex)) < threshold);
     }
 
     private static float getSpan(PointerCoords pointA, PointerCoords pointB) {
@@ -275,6 +281,13 @@ public class MouseTouchListener implements OnTouchListener {
     }
     public void setHidKeyboard(HidKeyboard hidKeyboard) {
         mHidKeyboard = hidKeyboard;
+    }
+
+    public Rect getTouchpadAreaRect() {
+        return mTouchpadAreaRect;
+    }
+    public void setTouchpadAreaRect(Rect value) {
+        mTouchpadAreaRect = value;
     }
 
     public float getMouseSensitivity() {
@@ -541,13 +554,16 @@ public class MouseTouchListener implements OnTouchListener {
             if (mPointerIdList.size() == 1) {
                 final int pointerIndex = getMainPointerIndex(event);
                 if (pointerIndex >= 0) {
-                    if (isTopEdge(view, event, pointerIndex, mGestureEdgeThreshold)) {
+                    final Rect rect = mTouchpadAreaRect;
+                    final float threshold = mGestureEdgeThreshold;
+
+                    if (isTopEdge(rect, event, pointerIndex, threshold)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_TOP;
-                    } else if (isBottomEdge(view, event, pointerIndex, mGestureEdgeThreshold)) {
+                    } else if (isBottomEdge(rect, event, pointerIndex, threshold)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_BOTTOM;
-                    } else if (isLeftEdge(view, event, pointerIndex, mGestureEdgeThreshold)) {
+                    } else if (isLeftEdge(rect, event, pointerIndex, threshold)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_LEFT;
-                    } else if (isRightEdge(view, event, pointerIndex, mGestureEdgeThreshold)) {
+                    } else if (isRightEdge(rect, event, pointerIndex, threshold)) {
                         mEdgeGestureType = TouchpadView.GESTURE_EDGE_RIGHT;
                     }
                 }
@@ -951,15 +967,18 @@ public class MouseTouchListener implements OnTouchListener {
          * yet.
          */
         private void addPointerEdgeMovement(View view, MotionEvent event, int pointerIndex) {
-            if (isTopEdge(view, event, pointerIndex, mPointerEdgeMoveThreshold)) {
+            final Rect rect = mTouchpadAreaRect;
+            final float threshold = mPointerEdgeMoveThreshold;
+
+            if (isTopEdge(rect, event, pointerIndex, threshold)) {
                 mMoveY -= POINTER_EDGE_MOVE_STEP;
-            } else if (isBottomEdge(view, event, pointerIndex, mPointerEdgeMoveThreshold)) {
+            } else if (isBottomEdge(rect, event, pointerIndex, threshold)) {
                 mMoveY += POINTER_EDGE_MOVE_STEP;
             }
 
-            if (isLeftEdge(view, event, pointerIndex, mPointerEdgeMoveThreshold)) {
+            if (isLeftEdge(rect, event, pointerIndex, threshold)) {
                 mMoveX -= POINTER_EDGE_MOVE_STEP;
-            } else if (isRightEdge(view, event, pointerIndex, mPointerEdgeMoveThreshold)) {
+            } else if (isRightEdge(rect, event, pointerIndex, threshold)) {
                 mMoveX += POINTER_EDGE_MOVE_STEP;
             }
         }
