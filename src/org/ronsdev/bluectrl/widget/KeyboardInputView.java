@@ -16,7 +16,6 @@
 
 package org.ronsdev.bluectrl.widget;
 
-import org.ronsdev.bluectrl.CharKeyReportMap;
 import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.KeyEventFuture;
 
@@ -37,8 +36,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
-import java.util.ArrayList;
-
 /**
  * View that handles key events and redirects them to a HID Keyboard.
  */
@@ -54,8 +51,6 @@ public class KeyboardInputView extends View {
 
 
     private HidKeyboard mHidKeyboard = null;
-    private String mKeyMap = "";
-    private CharKeyReportMap mCharKeyMap = null;
 
     private boolean mShouldShowKeyboard = false;
     private boolean mWasKeyboardToggled = false;
@@ -118,7 +113,7 @@ public class KeyboardInputView extends View {
     }
 
     public boolean isActive() {
-        return ((mCharKeyMap != null) && (mHidKeyboard != null) && mHidKeyboard.isConnected());
+        return ((mHidKeyboard != null) && mHidKeyboard.isConnected());
     }
 
     public HidKeyboard getHidKeyboard() {
@@ -126,16 +121,6 @@ public class KeyboardInputView extends View {
     }
     public void setHidKeyboard(HidKeyboard hidKeyboard) {
         mHidKeyboard = hidKeyboard;
-    }
-
-    public String getKeyMap() {
-        return mKeyMap;
-    }
-    public void setKeyMap(String keyMap) {
-        if (keyMap != mKeyMap) {
-            mKeyMap = keyMap;
-            mCharKeyMap = new CharKeyReportMap(keyMap, getContext().getAssets());
-        }
     }
 
     private InputMethodManager getInputManager() {
@@ -177,12 +162,6 @@ public class KeyboardInputView extends View {
          * latter didn't work in the landscape mode.
          */
         getInputManager().toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-    }
-
-    public void pasteText(String text) {
-        if (isActive()) {
-            typeText(text);
-        }
     }
 
     @Override
@@ -278,59 +257,24 @@ public class KeyboardInputView extends View {
     }
 
     private boolean onSingleKeyEvent(int keyCode, KeyEvent event) {
-        final int keyChar = event.getUnicodeChar(0);
+        final int character = event.getUnicodeChar(0);
 
         if (V) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                Log.v(TAG, String.format("Key Down (Key=%d   Char=%c)", keyCode, keyChar));
+                Log.v(TAG, String.format("Key Down (Key=%d   Char=%c)", keyCode, character));
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                Log.v(TAG, String.format("Key Up (Key=%d   Char=%c)", keyCode, keyChar));
+                Log.v(TAG, String.format("Key Up (Key=%d   Char=%c)", keyCode, character));
             }
         }
 
-        if (handleHardwareKey(keyCode, event) || handleMediaKey(keyCode, event)) {
+        if (handleHardwareKey(keyCode, event) ||
+                handleMediaKey(keyCode, event) ||
+                handleNonCharKey(keyCode, event) ||
+                handleCharKey(character, event)) {
             return true;
         }
 
-        int hidModifier = convertToHidModifier(keyCode);
-        int hidKeyCode = convertToHidKeyCode(keyCode);
-
-        // Try to find a compatible Keyboard Report in the CharKeyReportMap if the key code
-        // couldn't be converted
-        if ((hidModifier == 0) && (hidKeyCode == 0) && (keyChar != 0)) {
-            CharKeyReportMap.KeyReportSequence keyReportSequence = mCharKeyMap.get((char)keyChar);
-            if ((keyReportSequence != null) && (keyReportSequence.size() == 1)) {
-                hidModifier = keyReportSequence.get(0).getModifier();
-                hidKeyCode = keyReportSequence.get(0).getKeyCode();
-            }
-        }
-
-        boolean handled = false;
-
-        switch (event.getAction()) {
-        case KeyEvent.ACTION_DOWN:
-            if (hidModifier != 0) {
-                mHidKeyboard.pressModifierKey(hidModifier);
-                handled = true;
-            }
-            if (hidKeyCode != 0) {
-                mHidKeyboard.pressKey(hidKeyCode);
-                handled = true;
-            }
-            break;
-        case KeyEvent.ACTION_UP:
-            if (hidKeyCode != 0) {
-                mHidKeyboard.releaseKey(hidKeyCode);
-                handled = true;
-            }
-            if (hidModifier != 0) {
-                mHidKeyboard.releaseModifierKey(hidModifier);
-                handled = true;
-            }
-            break;
-        }
-
-        return handled;
+        return false;
     }
 
     private boolean handleHardwareKey(int keyCode, KeyEvent event) {
@@ -367,11 +311,56 @@ public class KeyboardInputView extends View {
         return false;
     }
 
+    private boolean handleNonCharKey(int keyCode, KeyEvent event) {
+        final int hidModifier = convertToHidModifier(keyCode);
+        final int hidKeyCode = convertToHidKeyCode(keyCode);
+
+        if ((hidModifier != 0) || (hidKeyCode != 0)) {
+            switch (event.getAction()) {
+            case KeyEvent.ACTION_DOWN:
+                if (hidModifier != 0) {
+                    mHidKeyboard.pressModifierKey(hidModifier);
+                }
+
+                if (hidKeyCode != 0) {
+                    mHidKeyboard.pressKey(hidKeyCode);
+                }
+
+                return true;
+            case KeyEvent.ACTION_UP:
+                if (hidKeyCode != 0) {
+                    mHidKeyboard.releaseKey(hidKeyCode);
+                }
+
+                if (hidModifier != 0) {
+                    mHidKeyboard.releaseModifierKey(hidModifier);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean handleCharKey(int character, KeyEvent event) {
+        if (character != 0) {
+            switch (event.getAction()) {
+            case KeyEvent.ACTION_DOWN:
+                return mHidKeyboard.pressCharKey((char)character);
+            case KeyEvent.ACTION_UP:
+                return mHidKeyboard.releaseCharKey((char)character);
+            }
+        }
+
+        return false;
+    }
+
     private boolean onMultipleKeyEvents(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
             if (V) Log.v(TAG, String.format("multiple key events (Text='%s')", event.getCharacters()));
 
-            typeText(event.getCharacters());
+            mHidKeyboard.typeText(event.getCharacters());
             return true;
         } else {
             if (V) Log.v(TAG, String.format("multiple key events (Repeat='%d')", event.getRepeatCount()));
@@ -379,55 +368,6 @@ public class KeyboardInputView extends View {
             // Repeated keys are ignored because only key changes have to be reported
             return true;
         }
-    }
-
-    /** Types a complete text with the Keyboard. */
-    private void typeText(String text) {
-        ArrayList<CharKeyReportMap.KeyReport> reportList = convertToKeyReports(text);
-
-        if (reportList.size() < 1) {
-            return;
-        }
-
-        int index = 0;
-        CharKeyReportMap.KeyReport keyReport;
-        CharKeyReportMap.KeyReport nextKeyReport = reportList.get(index);
-        while (nextKeyReport != null) {
-            keyReport = nextKeyReport;
-            index++;
-            nextKeyReport = (index < reportList.size()) ? reportList.get(index) : null;
-
-            final int modifier = keyReport.getModifier();
-            final int keyCode = keyReport.getKeyCode();
-
-            mHidKeyboard.pressModifierKey(modifier);
-            mHidKeyboard.pressKey(keyCode);
-            mHidKeyboard.releaseKey(keyCode);
-
-            // If the next Modifier value equals the current value then don't reset the Modifier.
-            // This saves two unnecessary HID Keyboard Reports.
-            if ((nextKeyReport == null) || (nextKeyReport.getModifier() != modifier)) {
-                mHidKeyboard.releaseModifierKey(modifier);
-            }
-        }
-    }
-
-    /** Converts a text to a list of Keyboard Reports. */
-    private ArrayList<CharKeyReportMap.KeyReport> convertToKeyReports(String text) {
-        ArrayList<CharKeyReportMap.KeyReport> result = new ArrayList<CharKeyReportMap.KeyReport>();
-
-        for (int i = 0; i < text.length(); i++) {
-            final char character = text.charAt(i);
-
-            CharKeyReportMap.KeyReportSequence keyReportSequence = mCharKeyMap.get(character);
-            if (keyReportSequence != null) {
-                result.addAll(keyReportSequence);
-            } else {
-                Log.w(TAG, String.format("unknown Keymap character '%c'", character));
-            }
-        }
-
-        return result;
     }
 
     /**

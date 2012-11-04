@@ -18,7 +18,10 @@ package org.ronsdev.bluectrl;
 
 import org.ronsdev.bluectrl.daemon.DaemonService;
 
+import android.content.Context;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 /**
  * Virtual Keyboard that sends HID Keyboard Reports to the application daemon.
@@ -240,6 +243,9 @@ public class HidKeyboard {
 
     private DaemonService mDaemon;
 
+    private String mKeyMap = "";
+    private CharKeyReportMap mCharKeyMap = null;
+
     private int mPressedModifier = 0;
     private int mPressedSystemKeys = 0;
     private int mPressedHardwareKeys = 0;
@@ -264,6 +270,19 @@ public class HidKeyboard {
     public boolean isConnected() {
         return (mDaemon.isRunning() &&
                 (mDaemon.getHidState() == DaemonService.HID_STATE_CONNECTED));
+    }
+
+    public String getKeyMap() {
+        return mKeyMap;
+    }
+    public void setKeyMap(Context context, String keyMap) {
+        if ((keyMap == null) || keyMap.isEmpty()) {
+            mKeyMap = "";
+            mCharKeyMap = null;
+        } else if (!keyMap.equals(mKeyMap)) {
+            mKeyMap = keyMap;
+            mCharKeyMap = new CharKeyReportMap(keyMap, context.getAssets());
+        }
     }
 
     public void pressModifierKey(int hidModifier) {
@@ -394,5 +413,123 @@ public class HidKeyboard {
 
             if (V) Log.v(TAG, String.format("application control key released (0x%h)", key));
         }
+    }
+
+    /**
+     * Presses the corresponding key for the specified character. Only simple characters that can
+     * be produced with one key and one modifier key (in other words no dead keys) are supported.
+     * Also the character must be specified in the current Keymap file.
+     * @param key
+     * The character of the key that should be pressed.
+     * @return
+     * Returns {@code false} if the character cannot be mapped to a key.
+     */
+    public boolean pressCharKey(char key) {
+        if (mCharKeyMap == null) {
+            return false;
+        }
+
+        CharKeyReportMap.KeyReportSequence keyReportSequence = mCharKeyMap.get(key);
+        if ((keyReportSequence != null) && (keyReportSequence.size() == 1)) {
+            final int hidModifier = keyReportSequence.get(0).getModifier();
+            if (hidModifier != 0) {
+                pressModifierKey(hidModifier);
+            }
+
+            final int hidKeyCode = keyReportSequence.get(0).getKeyCode();
+            if (hidKeyCode != 0) {
+                pressKey(hidKeyCode);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Releases the corresponding key for the specified character. Only simple characters that can
+     * be produced with one key and one modifier key (in other words no dead keys) are supported.
+     * Also the character must be specified in the current Keymap file.
+     * @param key
+     * The character of the key that should be released.
+     * @return
+     * Returns {@code false} if the character cannot be mapped to a key.
+     */
+    public boolean releaseCharKey(char key) {
+        if (mCharKeyMap == null) {
+            return false;
+        }
+
+        CharKeyReportMap.KeyReportSequence keyReportSequence = mCharKeyMap.get(key);
+        if ((keyReportSequence != null) && (keyReportSequence.size() == 1)) {
+            final int hidKeyCode = keyReportSequence.get(0).getKeyCode();
+            if (hidKeyCode != 0) {
+                releaseKey(hidKeyCode);
+            }
+
+            final int hidModifier = keyReportSequence.get(0).getModifier();
+            if (hidModifier != 0) {
+                releaseModifierKey(hidModifier);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Types a complete text. */
+    public void typeText(String text) {
+        if (mCharKeyMap == null) {
+            Log.w(TAG, "Keymap not set");
+            return;
+        }
+
+        ArrayList<CharKeyReportMap.KeyReport> reportList = convertToKeyReports(text);
+
+        if (reportList.size() < 1) {
+            return;
+        }
+
+        int index = 0;
+        CharKeyReportMap.KeyReport keyReport;
+        CharKeyReportMap.KeyReport nextKeyReport = reportList.get(index);
+        while (nextKeyReport != null) {
+            keyReport = nextKeyReport;
+            index++;
+            nextKeyReport = (index < reportList.size()) ? reportList.get(index) : null;
+
+            final int modifier = keyReport.getModifier();
+            final int keyCode = keyReport.getKeyCode();
+
+            pressModifierKey(modifier);
+            pressKey(keyCode);
+            releaseKey(keyCode);
+
+            // If the next Modifier value equals the current value then don't reset the Modifier.
+            // This saves two unnecessary HID Keyboard Reports.
+            if ((nextKeyReport == null) || (nextKeyReport.getModifier() != modifier)) {
+                releaseModifierKey(modifier);
+            }
+        }
+    }
+
+    /** Converts a text to a list of Keyboard Reports. */
+    private ArrayList<CharKeyReportMap.KeyReport> convertToKeyReports(String text) {
+        ArrayList<CharKeyReportMap.KeyReport> result = new ArrayList<CharKeyReportMap.KeyReport>();
+
+        for (int i = 0; i < text.length(); i++) {
+            final char character = text.charAt(i);
+
+            CharKeyReportMap.KeyReportSequence keyReportSequence = mCharKeyMap.get(character);
+            if (keyReportSequence != null) {
+                result.addAll(keyReportSequence);
+            } else {
+                Log.w(TAG, String.format("unknown Keymap character '%c'", character));
+            }
+        }
+
+        return result;
     }
 }

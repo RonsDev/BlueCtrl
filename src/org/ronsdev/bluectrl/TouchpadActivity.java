@@ -147,28 +147,23 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         public void run() {
-            // Save the current KeyboardInputView because the mKeyboardInputView variable can
-            // change if the screen is rotated.
-            KeyboardInputView localKIV = mKeyboardInputView;
-            if (localKIV != null) {
-                int position = 0;
-                while ((position < mText.length()) && !interrupted() && localKIV.isActive()) {
-                    int endPosition = position + SEND_TEXT_CHUNK_SIZE;
-                    if (endPosition > mText.length()) {
-                        endPosition = mText.length();
-                    }
-                    CharSequence chunk = mText.subSequence(position, endPosition);
-                    localKIV.pasteText(chunk.toString());
-                    position = endPosition;
-
-                    final int progress = position;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mSendTextProgressDlg.setProgress(progress);
-                        }
-                    });
+            int position = 0;
+            while ((position < mText.length()) && !interrupted() && mHidKeyboard.isConnected()) {
+                int endPosition = position + SEND_TEXT_CHUNK_SIZE;
+                if (endPosition > mText.length()) {
+                    endPosition = mText.length();
                 }
+                CharSequence chunk = mText.subSequence(position, endPosition);
+                mHidKeyboard.typeText(chunk.toString());
+                position = endPosition;
+
+                final int progress = position;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSendTextProgressDlg.setProgress(progress);
+                    }
+                });
             }
 
             runOnUiThread(new Runnable() {
@@ -226,6 +221,10 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     protected void onResume() {
         super.onResume();
 
+        if (mHidKeyboard != null) {
+            mHidKeyboard.setKeyMap(this, mDeviceSettings.getKeyMap());
+        }
+
         updateViewSettings();
     }
 
@@ -265,6 +264,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         final DaemonService daemon = getDaemon();
 
         mHidKeyboard = new HidKeyboard(daemon);
+        mHidKeyboard.setKeyMap(this, mDeviceSettings.getKeyMap());
 
         if (mKeyboardInputView != null) {
             mKeyboardInputView.setHidKeyboard(mHidKeyboard);
@@ -392,8 +392,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        final boolean keyboardInputActive = ((mKeyboardInputView != null) &&
-                mKeyboardInputView.isActive());
+        final boolean keyboardInputActive = ((mHidKeyboard != null) && mHidKeyboard.isConnected());
 
         MenuItem pasteItem = menu.findItem(R.id.menu_paste);
         pasteItem.setEnabled(keyboardInputActive && mClipboard.hasText());
@@ -584,10 +583,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         int touchpadButtonBarHeight = 0;
         int touchpadAreaPadding = 0;
 
-        if (mKeyboardInputView != null) {
-            mKeyboardInputView.setKeyMap(mDeviceSettings.getKeyMap());
-        }
-
         if (mTouchpadView != null) {
             mTouchpadView.setShowButtons(getShowTouchpadButtons());
             mTouchpadView.setMouseSensitivity(mDeviceSettings.getMouseSensitivity());
@@ -750,11 +745,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     private void pasteClipboard() {
-        if ((mKeyboardInputView != null) && mKeyboardInputView.isActive()) {
+        if ((mHidKeyboard != null) && mHidKeyboard.isConnected()) {
             final CharSequence pasteText = mClipboard.getText();
             if ((pasteText != null) && (pasteText.length() > 0)) {
                 if (pasteText.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
-                    mKeyboardInputView.pasteText(pasteText.toString());
+                    mHidKeyboard.typeText(pasteText.toString());
                 } else {
                     startSendTextTask(pasteText);
                 }
