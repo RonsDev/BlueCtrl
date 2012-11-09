@@ -584,6 +584,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         int touchpadAreaPadding = 0;
 
         if (mTouchpadView != null) {
+            mTouchpadView.setGestureMode(mDeviceSettings.getTouchpadGestureMode());
             mTouchpadView.setShowButtons(getShowTouchpadButtons());
             mTouchpadView.setMouseSensitivity(mDeviceSettings.getMouseSensitivity());
             mTouchpadView.setScrollSensitivity(mDeviceSettings.getScrollSensitivity());

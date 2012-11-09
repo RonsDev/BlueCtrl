@@ -48,6 +48,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
     private DeviceSettings mDeviceSettings;
 
     private ListPreference mKeyMap;
+    private ListPreference mTouchpadGestureMode;
     private ListPreference mTouchpadButtons;
     private FloatSliderPreference mMouseSensitivity;
     private CheckBoxPreference mInvertScroll;
@@ -92,10 +93,26 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.preferences_device);
 
         mKeyMap = (ListPreference)findPreference(DeviceSettings.PREF_KEY_KEYMAP);
-        mTouchpadButtons = (ListPreference)findPreference(
-                DeviceSettings.PREF_KEY_TOUCHPAD_BUTTONS);
         mMouseSensitivity = (FloatSliderPreference)findPreference(
                 DeviceSettings.PREF_KEY_MOUSE_SENSITIVITY);
+
+        mTouchpadGestureMode = (ListPreference)findPreference(
+                DeviceSettings.PREF_KEY_TOUCHPAD_GESTURE_MODE);
+        if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_LINUX)) {
+            mTouchpadGestureMode.setEntries(R.array.pref_touchpad_gesture_mode_linux_names);
+            mTouchpadGestureMode.setEntryValues(R.array.pref_touchpad_gesture_mode_linux_values);
+        } else if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_WINDOWS)) {
+            mTouchpadGestureMode.setEntries(R.array.pref_touchpad_gesture_mode_windows_names);
+            mTouchpadGestureMode.setEntryValues(R.array.pref_touchpad_gesture_mode_windows_values);
+        } else if (mDeviceSettings.getOperatingSystem().equals(DeviceSettings.OS_UNDEFINED)) {
+            mTouchpadGestureMode.setEntries(R.array.pref_touchpad_gesture_mode_all_names);
+            mTouchpadGestureMode.setEntryValues(R.array.pref_touchpad_gesture_mode_all_values);
+        } else {
+            getPreferenceScreen().removePreference(mTouchpadGestureMode);
+        }
+
+        mTouchpadButtons = (ListPreference)findPreference(
+                DeviceSettings.PREF_KEY_TOUCHPAD_BUTTONS);
         mInvertScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_INVERT_SCROLL);
         mFlingScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_FLING_SCROLL);
     }
@@ -131,16 +148,18 @@ public class DevicePreferenceActivity extends PreferenceActivity {
 
     private void loadSettings() {
         mKeyMap.setValue(mDeviceSettings.getKeyMap());
-        mTouchpadButtons.setValue(mDeviceSettings.getTouchpadButtons());
         mMouseSensitivity.setValue(mDeviceSettings.getMouseSensitivity());
+        mTouchpadGestureMode.setValue(mDeviceSettings.getTouchpadGestureMode());
+        mTouchpadButtons.setValue(mDeviceSettings.getTouchpadButtons());
         mInvertScroll.setChecked(mDeviceSettings.getInvertScroll());
         mFlingScroll.setChecked(mDeviceSettings.getFlingScroll());
     }
 
     private void updateSettings() {
         mDeviceSettings.setKeyMap(mKeyMap.getValue());
-        mDeviceSettings.setTouchpadButtons(mTouchpadButtons.getValue());
         mDeviceSettings.setMouseSensitivity(mMouseSensitivity.getValue());
+        mDeviceSettings.setTouchpadGestureMode(mTouchpadGestureMode.getValue());
+        mDeviceSettings.setTouchpadButtons(mTouchpadButtons.getValue());
         mDeviceSettings.setInvertScroll(mInvertScroll.isChecked());
         mDeviceSettings.setFlingScroll(mFlingScroll.isChecked());
     }

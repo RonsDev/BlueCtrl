@@ -31,6 +31,7 @@ public class DeviceSettings {
 
     public static final String PREF_KEY_OS = "os";
     public static final String PREF_KEY_KEYMAP = "keymap";
+    public static final String PREF_KEY_TOUCHPAD_GESTURE_MODE = "touchpad_gesture_mode";
     public static final String PREF_KEY_TOUCHPAD_BUTTONS = "touchpad_buttons";
     public static final String PREF_KEY_MOUSE_SENSITIVITY = "mouse_sensitivity";
     public static final String PREF_KEY_SCROLL_SENSITIVITY = "scroll_sensitivity";
@@ -47,12 +48,22 @@ public class DeviceSettings {
     public static final String OS_WINDOWS = "windows";
     public static final String OS_UNDEFINED = "";
 
+    public static final String TOUCHPAD_GESTURE_MODE_DEFAULT = "";
+    public static final String TOUCHPAD_GESTURE_MODE_ANDROID = "android";
+    public static final String TOUCHPAD_GESTURE_MODE_GNOME_SHELL = "gnome_shell";
+    public static final String TOUCHPAD_GESTURE_MODE_OSX = "osx";
+    public static final String TOUCHPAD_GESTURE_MODE_PLAYSTATION3 = "playstation3";
+    public static final String TOUCHPAD_GESTURE_MODE_UBUNTU_UNITY = "ubuntu_unity";
+    public static final String TOUCHPAD_GESTURE_MODE_WINDOWS7 = "windows7";
+    public static final String TOUCHPAD_GESTURE_MODE_WINDOWS8 = "windows8";
+
     public static final String TOUCHPAD_BUTTONS_SHOW = "show";
     public static final String TOUCHPAD_BUTTONS_SHOW_PORTRAIT = "show_portrait";
     public static final String TOUCHPAD_BUTTONS_HIDE = "hide";
 
     public static final String DEFAULT_OS = OS_UNDEFINED;
     public static final String DEFAULT_KEYMAP = "en_US";
+    public static final String DEFAULT_TOUCHPAD_GESTURE_MODE = TOUCHPAD_GESTURE_MODE_DEFAULT;
     public static final String DEFAULT_TOUCHPAD_BUTTONS = TOUCHPAD_BUTTONS_SHOW_PORTRAIT;
     public static final float DEFAULT_MOUSE_SENSITIVITY = 2.5f;
     public static final float DEFAULT_SCROLL_SENSITIVITY = 1.0f;
@@ -71,6 +82,7 @@ public class DeviceSettings {
 
     private String mOperatingSystem;
     private String mKeyMap;
+    private String mTouchpadGestureMode;
     private String mTouchpadButtons;
     private float mMouseSensitivity;
     private float mScrollSensitivity;
@@ -124,6 +136,20 @@ public class DeviceSettings {
         return DEFAULT_KEYMAP;
     }
 
+    public static String getDefaultTouchpadGestures(String operatingSystem) {
+        if (operatingSystem.equals(OS_ANDROID)) {
+            return TOUCHPAD_GESTURE_MODE_ANDROID;
+        } else if (operatingSystem.equals(OS_OSX)) {
+            return TOUCHPAD_GESTURE_MODE_OSX;
+        } else if (operatingSystem.equals(OS_PLAYSTATION3)) {
+            return TOUCHPAD_GESTURE_MODE_PLAYSTATION3;
+        } else if (operatingSystem.equals(OS_WINDOWS)) {
+            return TOUCHPAD_GESTURE_MODE_WINDOWS7;
+        } else {
+            return DEFAULT_TOUCHPAD_GESTURE_MODE;
+        }
+    }
+
     public static String getDefaultTouchpadButtons(String operatingSystem) {
         if (operatingSystem.equals(OS_ANDROID) || operatingSystem.equals(OS_IOS) ||
                 operatingSystem.equals(OS_PLAYSTATION3)) {
@@ -150,6 +176,8 @@ public class DeviceSettings {
         mOperatingSystem = preferences.getString(getKey(PREF_KEY_OS), DEFAULT_OS);
 
         mKeyMap = preferences.getString(getKey(PREF_KEY_KEYMAP), sDefaultKeyMap);
+        mTouchpadGestureMode = preferences.getString(getKey(PREF_KEY_TOUCHPAD_GESTURE_MODE),
+                getDefaultTouchpadGestures(mOperatingSystem));
         mTouchpadButtons = preferences.getString(getKey(PREF_KEY_TOUCHPAD_BUTTONS),
                 getDefaultTouchpadButtons(mOperatingSystem));
         mMouseSensitivity = preferences.getFloat(getKey(PREF_KEY_MOUSE_SENSITIVITY),
@@ -175,6 +203,11 @@ public class DeviceSettings {
 
         editor.putString(getKey(PREF_KEY_OS), operatingSystem);
 
+        // Reset invalid settings
+        if (!validateTouchpadGestureMode(operatingSystem, mTouchpadGestureMode)) {
+            editor.remove(getKey(PREF_KEY_TOUCHPAD_GESTURE_MODE));
+        }
+
         editor.commit();
 
         // Reload the preferences to get OS specific defaults
@@ -189,6 +222,9 @@ public class DeviceSettings {
 
         if (!mKeyMap.equals(oldSettings.mKeyMap)) {
             editor.putString(getKey(PREF_KEY_KEYMAP), mKeyMap);
+        }
+        if (!mTouchpadGestureMode.equals(oldSettings.mTouchpadGestureMode)) {
+            editor.putString(getKey(PREF_KEY_TOUCHPAD_GESTURE_MODE), mTouchpadGestureMode);
         }
         if (!mTouchpadButtons.equals(oldSettings.mTouchpadButtons)) {
             editor.putString(getKey(PREF_KEY_TOUCHPAD_BUTTONS), mTouchpadButtons);
@@ -221,6 +257,7 @@ public class DeviceSettings {
 
         editor.remove(getKey(PREF_KEY_OS));
         editor.remove(getKey(PREF_KEY_KEYMAP));
+        editor.remove(getKey(PREF_KEY_TOUCHPAD_GESTURE_MODE));
         editor.remove(getKey(PREF_KEY_TOUCHPAD_BUTTONS));
         editor.remove(getKey(PREF_KEY_MOUSE_SENSITIVITY));
         editor.remove(getKey(PREF_KEY_SCROLL_SENSITIVITY));
@@ -234,6 +271,29 @@ public class DeviceSettings {
         loadFromPreferences(preferences);
     }
 
+    private static boolean validateTouchpadGestureMode(String os, String touchpadGestureMode) {
+        if (os.equals(OS_ANDROID)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_ANDROID));
+        } else if (os.equals(OS_IOS)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_DEFAULT));
+        } else if (os.equals(OS_LINUX)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_DEFAULT) ||
+                    touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_GNOME_SHELL) ||
+                    touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_UBUNTU_UNITY));
+        } else if (os.equals(OS_OSX)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_OSX));
+        } else if (os.equals(OS_PLAYSTATION3)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_PLAYSTATION3));
+        } else if (os.equals(OS_WINDOWS)) {
+            return (touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_WINDOWS7) ||
+                    touchpadGestureMode.equals(TOUCHPAD_GESTURE_MODE_WINDOWS8));
+        } else if (os.equals(OS_UNDEFINED)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     public String getOperatingSystem() {
         return mOperatingSystem;
@@ -244,6 +304,13 @@ public class DeviceSettings {
     }
     public void setKeyMap(String value) {
         mKeyMap = value;
+    }
+
+    public String getTouchpadGestureMode() {
+        return mTouchpadGestureMode;
+    }
+    public void setTouchpadGestureMode(String value) {
+        mTouchpadGestureMode = value;
     }
 
     public String getTouchpadButtons() {

@@ -338,6 +338,16 @@ public class MouseTouchListener implements OnTouchListener {
             return TouchpadView.SCROLL_MODE_NONE;
         }
     }
+
+    public void activatePointerMode() {
+        changeSubListener(mPointerSubListener, null);
+    }
+
+    public void activateDragMode(int dragButton) {
+        changeSubListener(mPointerSubListener, null);
+        mPointerSubListener.setDragButton(dragButton);
+    }
+
     public void activateScrollMode(int scrollMode) {
         changeSubListener(mScrollSubListener, null);
         mScrollSubListener.setScrollMode(scrollMode);
@@ -701,6 +711,12 @@ public class MouseTouchListener implements OnTouchListener {
                     if (V) Log.v(TAG, String.format("three finger gesture detected (%d)", direction));
 
                     if (onTouchpadGesture(TouchpadView.GESTURE_3FINGER, direction)) {
+                        return true;
+                    }
+                } else if (mPointerIdList.size() == 4) {
+                    if (V) Log.v(TAG, String.format("four finger gesture detected (%d)", direction));
+
+                    if (onTouchpadGesture(TouchpadView.GESTURE_4FINGER, direction)) {
                         return true;
                     }
                 }

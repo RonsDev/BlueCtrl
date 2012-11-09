@@ -36,7 +36,7 @@ import android.view.View;
  * A touchpad that handles touch events and redirects them to a HID Mouse.
  */
 public class TouchpadView extends View
-        implements OnTouchpadGestureListener, OnScrollModeChangedListener {
+        implements OnScrollModeChangedListener {
 
     /** Indicates that a gesture from the top edge of the screen has been detected. */
     public static final int GESTURE_EDGE_TOP = 10;
@@ -55,6 +55,9 @@ public class TouchpadView extends View
 
     /** Indicates that a 3-finger gesture has been detected. */
     public static final int GESTURE_3FINGER = 300;
+
+    /** Indicates that a 4-finger gesture has been detected. */
+    public static final int GESTURE_4FINGER = 400;
 
 
     /** Indicates that the gesture movement went to the top. */
@@ -106,6 +109,7 @@ public class TouchpadView extends View
     private Drawable mScrollHorizontalDrawable = null;
     private Drawable mScrollAllDrawable = null;
 
+    private TouchpadViewGestureListener mGestureListener = null;
     private MouseTouchListener mMouseTouchListener = null;
 
     private HidMouse mHidMouse = null;
@@ -185,8 +189,10 @@ public class TouchpadView extends View
         mButtonSepMargin = (int)(BUTTON_SEP_MARGIN_DP * displayDensity + 0.5f);
         mMiddleButtonWidth = (int)(MIDDLE_BUTTON_WIDTH_DP * displayDensity + 0.5f);
 
+        mGestureListener = new TouchpadViewGestureListener(this);
+
         mMouseTouchListener = new MouseTouchListener(this);
-        mMouseTouchListener.setOnTouchpadGestureListener(this);
+        mMouseTouchListener.setOnTouchpadGestureListener(mGestureListener);
         mMouseTouchListener.setOnScrollModeChangedListener(this);
 
         recalculateRects();
@@ -248,6 +254,13 @@ public class TouchpadView extends View
         }
     }
 
+    public String getGestureMode() {
+        return mGestureListener.getGestureMode();
+    }
+    public void setGestureMode(String value) {
+        mGestureListener.setGestureMode(value);
+    }
+
     public float getMouseSensitivity() {
         return mMouseTouchListener.getMouseSensitivity();
     }
@@ -297,6 +310,18 @@ public class TouchpadView extends View
         return (mShowButtons ? mButtonBarHeight : 0);
     }
 
+    public void activatePointerMode() {
+        mMouseTouchListener.activatePointerMode();
+    }
+
+    public void activateDragMode(int dragButton) {
+        mMouseTouchListener.activateDragMode(dragButton);
+    }
+
+    public void activateScrollMode(int scrollMode) {
+        mMouseTouchListener.activateScrollMode(scrollMode);
+    }
+
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -321,42 +346,6 @@ public class TouchpadView extends View
         }
 
         invalidate();
-    }
-
-    public boolean onTouchpadGesture(int gesture, int direction) {
-        switch (gesture) {
-        case TouchpadView.GESTURE_EDGE_RIGHT:
-            switch (direction) {
-            case TouchpadView.GESTURE_DIRECTION_UP:
-            case TouchpadView.GESTURE_DIRECTION_DOWN:
-                mMouseTouchListener.activateScrollMode(SCROLL_MODE_VERTICAL);
-                return true;
-            }
-            break;
-        case TouchpadView.GESTURE_2FINGER:
-            switch (direction) {
-            case TouchpadView.GESTURE_DIRECTION_UP:
-            case TouchpadView.GESTURE_DIRECTION_DOWN:
-                mMouseTouchListener.activateScrollMode(SCROLL_MODE_VERTICAL);
-                return true;
-            case TouchpadView.GESTURE_DIRECTION_LEFT:
-                if (mHidMouse != null) {
-                    mHidMouse.clickButton(HidMouse.BUTTON_4);
-                    return true;
-                } else {
-                    return false;
-                }
-            case TouchpadView.GESTURE_DIRECTION_RIGHT:
-                if (mHidMouse != null) {
-                    mHidMouse.clickButton(HidMouse.BUTTON_5);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            break;
-        }
-        return false;
     }
 
     public void onScrollModeChanged(int newMode, int oldMode) {

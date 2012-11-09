@@ -50,10 +50,20 @@
 
     <string name="device_preferences">Device settings</string>
     <string name="pref_keymap">Keyboard layout</string>
-    <string name="pref_mouse_sensitivity">Mouse sensitivity</string>
+    <string name="pref_mouse_sensitivity">Touchpad sensitivity</string>
+    <string name="pref_touchpad_gesture_mode">Touchpad gestures</string>
     <string name="pref_touchpad_buttons">Touchpad buttons</string>
     <string name="pref_invert_scroll">Invert scroll direction</string>
     <string name="pref_fling_scroll">Fling scroll</string>
+
+    <string name="pref_touchpad_gesture_mode_default">Default</string>
+    <string name="pref_touchpad_gesture_mode_android">Android</string>
+    <string name="pref_touchpad_gesture_mode_gnome_shell">Gnome Shell</string>
+    <string name="pref_touchpad_gesture_mode_osx">Mac OS X</string>
+    <string name="pref_touchpad_gesture_mode_playstation3">PlayStation 3</string>
+    <string name="pref_touchpad_gesture_mode_ubuntu_unity">Ubuntu Unity</string>
+    <string name="pref_touchpad_gesture_mode_windows7">Windows 7</string>
+    <string name="pref_touchpad_gesture_mode_windows8">Windows 8</string>
 
     <string name="pref_touchpad_buttons_show">Always show</string>
     <string name="pref_touchpad_buttons_show_portrait">Show on portrait mode</string>

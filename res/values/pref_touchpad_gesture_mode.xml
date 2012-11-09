@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_touchpad_gesture_mode_all_values">
+        <item></item>
+        <item>android</item>
+        <item>gnome_shell</item>
+        <item>osx</item>
+        <item>playstation3</item>
+        <item>ubuntu_unity</item>
+        <item>windows7</item>
+        <item>windows8</item>
+    </array>
+    <array name="pref_touchpad_gesture_mode_all_names">
+        <item>@string/pref_touchpad_gesture_mode_default</item>
+        <item>@string/pref_touchpad_gesture_mode_android</item>
+        <item>@string/pref_touchpad_gesture_mode_gnome_shell</item>
+        <item>@string/pref_touchpad_gesture_mode_osx</item>
+        <item>@string/pref_touchpad_gesture_mode_playstation3</item>
+        <item>@string/pref_touchpad_gesture_mode_ubuntu_unity</item>
+        <item>@string/pref_touchpad_gesture_mode_windows7</item>
+        <item>@string/pref_touchpad_gesture_mode_windows8</item>
+    </array>
+
+    <array name="pref_touchpad_gesture_mode_linux_values">
+        <item></item>
+        <item>gnome_shell</item>
+        <item>ubuntu_unity</item>
+    </array>
+    <array name="pref_touchpad_gesture_mode_linux_names">
+        <item>@string/pref_touchpad_gesture_mode_default</item>
+        <item>@string/pref_touchpad_gesture_mode_gnome_shell</item>
+        <item>@string/pref_touchpad_gesture_mode_ubuntu_unity</item>
+    </array>
+
+    <array name="pref_touchpad_gesture_mode_windows_values">
+        <item>windows7</item>
+        <item>windows8</item>
+    </array>
+    <array name="pref_touchpad_gesture_mode_windows_names">
+        <item>@string/pref_touchpad_gesture_mode_windows7</item>
+        <item>@string/pref_touchpad_gesture_mode_windows8</item>
+    </array>
+</resources>

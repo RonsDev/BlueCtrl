@@ -14,6 +14,13 @@
         android:summary="%.1f"
         android:persistent="false" />
     <org.ronsdev.bluectrl.widget.SummaryListPreference
+        android:key="touchpad_gesture_mode"
+        android:title="@string/pref_touchpad_gesture_mode"
+        android:entries="@array/pref_touchpad_gesture_mode_all_names"
+        android:entryValues="@array/pref_touchpad_gesture_mode_all_values"
+        android:summary="%s"
+        android:persistent="false" />
+    <org.ronsdev.bluectrl.widget.SummaryListPreference
         android:key="touchpad_buttons"
         android:title="@string/pref_touchpad_buttons"
         android:entries="@array/pref_touchpad_buttons_names"
