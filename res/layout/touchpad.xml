@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_height="match_parent"
-              android:layout_width="match_parent"
-              android:orientation="vertical"
-              android:baselineAligned="false">
-
-    <LinearLayout style="@style/action_bar">
-        <ImageButton style="@style/action_bar_home"
-                     android:id="@+id/action_bar_home"
-                     android:src="@drawable/action_bar_home"
-                     android:contentDescription="@string/description_app_icon" />
-        <TextView style="@style/action_bar_title"
-                  android:id="@+id/action_bar_title" />
-        <ImageButton style="@style/action_bar_button"
-                     android:id="@+id/button_keyboard"
-                     android:src="@drawable/ab_btn_keyboard"
-                     android:contentDescription="@string/description_keyboard" />
-    </LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent">
 
     <ViewFlipper style="@style/touchpad_flipper"
                  android:id="@+id/flipper"
-                 android:layout_height="0dp"
-                 android:layout_width="match_parent"
-                 android:layout_weight="1">
+                 android:layout_height="match_parent"
+                 android:layout_width="match_parent">
 
         <!-- Connected -->
-        <RelativeLayout style="@style/touchpad_content"
+        <RelativeLayout style="@style/touchpad_fullscreen_content"
                         android:id="@+id/view_connected">
 
             <org.ronsdev.bluectrl.widget.KeyboardInputView
@@ -34,9 +18,8 @@
                 android:layout_width="match_parent" />
 
             <org.ronsdev.bluectrl.widget.TouchpadView
-                android:id="@+id/touchpad"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent" />
+                style="@style/touchpad_control"
+                android:id="@+id/touchpad" />
 
             <LinearLayout style="@style/touchpad_android_controls"
                           android:id="@+id/touchpad_android_controls"
@@ -133,4 +116,17 @@
 
     </ViewFlipper>
 
-</LinearLayout>
+    <LinearLayout style="@style/action_bar">
+        <ImageButton style="@style/action_bar_home"
+                     android:id="@+id/action_bar_home"
+                     android:src="@drawable/action_bar_home"
+                     android:contentDescription="@string/description_app_icon" />
+        <TextView style="@style/action_bar_title"
+                  android:id="@+id/action_bar_title" />
+        <ImageButton style="@style/action_bar_button"
+                     android:id="@+id/button_keyboard"
+                     android:src="@drawable/ab_btn_keyboard"
+                     android:contentDescription="@string/description_keyboard" />
+    </LinearLayout>
+
+</RelativeLayout>
