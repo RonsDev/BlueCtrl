@@ -838,8 +838,13 @@ public class MouseTouchListener implements OnTouchListener {
          * Checks if the touch event is a valid tap action.
          */
         private boolean isTap(MotionEvent event) {
+            if (!mTouchpadAreaRect.contains((int)mFirstPoint.x, (int)mFirstPoint.y)) {
+                if (V) Log.v(TAG, "invalid tap  (area)");
+                return false;
+            }
+
             if ((event.getEventTime() - mFirstEventTime) > MAX_TAP_TOUCH_TIME) {
-                if (V) Log.v(TAG, "tap limit exceeded (Time)");
+                if (V) Log.v(TAG, "invalid tap (time)");
                 return false;
             }
 
@@ -855,7 +860,7 @@ public class MouseTouchListener implements OnTouchListener {
                 }
 
                 if (isDistanceReached(deltaX, deltaY, maxDistanceSquare)) {
-                    if (V) Log.v(TAG, "tap limit exceeded (Move)");
+                    if (V) Log.v(TAG, "invalid tap (movement)");
                     return false;
                 }
             }
