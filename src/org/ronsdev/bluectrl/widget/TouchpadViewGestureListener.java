@@ -120,7 +120,7 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
 
         if (hidMouse != null) {
             hidMouse.movePointerAbsolute((HidMouse.MAX_ABSOLUTE_VALUE_X / 2), 0);
-            mTouchpadView.activateDragMode(HidMouse.BUTTON_FIRST);
+            mTouchpadView.activateDragMode(HidMouse.BUTTON_FIRST, true);
             return true;
         } else {
             return false;
@@ -143,7 +143,7 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
                 hidMouse.movePointerAbsolute(10, 10);
                 hidMouse.movePointer(-20, -20);
                 Thread.sleep(20);
-                mTouchpadView.activateDragMode(HidMouse.BUTTON_FIRST);
+                mTouchpadView.activateDragMode(HidMouse.BUTTON_FIRST, true);
                 hidMouse.movePointerAbsolute(50, 100);
                 Thread.sleep(20);
                 hidMouse.movePointerAbsolute(100, (HidMouse.MAX_ABSOLUTE_VALUE_Y / 4));

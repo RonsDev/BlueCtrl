@@ -83,6 +83,9 @@ public class MouseTouchListener implements OnTouchListener {
     /** Pointer movement speed when the touch point is at the edge of the touchpad. */
     private static final float POINTER_EDGE_MOVE_STEP = 4.0f;
 
+    /** Faster pointer movement speed when the touch point is at the edge of the touchpad. */
+    private static final float FAST_POINTER_EDGE_MOVE_STEP = 20.0f;
+
 
     /**
      * Maximum time (in ms) the pointer movement can be interrupted when a touch end was predicted.
@@ -343,9 +346,9 @@ public class MouseTouchListener implements OnTouchListener {
         changeSubListener(mPointerSubListener, null);
     }
 
-    public void activateDragMode(int dragButton) {
+    public void activateDragMode(int dragButton, boolean useFastEdgeMovement) {
         changeSubListener(mPointerSubListener, null);
-        mPointerSubListener.setDragButton(dragButton);
+        mPointerSubListener.setDragButton(dragButton, useFastEdgeMovement);
     }
 
     public void activateScrollMode(int scrollMode) {
@@ -888,6 +891,9 @@ public class MouseTouchListener implements OnTouchListener {
         /** A Mouse button that is pressed for the whole pointer movement. */
         private int mDragButton;
 
+        /** {@code true} if the edge movement should be faster than normal. */
+        private boolean mUseFastEdgeMovement;
+
         /** Stores the next movement on the X-axis. */
         private float mMoveX;
 
@@ -907,6 +913,7 @@ public class MouseTouchListener implements OnTouchListener {
         @Override
         protected void resetMembers() {
             mDragButton = 0;
+            mUseFastEdgeMovement = false;
             mMoveX = 0f;
             mMoveY = 0f;
             mIsTouchEndPredicted = false;
@@ -966,6 +973,10 @@ public class MouseTouchListener implements OnTouchListener {
         }
 
         public void setDragButton(int dragButton) {
+            setDragButton(dragButton, false);
+        }
+
+        public void setDragButton(int dragButton, boolean useFastEdgeMovement) {
             if ((mHidMouse != null) && (dragButton != mDragButton)) {
                 if (mDragButton > 0) {
                     mHidMouse.releaseButton(mDragButton);
@@ -976,6 +987,8 @@ public class MouseTouchListener implements OnTouchListener {
                     mHidMouse.pressButton(mDragButton);
                 }
             }
+
+            mUseFastEdgeMovement = useFastEdgeMovement;
         }
 
         /** Converts the touch move value to the HID Report pointer move value. */
@@ -1000,17 +1013,19 @@ public class MouseTouchListener implements OnTouchListener {
         private void addPointerEdgeMovement(View view, MotionEvent event, int pointerIndex) {
             final Rect rect = mTouchpadAreaRect;
             final float threshold = mPointerEdgeMoveThreshold;
+            final float edgeMoveStep = (mUseFastEdgeMovement ? FAST_POINTER_EDGE_MOVE_STEP :
+                POINTER_EDGE_MOVE_STEP);
 
             if (isTopEdge(rect, event, pointerIndex, threshold)) {
-                mMoveY -= POINTER_EDGE_MOVE_STEP;
+                mMoveY -= edgeMoveStep;
             } else if (isBottomEdge(rect, event, pointerIndex, threshold)) {
-                mMoveY += POINTER_EDGE_MOVE_STEP;
+                mMoveY += edgeMoveStep;
             }
 
             if (isLeftEdge(rect, event, pointerIndex, threshold)) {
-                mMoveX -= POINTER_EDGE_MOVE_STEP;
+                mMoveX -= edgeMoveStep;
             } else if (isRightEdge(rect, event, pointerIndex, threshold)) {
-                mMoveX += POINTER_EDGE_MOVE_STEP;
+                mMoveX += edgeMoveStep;
             }
         }
 

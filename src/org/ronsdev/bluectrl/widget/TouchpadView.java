@@ -314,8 +314,8 @@ public class TouchpadView extends View
         mMouseTouchListener.activatePointerMode();
     }
 
-    public void activateDragMode(int dragButton) {
-        mMouseTouchListener.activateDragMode(dragButton);
+    public void activateDragMode(int dragButton, boolean useFastEdgeMovement) {
+        mMouseTouchListener.activateDragMode(dragButton, useFastEdgeMovement);
     }
 
     public void activateScrollMode(int scrollMode) {
