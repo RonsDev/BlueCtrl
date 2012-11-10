@@ -117,6 +117,7 @@ public class TouchpadView extends View
 
     private boolean mShowButtons = true;
 
+    private Rect mInnerRect = null;
     private Rect mTouchpadAreaRect = null;
 
     private int mDefaultTouchpadAreaPadding;
@@ -203,24 +204,28 @@ public class TouchpadView extends View
     }
 
     private void recalculateRects() {
-        final int width = getWidth();
-        final int height = getHeight();
-        final int buttonBarTop = height - getVisibleButtonBarHeight();
-        final int centerHorizontal = (width / 2);
-        final int middleButtonLeft = centerHorizontal - (mMiddleButtonWidth / 2);
+        final int innerLeft = getPaddingLeft();
+        final int innerRight = getWidth() - getPaddingRight();
+        final int innerTop = getPaddingTop();
+        final int innerBottom = getHeight() - getPaddingBottom();
+        final int buttonBarTop = innerBottom - getVisibleButtonBarHeight();
+        final int buttonCenterX = innerLeft + ((innerRight - innerLeft) / 2);
+        final int middleButtonLeft = buttonCenterX - (mMiddleButtonWidth / 2);
         final int middleButtonRight = middleButtonLeft + mMiddleButtonWidth;
 
-        mTouchpadAreaRect = new Rect(0, 0, width, buttonBarTop);
+        mInnerRect = new Rect(innerLeft, innerTop, innerRight, innerBottom);
+
+        mTouchpadAreaRect = new Rect(innerLeft, innerTop, innerRight, buttonBarTop);
         mMouseTouchListener.setTouchpadAreaRect(mTouchpadAreaRect);
 
         mButtonRects[BUTTON_INDEX_FIRST] =
-                new Rect(0, buttonBarTop, centerHorizontal, height);
+                new Rect(innerLeft, buttonBarTop, buttonCenterX, innerBottom);
 
         mButtonRects[BUTTON_INDEX_SECOND] =
-                new Rect(centerHorizontal, buttonBarTop, width, height);
+                new Rect(buttonCenterX, buttonBarTop, innerRight, innerBottom);
 
         mButtonRects[BUTTON_INDEX_MIDDLE] =
-                new Rect(middleButtonLeft, buttonBarTop, middleButtonRight, height);
+                new Rect(middleButtonLeft, buttonBarTop, middleButtonRight, innerBottom);
     }
 
     public boolean isActive() {
@@ -460,7 +465,7 @@ public class TouchpadView extends View
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        mBackgroundDrawable.setBounds(0, 0, getWidth(), getHeight());
+        mBackgroundDrawable.setBounds(mInnerRect);
         mBackgroundDrawable.draw(canvas);
 
         switch (mMouseTouchListener.getScrollMode()) {
@@ -496,8 +501,10 @@ public class TouchpadView extends View
             }
         }
 
-        final int left = (mTouchpadAreaRect.width() / 2) - (drawableWidth / 2);
-        final int top = (mTouchpadAreaRect.height() / 2) - (drawableHeight / 2);
+        final int touchpadCenterX = mTouchpadAreaRect.left + (mTouchpadAreaRect.width() / 2);
+        final int touchpadCenterY = mTouchpadAreaRect.top + (mTouchpadAreaRect.height() / 2);
+        final int left = touchpadCenterX - (drawableWidth / 2);
+        final int top = touchpadCenterY - (drawableHeight / 2);
 
         drawable.setBounds(left, top, left + drawableWidth, top + drawableHeight);
         drawable.draw(canvas);

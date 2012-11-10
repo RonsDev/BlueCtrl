@@ -231,7 +231,7 @@ public class MouseTouchListener implements OnTouchListener {
 
     private static boolean isTopEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return ((rect.top + event.getY(pointerIndex)) < threshold);
+        return ((event.getY(pointerIndex) - rect.top) < threshold);
     }
 
     private static boolean isBottomEdge(Rect rect, MotionEvent event, int pointerIndex,
@@ -241,7 +241,7 @@ public class MouseTouchListener implements OnTouchListener {
 
     private static boolean isLeftEdge(Rect rect, MotionEvent event, int pointerIndex,
             float threshold) {
-        return ((rect.left + event.getX(pointerIndex)) < threshold);
+        return ((event.getX(pointerIndex) - rect.left) < threshold);
     }
 
     private static boolean isRightEdge(Rect rect, MotionEvent event, int pointerIndex,
