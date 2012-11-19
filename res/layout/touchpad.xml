@@ -82,13 +82,13 @@
         </RelativeLayout>
 
         <!-- Disconnected -->
-        <RelativeLayout style="@style/touchpad_content"
-                        android:id="@+id/view_disconnected">
+        <FrameLayout style="@style/touchpad_content"
+                     android:id="@+id/view_disconnected">
             <LinearLayout style="@style/info_block">
                 <ImageView style="@style/info_block_image"
                            android:id="@+id/info_image"
                            android:contentDescription="@string/description_info_image" />
-                <LinearLayout style="@style/info_block_content">
+                <LinearLayout style="@style/info_block_text_block">
                     <TextView style="@style/info_block_title"
                               android:id="@+id/info_title" />
                     <TextView style="@style/info_block_text.first"
@@ -98,19 +98,19 @@
                               android:text="@string/info_text_reconnect" />
                 </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
+        </FrameLayout>
 
         <!-- Connecting -->
-        <RelativeLayout style="@style/touchpad_content"
-                        android:id="@+id/view_connecting">
+        <FrameLayout style="@style/touchpad_content"
+                     android:id="@+id/view_connecting">
             <LinearLayout style="@style/info_block">
                 <ProgressBar style="@style/info_block_wait" />
-                <LinearLayout style="@style/info_block_content">
+                <LinearLayout style="@style/info_block_text_block">
                     <TextView style="@style/info_block_title"
                               android:text="@string/info_title_connecting" />
                 </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
+        </FrameLayout>
 
     </ViewFlipper>
 

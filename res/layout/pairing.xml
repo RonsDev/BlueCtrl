@@ -26,46 +26,40 @@
         </FrameLayout>
 
         <!-- Search for device -->
-        <RelativeLayout style="@style/pairing_content"
-                        android:id="@+id/view_search">
-            <LinearLayout style="@style/info_block">
-                <ImageView style="@style/info_block_image"
-                           android:src="@drawable/search_bt_device"
-                           android:contentDescription="@string/description_info_image" />
-                <LinearLayout style="@style/info_block_content">
-                    <TextView style="@style/info_block_text.first_no_title"
-                              android:id="@+id/info_text_search" />
-                    <TextView style="@style/info_block_text"
-                              android:text="@string/pairing_remove_if_paired_text" />
-                </LinearLayout>
+        <LinearLayout style="@style/info_block"
+                      android:id="@+id/view_search">
+            <ImageView style="@style/info_block_image"
+                       android:src="@drawable/search_bt_device"
+                       android:contentDescription="@string/description_info_image" />
+            <LinearLayout style="@style/info_block_text_block">
+                <TextView style="@style/info_block_text.first_no_title"
+                          android:id="@+id/info_text_search" />
+                <TextView style="@style/info_block_text"
+                          android:text="@string/pairing_remove_if_paired_text" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
         <!-- Pairing devices -->
-        <RelativeLayout style="@style/pairing_content"
-                        android:id="@+id/view_pairing">
-            <LinearLayout style="@style/info_block">
-                <ProgressBar style="@style/info_block_wait" />
-                <LinearLayout style="@style/info_block_content">
-                    <TextView style="@style/info_block_title"
-                              android:text="@string/pairing_device_title" />
-                </LinearLayout>
+        <LinearLayout style="@style/info_block"
+                      android:id="@+id/view_pairing">
+            <ProgressBar style="@style/info_block_wait" />
+            <LinearLayout style="@style/info_block_text_block">
+                <TextView style="@style/info_block_title"
+                          android:text="@string/pairing_device_title" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
         <!-- Pairing failed -->
-        <RelativeLayout style="@style/pairing_content"
-                        android:id="@+id/view_failed">
-            <LinearLayout style="@style/info_block">
-                <ImageView style="@style/info_block_image"
-                           android:src="@drawable/problem"
-                           android:contentDescription="@string/description_info_image" />
-                <LinearLayout style="@style/info_block_content">
-                    <TextView style="@style/info_block_title"
-                              android:text="@string/pairing_failed_title" />
-                </LinearLayout>
+        <LinearLayout style="@style/info_block"
+                      android:id="@+id/view_failed">
+            <ImageView style="@style/info_block_image"
+                       android:src="@drawable/problem"
+                       android:contentDescription="@string/description_info_image" />
+            <LinearLayout style="@style/info_block_text_block">
+                <TextView style="@style/info_block_title"
+                          android:text="@string/pairing_failed_title" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
     </ViewFlipper>
 
