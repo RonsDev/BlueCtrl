@@ -4,4 +4,7 @@
     <color name="btn_touchpad_pressed">#7533b5e5</color>
     <color name="icon_btn_touchpad_pressed_start">#7533b5e5</color>
     <color name="icon_btn_touchpad_pressed_end">#3033b5e5</color>
+    <color name="tutorial_touch_point">#b20099cc</color>
+    <color name="tutorial_tap_inner_circle">#b20099cc</color>
+    <color name="tutorial_tap_outer_circle">#4c33b5e5</color>
 </resources>

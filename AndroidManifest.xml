@@ -36,6 +36,10 @@
                   android:theme="@android:style/Theme.NoTitleBar"
                   android:windowSoftInputMode="adjustResize" />
 
+        <activity android:name=".TouchpadTutorialActivity"
+                  android:configChanges="orientation|keyboardHidden"
+                  android:theme="@android:style/Theme.NoTitleBar" />
+
         <service android:name=".daemon.DaemonService"
                  android:exported="false" />
 

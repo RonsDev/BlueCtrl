@@ -116,6 +116,7 @@ public class TouchpadView extends View
     private HidKeyboard mHidKeyboard = null;
 
     private boolean mShowButtons = true;
+    private boolean mShowInfoGraphics = true;
 
     private Rect mInnerRect = null;
     private Rect mTouchpadAreaRect = null;
@@ -255,6 +256,16 @@ public class TouchpadView extends View
         if (value != mShowButtons) {
             mShowButtons = value;
             recalculateRects();
+            invalidate();
+        }
+    }
+
+    public boolean getShowInfoGraphics() {
+        return mShowInfoGraphics;
+    }
+    public void setShowInfoGraphics(boolean value) {
+        if (value != mShowInfoGraphics) {
+            mShowInfoGraphics = value;
             invalidate();
         }
     }
@@ -468,16 +479,18 @@ public class TouchpadView extends View
         mBackgroundDrawable.setBounds(mInnerRect);
         mBackgroundDrawable.draw(canvas);
 
-        switch (mMouseTouchListener.getScrollMode()) {
-        case SCROLL_MODE_VERTICAL:
-            drawInfoDrawable(canvas, mScrollVerticalDrawable);
-            break;
-        case SCROLL_MODE_HORIZONTAL:
-            drawInfoDrawable(canvas, mScrollHorizontalDrawable);
-            break;
-        case SCROLL_MODE_ALL:
-            drawInfoDrawable(canvas, mScrollAllDrawable);
-            break;
+        if (mShowInfoGraphics) {
+            switch (mMouseTouchListener.getScrollMode()) {
+            case SCROLL_MODE_VERTICAL:
+                drawInfoDrawable(canvas, mScrollVerticalDrawable);
+                break;
+            case SCROLL_MODE_HORIZONTAL:
+                drawInfoDrawable(canvas, mScrollHorizontalDrawable);
+                break;
+            case SCROLL_MODE_ALL:
+                drawInfoDrawable(canvas, mScrollAllDrawable);
+                break;
+            }
         }
 
         if (mShowButtons) {

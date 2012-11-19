@@ -4,9 +4,7 @@
                 android:layout_width="match_parent">
 
     <ViewFlipper style="@style/touchpad_flipper"
-                 android:id="@+id/flipper"
-                 android:layout_height="match_parent"
-                 android:layout_width="match_parent">
+                 android:id="@+id/flipper">
 
         <!-- Connected -->
         <RelativeLayout style="@style/touchpad_fullscreen_content"

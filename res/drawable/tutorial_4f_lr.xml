@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:top="72dp"
+          android:right="264dp"
+          android:bottom="72dp"
+          android:left="72dp"
+          android:drawable="@drawable/tutorial_touch_point" />
+    <item android:top="72dp"
+          android:right="200dp"
+          android:bottom="72dp"
+          android:left="136dp"
+          android:drawable="@drawable/tutorial_touch_point" />
+    <item android:top="72dp"
+          android:right="136dp"
+          android:bottom="72dp"
+          android:left="200dp"
+          android:drawable="@drawable/tutorial_touch_point" />
+    <item android:top="72dp"
+          android:right="72dp"
+          android:bottom="72dp"
+          android:left="264dp"
+          android:drawable="@drawable/tutorial_touch_point" />
+
+    <item android:top="60dp"
+          android:right="0dp"
+          android:bottom="60dp"
+          android:left="312dp"
+          android:drawable="@drawable/tutorial_touch_arrow_right" />
+
+    <item android:top="60dp"
+          android:right="312dp"
+          android:bottom="60dp"
+          android:left="0dp"
+          android:drawable="@drawable/tutorial_touch_arrow_left" />
+</layer-list>

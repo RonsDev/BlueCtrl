@@ -22,7 +22,6 @@ import org.ronsdev.bluectrl.widget.KeyboardInputView;
 import org.ronsdev.bluectrl.widget.TouchpadView;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -36,7 +35,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -76,7 +74,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private static final String TAG = "TouchpadActivity";
 
 
-    private static final int DIALOG_HELP = 1;
     private static final int DIALOG_SEND_TEXT_PROGRESS = 2;
 
 
@@ -116,6 +113,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
     private boolean mIsFullscreen = false;
+    private boolean mKeepConnected = false;
 
     private CharSequence mSendTextValue = "";
     private SendTextThread mSendTextThread;
@@ -221,6 +219,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     protected void onResume() {
         super.onResume();
 
+        mKeepConnected = false;
+
         if (mHidKeyboard != null) {
             mHidKeyboard.setKeyMap(this, mDeviceSettings.getKeyMap());
         }
@@ -234,7 +234,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         stopSendTextTask();
 
-        if (isDaemonAvailable()) {
+        if (!mKeepConnected && isDaemonAvailable()) {
             final DaemonService daemon = getDaemon();
             daemon.disconnectHid();
         }
@@ -364,8 +364,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     @Override
     protected Dialog onCreateDialog(int id, Bundle args) {
         switch(id) {
-        case DIALOG_HELP:
-            return createHelpDialog();
         case DIALOG_SEND_TEXT_PROGRESS:
             return createSendTextProgressDialog();
         default:
@@ -392,10 +390,14 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        final boolean keyboardInputActive = ((mHidKeyboard != null) && mHidKeyboard.isConnected());
+        final boolean isConnected = (isDaemonAvailable() &&
+                (getDaemon().getHidState() == DaemonService.HID_STATE_CONNECTED));
 
         MenuItem pasteItem = menu.findItem(R.id.menu_paste);
-        pasteItem.setEnabled(keyboardInputActive && mClipboard.hasText());
+        pasteItem.setEnabled(isConnected && mClipboard.hasText());
+
+        MenuItem helpItem = menu.findItem(R.id.menu_help);
+        helpItem.setEnabled(isConnected);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -410,7 +412,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             DevicePreferenceActivity.startActivity(this, mBtDevice);
             return true;
         case R.id.menu_help:
-            showDialog(DIALOG_HELP);
+            if (mKeyboardInputView != null) {
+                mKeyboardInputView.hideToggledKeyboard();
+            }
+            mKeepConnected = true;
+            TouchpadTutorialActivity.startActivity(this, mBtDevice);
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -635,22 +641,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         } else {
             return false;
         }
-    }
-
-    public Dialog createHelpDialog() {
-        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.help_dialog,
-                (ViewGroup)findViewById(R.id.view_help));
-
-        return new AlertDialog.Builder(this)
-            .setView(layout)
-            .setTitle(R.string.menu_help)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                }
-            })
-            .create();
     }
 
     private Dialog createSendTextProgressDialog() {

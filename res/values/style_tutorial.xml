@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="tutorial_touchpad_control"
+           parent="@style/touchpad_control">
+    </style>
+
+    <style name="tutorial_flipper">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginTop">42dp</item>
+        <item name="android:layout_gravity">bottom</item>
+    </style>
+    <style name="tutorial_flipper_content">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="tutorial_vertical_info_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_vertical_info_block_image_frame">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="tutorial_vertical_info_block_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="tutorial_vertical_info_block_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_vertical_info_block_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="tutorial_vertical_info_block_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:maxWidth">320dp</item>
+    </style>
+    <style name="tutorial_vertical_info_block_text.first">
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+
+    <style name="tutorial_horizontal_info_block">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_image_frame">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right|center_vertical</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_text_block">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_gravity">left|center_vertical</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingLeft">10dp</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:gravity">left</item>
+        <item name="android:maxWidth">320dp</item>
+    </style>
+    <style name="tutorial_horizontal_info_block_text.first">
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+
+    <style name="tutorial_info_block"
+           parent="@style/tutorial_horizontal_info_block">
+    </style>
+    <style name="tutorial_info_block_image_frame"
+           parent="@style/tutorial_horizontal_info_block_image_frame">
+    </style>
+    <style name="tutorial_info_block_image"
+           parent="@style/tutorial_horizontal_info_block_image">
+    </style>
+    <style name="tutorial_info_block_text_block"
+           parent="@style/tutorial_horizontal_info_block_text_block">
+    </style>
+    <style name="tutorial_info_block_title"
+           parent="@style/tutorial_horizontal_info_block_title">
+    </style>
+    <style name="tutorial_info_block_text"
+           parent="@style/tutorial_horizontal_info_block_text">
+    </style>
+    <style name="tutorial_info_block_text.first"
+           parent="@style/tutorial_horizontal_info_block_text.first">
+    </style>
+
+    <style name="tutorial_edge_gesture_top_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">top|center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_top_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginTop">72dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_bottom_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">bottom|center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_bottom_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginBottom">72dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_left_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left|center_vertical</item>
+    </style>
+    <style name="tutorial_edge_gesture_left_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginTop">72dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_right_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right|center_vertical</item>
+    </style>
+    <style name="tutorial_edge_gesture_right_text_block"
+           parent="@style/tutorial_edge_gesture_left_text_block">
+    </style>
+    <style name="tutorial_edge_gesture_title"
+           parent="@style/tutorial_vertical_info_block_title">
+    </style>
+    <style name="tutorial_edge_gesture_text"
+           parent="@style/tutorial_vertical_info_block_text">
+    </style>
+    <style name="tutorial_edge_gesture_text.first"
+           parent="@style/tutorial_vertical_info_block_text.first">
+    </style>
+
+    <style name="tutorial_introduction_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:maxWidth">400dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="tutorial_tap_flipper_content">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="tutorial_tap_row1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="tutorial_tap_row2">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="tutorial_tap_info_block">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="tutorial_tap_info_block_image"
+           parent="@style/tutorial_vertical_info_block_image">
+    </style>
+    <style name="tutorial_tap_info_block_text_block"
+           parent="@style/tutorial_vertical_info_block_text_block">
+        <item name="android:layout_marginTop">5dp</item>
+    </style>
+    <style name="tutorial_tap_info_block_title"
+           parent="@style/tutorial_vertical_info_block_title">
+    </style>
+    <style name="tutorial_tap_info_block_text"
+           parent="@style/tutorial_vertical_info_block_text.first">
+    </style>
+
+    <style name="tutorial_1f_scroll_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right|center_vertical</item>
+    </style>
+    <style name="tutorial_1f_scroll_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+</resources>

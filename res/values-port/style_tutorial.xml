@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="tutorial_info_block"
+           parent="@style/tutorial_vertical_info_block">
+    </style>
+    <style name="tutorial_info_block_image_frame"
+           parent="@style/tutorial_vertical_info_block_image_frame">
+    </style>
+    <style name="tutorial_info_block_image"
+           parent="@style/tutorial_vertical_info_block_image">
+    </style>
+    <style name="tutorial_info_block_text_block"
+           parent="@style/tutorial_vertical_info_block_text_block">
+    </style>
+    <style name="tutorial_info_block_title"
+           parent="@style/tutorial_vertical_info_block_title">
+    </style>
+    <style name="tutorial_info_block_text"
+           parent="@style/tutorial_vertical_info_block_text">
+    </style>
+    <style name="tutorial_info_block_text.first"
+           parent="@style/tutorial_vertical_info_block_text.first">
+    </style>
+
+    <style name="tutorial_edge_gesture_top_text_block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="tutorial_edge_gesture_bottom_text_block"
+           parent="@style/tutorial_edge_gesture_top_text_block">
+    </style>
+
+    <style name="tutorial_tap_row1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="tutorial_tap_row2">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="tutorial_tap_info_block">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="tutorial_1f_scroll_text_block">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:paddingRight">64dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+</resources>
