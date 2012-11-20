@@ -22,7 +22,6 @@ import org.ronsdev.bluectrl.HidMouse;
 import org.ronsdev.bluectrl.IntArrayList;
 
 import android.graphics.Rect;
-import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -256,7 +255,7 @@ public class MouseTouchListener implements OnTouchListener {
     private static float getSpan(float aX, float aY, float bX, float bY) {
         final float diffX = aX - bX;
         final float diffY = aY - bY;
-        return FloatMath.sqrt((diffX * diffX) + (diffY * diffY));
+        return (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
     }
 
     private static int convertPointerCountToButtonMask(int pointerCount) {
