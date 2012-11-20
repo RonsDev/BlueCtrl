@@ -43,7 +43,7 @@ The easiest way to get the library file is to extract it from an existing Androi
 
 After that put the extracted `libbluetooth.so` file to the following directory inside the Android NDK:
 
-    platforms/android-14/arch-arm/usr/lib
+    platforms/android-9/arch-arm/usr/lib
 
 Now you must get the header files for the bluetooth and cutils includes. You can download them from the following two repositories from the CyanogenMod project:
 
@@ -52,7 +52,7 @@ Now you must get the header files for the bluetooth and cutils includes. You can
 
 Then copy the directory `lib/bluetooth` from the Android BlueZ code and the directory `include/cutils` from the Android System Core code to the following directory inside the Android NDK:
 
-    platforms/android-14/arch-arm/usr/include/
+    platforms/android-9/arch-arm/usr/include/
 
 
 
