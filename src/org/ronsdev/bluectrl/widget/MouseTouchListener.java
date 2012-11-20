@@ -119,7 +119,7 @@ public class MouseTouchListener implements OnTouchListener {
     private static final float FLING_SCROLL_MOVE_FRICTION_DP = 0.4f;
 
 
-    private View mView;
+    private TouchpadView mTouchpadView;
     private HidMouse mHidMouse;
     private HidKeyboard mHidKeyboard;
 
@@ -180,22 +180,22 @@ public class MouseTouchListener implements OnTouchListener {
     private OnTouchpadGestureListener mOnTouchpadGestureListener;
 
 
-    public MouseTouchListener(View view) {
-        mView = view;
+    public MouseTouchListener(TouchpadView touchpadView) {
+        mTouchpadView = touchpadView;
 
         mSubListener = mIdleSubListener;
 
-        setTouchpadAreaRect(new Rect(mView.getLeft(),
-                mView.getTop(),
-                mView.getRight(),
-                mView.getBottom()));
+        setTouchpadAreaRect(new Rect(mTouchpadView.getLeft(),
+                mTouchpadView.getTop(),
+                mTouchpadView.getRight(),
+                mTouchpadView.getBottom()));
         setMouseSensitivity(DeviceSettings.DEFAULT_MOUSE_SENSITIVITY);
         setScrollSensitivity(DeviceSettings.DEFAULT_SCROLL_SENSITIVITY);
         setPinchZoomSensitivity(DeviceSettings.DEFAULT_PINCH_ZOOM_SENSITIVITY);
         setInvertScroll(DeviceSettings.DEFAULT_INVERT_SCROLL);
         setFlingScroll(DeviceSettings.DEFAULT_FLING_SCROLL);
 
-        mDisplayDensity = mView.getResources().getDisplayMetrics().density;
+        mDisplayDensity = mTouchpadView.getResources().getDisplayMetrics().density;
 
         mMaxGestureEdgeThreshold = (MAX_GESTURE_EDGE_THRESHOLD_DP * mDisplayDensity);
 
@@ -371,7 +371,7 @@ public class MouseTouchListener implements OnTouchListener {
             }
 
             if (event != null) {
-                mSubListener.onTouch(mView, event);
+                mSubListener.onTouch(mTouchpadView, event);
             }
         }
     }
@@ -762,10 +762,11 @@ public class MouseTouchListener implements OnTouchListener {
         {
              @Override
              public void run() {
-                 if (mView.isShown() && isActive()) {
+                 if (mTouchpadView.isShown() && isActive()) {
                      final int buttonMask = convertPointerCountToButtonMask(mMaxTouchPoints);
                      if (!mHidMouse.isButtonPressed(buttonMask)) {
                          mHidMouse.clickButton(buttonMask);
+                         mTouchpadView.performButtonClickFeedback();
                      }
                  }
                  changeSubListener(mIdleSubListener, null);
@@ -869,11 +870,11 @@ public class MouseTouchListener implements OnTouchListener {
         }
 
         private void startDeferredClick() {
-            mView.postDelayed(mDeferredClickRunnable, MAX_TAP_GAP_TIME);
+            mTouchpadView.postDelayed(mDeferredClickRunnable, MAX_TAP_GAP_TIME);
         }
 
         private void stopDeferredClick() {
-            mView.removeCallbacks(mDeferredClickRunnable);
+            mTouchpadView.removeCallbacks(mDeferredClickRunnable);
         }
 
         private void executeDoubleClick() {
@@ -881,7 +882,9 @@ public class MouseTouchListener implements OnTouchListener {
                 final int buttonMask = convertPointerCountToButtonMask(mMaxTouchPoints);
                 if (!mHidMouse.isButtonPressed(buttonMask)) {
                     mHidMouse.clickButton(buttonMask);
+                    mTouchpadView.performButtonClickFeedback();
                     mHidMouse.clickButton(buttonMask);
+                    mTouchpadView.performButtonClickFeedback();
                 }
             }
         }
@@ -932,6 +935,7 @@ public class MouseTouchListener implements OnTouchListener {
             if ((mHidMouse != null) && (mDragButton > 0)) {
                 mHidMouse.releaseButton(mDragButton);
                 mDragButton = 0;
+                mTouchpadView.performButtonReleaseFeedback();
             }
         }
 
@@ -945,6 +949,7 @@ public class MouseTouchListener implements OnTouchListener {
                 if ((mHidMouse != null) && (mDragButton > 0)) {
                     mHidMouse.releaseButton(mDragButton);
                     mDragButton = 0;
+                    mTouchpadView.performButtonReleaseFeedback();
                 }
                 changeSubListener(mIdleSubListener, event);
             }
@@ -986,10 +991,12 @@ public class MouseTouchListener implements OnTouchListener {
                 if (mDragButton > 0) {
                     mHidMouse.releaseButton(mDragButton);
                     mDragButton = 0;
+                    mTouchpadView.performButtonReleaseFeedback();
                 }
                 if ((dragButton > 0) && !mHidMouse.isButtonPressed(dragButton)) {
                     mDragButton = dragButton;
                     mHidMouse.pressButton(mDragButton);
+                    mTouchpadView.performButtonPressFeedback();
                 }
             }
 
@@ -1111,14 +1118,14 @@ public class MouseTouchListener implements OnTouchListener {
         {
              @Override
              public void run() {
-                 if (mView.isShown() && isActive() &&
+                 if (mTouchpadView.isShown() && isActive() &&
                          checkFlingScrollMoveThreshold(0)) {
                      mFlingScrollMoveY = subtractFlingScrollMoveFriction(mFlingScrollMoveY);
                      mFlingScrollMoveX = subtractFlingScrollMoveFriction(mFlingScrollMoveX);
 
                      scrollWheel(mFlingScrollMoveY, mFlingScrollMoveX);
 
-                     mView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
+                     mTouchpadView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
                  } else {
                      changeSubListener(mIdleSubListener, null);
                  }
@@ -1145,6 +1152,7 @@ public class MouseTouchListener implements OnTouchListener {
         protected void start() {
             super.start();
 
+            mTouchpadView.performModeChangedFeedback();
             onScrollModeChanged(mScrollMode, TouchpadView.SCROLL_MODE_NONE);
         }
 
@@ -1152,6 +1160,7 @@ public class MouseTouchListener implements OnTouchListener {
         protected void stop() {
             super.stop();
 
+            mTouchpadView.performModeChangedFeedback();
             onScrollModeChanged(TouchpadView.SCROLL_MODE_NONE, mScrollMode);
         }
 
@@ -1324,11 +1333,11 @@ public class MouseTouchListener implements OnTouchListener {
                 }
             }
 
-            mView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
+            mTouchpadView.postDelayed(mFlingScrollRunnable, FLING_SCROLL_LOOP_TIME);
         }
 
         private void stopFlingScroll() {
-            mView.removeCallbacks(mFlingScrollRunnable);
+            mTouchpadView.removeCallbacks(mFlingScrollRunnable);
         }
 
         private float subtractFlingScrollMoveFriction(float moveValue) {
@@ -1365,6 +1374,7 @@ public class MouseTouchListener implements OnTouchListener {
         protected void start() {
             super.start();
 
+            mTouchpadView.performModeChangedFeedback();
             if (mHidKeyboard != null) {
                 mHidKeyboard.pressModifierKey(HidKeyboard.MODIFIER_LEFT_CTRL);
             }
@@ -1374,6 +1384,7 @@ public class MouseTouchListener implements OnTouchListener {
         protected void stop() {
             super.stop();
 
+            mTouchpadView.performModeChangedFeedback();
             if (mHidKeyboard != null) {
                 mHidKeyboard.releaseModifierKey(HidKeyboard.MODIFIER_LEFT_CTRL);
             }

@@ -52,6 +52,7 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
         final HidMouse hidMouse = mTouchpadView.getHidMouse();
 
         if (hidMouse != null) {
+            mTouchpadView.performGestureDetectedFeedback();
             hidMouse.clickButton(button);
             return true;
         } else {
@@ -63,6 +64,8 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
         final HidKeyboard hidKeyboard = mTouchpadView.getHidKeyboard();
 
         if (hidKeyboard != null) {
+            mTouchpadView.performGestureDetectedFeedback();
+
             if (modifier != 0) {
                 hidKeyboard.pressModifierKey(modifier);
             }
@@ -86,6 +89,8 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
         final HidKeyboard hidKeyboard = mTouchpadView.getHidKeyboard();
 
         if (hidKeyboard != null) {
+            mTouchpadView.performGestureDetectedFeedback();
+
             if (modifier != 0) {
                 hidKeyboard.pressModifierKey(modifier);
             }
@@ -107,6 +112,7 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
         final HidKeyboard hidKeyboard = mTouchpadView.getHidKeyboard();
 
         if (hidKeyboard != null) {
+            mTouchpadView.performGestureDetectedFeedback();
             hidKeyboard.pressAppCtrlKey(key);
             hidKeyboard.releaseAppCtrlKey(key);
             return true;

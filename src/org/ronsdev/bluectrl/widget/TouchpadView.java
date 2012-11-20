@@ -19,6 +19,7 @@ package org.ronsdev.bluectrl.widget;
 import org.ronsdev.bluectrl.HidKeyboard;
 import org.ronsdev.bluectrl.HidMouse;
 import org.ronsdev.bluectrl.IntArrayList;
+import org.ronsdev.bluectrl.OnMouseButtonClickListener;
 import org.ronsdev.bluectrl.R;
 
 import android.content.Context;
@@ -30,13 +31,14 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 /**
  * A touchpad that handles touch events and redirects them to a HID Mouse.
  */
 public class TouchpadView extends View
-        implements OnScrollModeChangedListener {
+        implements OnMouseButtonClickListener, OnScrollModeChangedListener {
 
     /** Indicates that a gesture from the top edge of the screen has been detected. */
     public static final int GESTURE_EDGE_TOP = 10;
@@ -338,6 +340,29 @@ public class TouchpadView extends View
         mMouseTouchListener.activateScrollMode(scrollMode);
     }
 
+    public void performButtonPressFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        playSoundEffect(SoundEffectConstants.CLICK);
+    }
+
+    public void performButtonReleaseFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        playSoundEffect(SoundEffectConstants.CLICK);
+    }
+
+    public void performButtonClickFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+        playSoundEffect(SoundEffectConstants.CLICK);
+    }
+
+    public void performGestureDetectedFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+    }
+
+    public void performModeChangedFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+    }
+
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -365,10 +390,6 @@ public class TouchpadView extends View
     }
 
     public void onScrollModeChanged(int newMode, int oldMode) {
-        if ((oldMode == SCROLL_MODE_NONE) || (newMode == SCROLL_MODE_NONE)) {
-            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-        }
-
         invalidate();
     }
 
@@ -399,6 +420,7 @@ public class TouchpadView extends View
                 if (mButtonRects[i].contains(downX, downY)) {
                     if (mButtonPointerIds[i].isEmpty()) {
                         mHidMouse.pressButton(convertBtIndexToHidMouseBt(i));
+                        performButtonPressFeedback();
                     }
                     if (!mButtonPointerIds[i].containsValue(downPointerId)) {
                         mButtonPointerIds[i].addValue(downPointerId);
@@ -416,6 +438,7 @@ public class TouchpadView extends View
                     mButtonPointerIds[i].removeValue(upPointerId);
                     if (mButtonPointerIds[i].isEmpty()) {
                         mHidMouse.releaseButton(convertBtIndexToHidMouseBt(i));
+                        performButtonReleaseFeedback();
                     }
                     return true;
                 }
@@ -466,6 +489,7 @@ public class TouchpadView extends View
             if (!mButtonPointerIds[i].isEmpty()) {
                 if (mHidMouse != null) {
                     mHidMouse.releaseButton(convertBtIndexToHidMouseBt(i));
+                    performButtonReleaseFeedback();
                 }
                 mButtonPointerIds[i].clear();
             }

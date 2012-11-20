@@ -39,7 +39,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -679,19 +678,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     }
 
     public void onMouseButtonClick(int clickType, int button) {
-        switch (clickType) {
-        case HidMouse.CLICK_TYPE_DOWN:
-        case HidMouse.CLICK_TYPE_UP:
-            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
-            break;
-        case HidMouse.CLICK_TYPE_CLICK:
-            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
-            break;
+        if (mTouchpadView != null) {
+            mTouchpadView.onMouseButtonClick(clickType, button);
         }
-
-        mTouchpadView.onMouseButtonClick(clickType, button);
     }
 
     private boolean isScreenHeightSmall() {

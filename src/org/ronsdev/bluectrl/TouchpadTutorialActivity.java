@@ -25,8 +25,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.HapticFeedbackConstants;
-import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
@@ -190,19 +188,9 @@ public class TouchpadTutorialActivity extends DaemonActivity
     }
 
     public void onMouseButtonClick(int clickType, int button) {
-        switch (clickType) {
-        case HidMouse.CLICK_TYPE_DOWN:
-        case HidMouse.CLICK_TYPE_UP:
-            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
-            break;
-        case HidMouse.CLICK_TYPE_CLICK:
-            mTouchpadView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            mTouchpadView.playSoundEffect(SoundEffectConstants.CLICK);
-            break;
+        if (mTouchpadView != null) {
+            mTouchpadView.onMouseButtonClick(clickType, button);
         }
-
-        mTouchpadView.onMouseButtonClick(clickType, button);
     }
 
     private void initPageList() {
