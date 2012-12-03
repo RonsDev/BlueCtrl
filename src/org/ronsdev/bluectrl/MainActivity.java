@@ -76,7 +76,6 @@ public class MainActivity extends DaemonListActivity
     private ImageButton mButtonAddDevice;
     private TextView mTextEmptyList;
 
-    private BluetoothAdapter mBtAdapter;
     private DeviceManager mDeviceManager;
     private List<PairedDevice> mDevices;
 
@@ -103,21 +102,9 @@ public class MainActivity extends DaemonListActivity
             mWasEnableBtAsked = savedInstanceState.getBoolean(SAVED_STATE_WAS_ENABLE_BT_ASKED);
         }
 
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         mDeviceManager = new DeviceManager(this);
 
         loadLayout();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if ((mBtAdapter != null) && !mBtAdapter.isEnabled() && !mWasEnableBtAsked) {
-            mWasEnableBtAsked = true;
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
     }
 
     @Override
@@ -246,8 +233,14 @@ public class MainActivity extends DaemonListActivity
 
             switch (errorCode) {
             case DaemonService.ERROR_ROOT_REQUIRED:
-            case DaemonService.ERROR_BT_REQUIRED:
                 // Do nothing at non critical errors
+                break;
+            case DaemonService.ERROR_BT_REQUIRED:
+                if (!mWasEnableBtAsked) {
+                    mWasEnableBtAsked = true;
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
                 break;
             case DaemonService.ERROR_INCOMPATIBLE:
                 args = new Bundle();
