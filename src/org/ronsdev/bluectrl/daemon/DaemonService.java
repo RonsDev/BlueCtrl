@@ -440,6 +440,11 @@ public class DaemonService extends Service {
     }
 
 
+    private boolean checkLibraries() {
+        File checkFile = new File("/system/lib/", "libbluetooth.so");
+        return checkFile.exists();
+    }
+
     private File getBinaryFile() {
         return new File(getFilesDir().getAbsolutePath(), BINARY_NAME);
     }
@@ -611,7 +616,11 @@ public class DaemonService extends Service {
 
         int errorCode = 0;
 
-        if ((mBtAdapter == null) || !mBtAdapter.isEnabled()) {
+        if (!checkLibraries()) {
+            errorCode = ERROR_INCOMPATIBLE;
+        }
+
+        if ((errorCode == 0) && ((mBtAdapter == null) || !mBtAdapter.isEnabled())) {
             errorCode = ERROR_BT_REQUIRED;
         }
 
