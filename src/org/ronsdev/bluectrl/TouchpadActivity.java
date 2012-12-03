@@ -18,7 +18,10 @@ package org.ronsdev.bluectrl;
 
 import org.ronsdev.bluectrl.daemon.DaemonActivity;
 import org.ronsdev.bluectrl.daemon.DaemonService;
+import org.ronsdev.bluectrl.widget.ComposeTextLayout;
 import org.ronsdev.bluectrl.widget.KeyboardInputView;
+import org.ronsdev.bluectrl.widget.OnKeyboardComposingTextListener;
+import org.ronsdev.bluectrl.widget.OnSendComposeTextListener;
 import org.ronsdev.bluectrl.widget.TouchpadView;
 
 import android.app.Activity;
@@ -91,6 +94,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private View mViewConnected;
     private KeyboardInputView mKeyboardInputView;
     private TouchpadView mTouchpadView;
+    private ComposeTextLayout mViewComposeText;
     private ViewGroup mAndroidControls;
     private ViewGroup mPs3Controls;
     private View mViewDisconnected;
@@ -128,9 +132,30 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private OnClickListener mToggleKeyboardClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mKeyboardInputView != null) {
-                mKeyboardInputView.toggleKeyboard();
+            if ((mViewComposeText != null) && mViewComposeText.isShown()) {
+                mViewComposeText.hide();
+            } else {
+                if (mKeyboardInputView != null) {
+                    mKeyboardInputView.toggleKeyboard();
+                }
             }
+        }
+    };
+
+    private OnKeyboardComposingTextListener mKeyboardComposingTextListener =
+            new OnKeyboardComposingTextListener() {
+                @Override
+                public void OnKeyboardComposingText(CharSequence composingText) {
+                    if (mViewComposeText != null) {
+                        mViewComposeText.show(composingText);
+                    }
+                }
+            };
+
+    private OnSendComposeTextListener mSendComposeTextListener = new OnSendComposeTextListener() {
+        @Override
+        public void OnSendComposeText(CharSequence text) {
+            sendText(text);
         }
     };
 
@@ -238,8 +263,13 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             daemon.disconnectHid();
         }
 
-        if (isFinishing() && (mKeyboardInputView != null)) {
-            mKeyboardInputView.hideToggledKeyboard();
+        if (isFinishing()) {
+            if (mKeyboardInputView != null) {
+                mKeyboardInputView.hideToggledKeyboard();
+            }
+            if (mViewComposeText != null) {
+                mViewComposeText.hide();
+            }
         }
     }
 
@@ -392,6 +422,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         final boolean isConnected = (isDaemonAvailable() &&
                 (getDaemon().getHidState() == DaemonService.HID_STATE_CONNECTED));
 
+        MenuItem composeTextItem = menu.findItem(R.id.menu_compose_text);
+        composeTextItem.setEnabled(isConnected);
+
         MenuItem pasteItem = menu.findItem(R.id.menu_paste);
         pasteItem.setEnabled(isConnected && mClipboard.hasText());
 
@@ -404,16 +437,18 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case R.id.menu_compose_text:
+            if (mViewComposeText != null) {
+                mViewComposeText.toggleVisibility();
+            }
+            return true;
         case R.id.menu_paste:
-            pasteClipboard();
+            sendText(mClipboard.getText());
             return true;
         case R.id.menu_preferences:
             DevicePreferenceActivity.startActivity(this, mBtDevice);
             return true;
         case R.id.menu_help:
-            if (mKeyboardInputView != null) {
-                mKeyboardInputView.hideToggledKeyboard();
-            }
             mKeepConnected = true;
             TouchpadTutorialActivity.startActivity(this, mBtDevice);
             return true;
@@ -443,6 +478,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         if (mKeyboardInputView != null) {
             mKeyboardInputView.saveHierarchyState(stateContainer);
         }
+        if (mViewComposeText != null) {
+            mViewComposeText.saveHierarchyState(stateContainer);
+        }
 
 
         setContentView(R.layout.touchpad);
@@ -469,10 +507,16 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mKeyboardInputView = (KeyboardInputView)findViewById(R.id.keyboard_input);
         mKeyboardInputView.restoreHierarchyState(stateContainer);
         mKeyboardInputView.setHidKeyboard(mHidKeyboard);
+        mKeyboardInputView.setOnKeyboardComposingTextListener(mKeyboardComposingTextListener);
 
         mTouchpadView = (TouchpadView)findViewById(R.id.touchpad);
         mTouchpadView.setHidMouse(mHidMouse);
         mTouchpadView.setHidKeyboard(mHidKeyboard);
+
+        mViewComposeText = (ComposeTextLayout)findViewById(R.id.view_compose_text);
+        mViewComposeText.restoreHierarchyState(stateContainer);
+        mViewComposeText.setOnSendComposeTextListener(mSendComposeTextListener);
+
 
         mAndroidControls = (ViewGroup)findViewById(R.id.touchpad_android_controls);
 
@@ -724,15 +768,13 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
     }
 
-    private void pasteClipboard() {
-        if ((mHidKeyboard != null) && mHidKeyboard.isConnected()) {
-            final CharSequence pasteText = mClipboard.getText();
-            if ((pasteText != null) && (pasteText.length() > 0)) {
-                if (pasteText.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
-                    mHidKeyboard.typeText(pasteText.toString());
-                } else {
-                    startSendTextTask(pasteText);
-                }
+    private void sendText(CharSequence text) {
+        if ((text != null) && (text.length() > 0) && (mHidKeyboard != null) &&
+                mHidKeyboard.isConnected()) {
+            if (text.length() < SEND_TEXT_PROGRESS_MIN_SIZE) {
+                mHidKeyboard.typeText(text.toString());
+            } else {
+                startSendTextTask(text);
             }
         }
     }
@@ -763,7 +805,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private void showViewConnected() {
         changeFlipperView(mViewConnected);
 
-        mKeyboardInputView.requestFocus();
+        if (!mViewComposeText.isShown()) {
+            mKeyboardInputView.requestFocus();
+        }
     }
 
     private void showViewDisconnected(int errorCode) {

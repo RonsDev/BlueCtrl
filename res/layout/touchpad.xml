@@ -11,13 +11,27 @@
                         android:id="@+id/view_connected">
 
             <org.ronsdev.bluectrl.widget.KeyboardInputView
-                android:id="@+id/keyboard_input"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent" />
+                    android:id="@+id/keyboard_input"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent" />
 
             <org.ronsdev.bluectrl.widget.TouchpadView
-                style="@style/touchpad_control"
-                android:id="@+id/touchpad" />
+                    style="@style/touchpad_control"
+                    android:id="@+id/touchpad" />
+
+            <org.ronsdev.bluectrl.widget.ComposeTextLayout
+                    style="@style/touchpad_compose"
+                    android:id="@+id/view_compose_text">
+                <EditText style="@style/touchpad_compose_edit"
+                          android:id="@+id/edit_compose_text"
+                          android:inputType="text|textMultiLine"
+                          android:imeActionLabel="@string/compose_text_send"
+                          android:hint="@string/compose_text_hint" />
+                <ImageButton style="@style/touchpad_compose_button"
+                             android:id="@+id/btn_compose_text"
+                             android:src="@drawable/ic_action_send"
+                             android:contentDescription="@string/compose_text_send" />
+            </org.ronsdev.bluectrl.widget.ComposeTextLayout>
 
             <LinearLayout style="@style/touchpad_android_controls"
                           android:id="@+id/touchpad_android_controls"

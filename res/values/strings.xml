@@ -37,6 +37,7 @@
     <string name="menu_preferences">Settings</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_remove_device">Remove Device</string>
+    <string name="menu_compose_text">Compose Text</string>
     <string name="menu_paste">Paste Text</string>
 
     <string name="device_list_add_device">Add Device</string>
@@ -49,6 +50,9 @@
     <string name="pairing_device_title">Pairing\u2026</string>
     <string name="pairing_failed_title">Pairing failed</string>
     <string name="pairing_service_conflict_windows_text">Sorry, but you cannot use this app with a Windows system because another Bluetooth input service is active on your device.</string>
+
+    <string name="compose_text_hint">Type text</string>
+    <string name="compose_text_send">Send</string>
 
     <string name="device_preferences">Device settings</string>
     <string name="pref_keymap">Keyboard layout</string>

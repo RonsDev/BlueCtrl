@@ -21,6 +21,29 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:paddingTop">42dp</item>
     </style>
+    <style name="touchpad_compose">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_marginTop">42dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@drawable/bottom_bar_dark_holo</item>
+    </style>
+    <style name="touchpad_compose_edit" parent="@style/edit_text_holo_dark">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:maxLines">4</item>
+    </style>
+    <style name="touchpad_compose_button">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/ab_button</item>
+    </style>
     <style name="touchpad_ps3_controls">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>

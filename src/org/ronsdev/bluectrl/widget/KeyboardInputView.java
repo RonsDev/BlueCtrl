@@ -56,6 +56,9 @@ public class KeyboardInputView extends View {
     private boolean mWasKeyboardToggled = false;
 
 
+    private OnKeyboardComposingTextListener mOnKeyboardComposingTextListener;
+
+
     /**
      * A custom InputConnection that immediately redirects text input as key events.
      */
@@ -72,11 +75,8 @@ public class KeyboardInputView extends View {
 
         @Override
         public boolean setComposingText(CharSequence text, int newCursorPosition) {
-            /*
-             * Directly commit composing text (such as voice input) because the user doesn't see
-             * the text and cannot correct it anyway.
-             */
-            return commitText(text, newCursorPosition);
+            OnKeyboardComposingText(text);
+            return true;
         }
 
         @Override
@@ -121,6 +121,16 @@ public class KeyboardInputView extends View {
     }
     public void setHidKeyboard(HidKeyboard hidKeyboard) {
         mHidKeyboard = hidKeyboard;
+    }
+
+    private void OnKeyboardComposingText(CharSequence composingText) {
+        if (mOnKeyboardComposingTextListener != null) {
+            mOnKeyboardComposingTextListener.OnKeyboardComposingText(composingText);
+        }
+    }
+
+    public void setOnKeyboardComposingTextListener(OnKeyboardComposingTextListener listener) {
+        mOnKeyboardComposingTextListener = listener;
     }
 
     private InputMethodManager getInputManager() {
@@ -201,32 +211,14 @@ public class KeyboardInputView extends View {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
 
-        if (hasWindowFocus && mShouldShowKeyboard) {
-            showKeyboard();
-        }
+        onKeyboardActiveStateChanged(hasWindowFocus);
     }
 
     @Override
     public void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        if (isShown()) {
-            if (mShouldShowKeyboard) {
-                showKeyboard();
-            }
-        } else if (mWasKeyboardToggled) {
-            mWasKeyboardToggled = false;
-            getInputManager().hideSoftInputFromWindow(getWindowToken(),
-                    0,
-                    new ResultReceiver(null) {
-                        @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-                            if (resultCode == InputMethodManager.RESULT_HIDDEN) {
-                                mShouldShowKeyboard = true;
-                            }
-                        }
-                    });
-        }
+        onKeyboardActiveStateChanged(isShown());
     }
 
     @Override
@@ -253,6 +245,28 @@ public class KeyboardInputView extends View {
             return onMultipleKeyEvents(event);
         } else {
             return super.onKeyMultiple(keyCode, repeatCount, event);
+        }
+    }
+
+    private void onKeyboardActiveStateChanged(boolean isActive) {
+        if (isActive) {
+            if (mShouldShowKeyboard) {
+                showKeyboard();
+            }
+        } else {
+            if (mWasKeyboardToggled) {
+                mWasKeyboardToggled = false;
+                getInputManager().hideSoftInputFromWindow(getWindowToken(),
+                        0,
+                        new ResultReceiver(null) {
+                            @Override
+                            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                                if (resultCode == InputMethodManager.RESULT_HIDDEN) {
+                                    mShouldShowKeyboard = true;
+                                }
+                            }
+                        });
+            }
         }
     }
 
