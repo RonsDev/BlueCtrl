@@ -51,6 +51,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
     private ListPreference mTouchpadGestureMode;
     private ListPreference mTouchpadButtons;
     private FloatSliderPreference mMouseSensitivity;
+    private FloatSliderPreference mScrollSensitivity;
     private CheckBoxPreference mInvertScroll;
     private CheckBoxPreference mFlingScroll;
 
@@ -113,6 +114,8 @@ public class DevicePreferenceActivity extends PreferenceActivity {
 
         mTouchpadButtons = (ListPreference)findPreference(
                 DeviceSettings.PREF_KEY_TOUCHPAD_BUTTONS);
+        mScrollSensitivity = (FloatSliderPreference)findPreference(
+                DeviceSettings.PREF_KEY_SCROLL_SENSITIVITY);
         mInvertScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_INVERT_SCROLL);
         mFlingScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_FLING_SCROLL);
     }
@@ -151,6 +154,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mMouseSensitivity.setValue(mDeviceSettings.getMouseSensitivity());
         mTouchpadGestureMode.setValue(mDeviceSettings.getTouchpadGestureMode());
         mTouchpadButtons.setValue(mDeviceSettings.getTouchpadButtons());
+        mScrollSensitivity.setValue(mDeviceSettings.getScrollSensitivity());
         mInvertScroll.setChecked(mDeviceSettings.getInvertScroll());
         mFlingScroll.setChecked(mDeviceSettings.getFlingScroll());
     }
@@ -160,6 +164,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mDeviceSettings.setMouseSensitivity(mMouseSensitivity.getValue());
         mDeviceSettings.setTouchpadGestureMode(mTouchpadGestureMode.getValue());
         mDeviceSettings.setTouchpadButtons(mTouchpadButtons.getValue());
+        mDeviceSettings.setScrollSensitivity(mScrollSensitivity.getValue());
         mDeviceSettings.setInvertScroll(mInvertScroll.isChecked());
         mDeviceSettings.setFlingScroll(mFlingScroll.isChecked());
     }

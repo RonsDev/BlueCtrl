@@ -27,6 +27,12 @@
         android:entryValues="@array/pref_touchpad_buttons_values"
         android:summary="%s"
         android:persistent="false" />
+    <org.ronsdev.bluectrl.widget.FloatSliderPreference
+        android:key="scroll_sensitivity"
+        android:title="@string/pref_scroll_sensitivity"
+        android:max="2"
+        android:summary="%.1f"
+        android:persistent="false" />
     <CheckBoxPreference android:key="invert_scroll"
                         android:title="@string/pref_invert_scroll"
                         android:persistent="false" />
