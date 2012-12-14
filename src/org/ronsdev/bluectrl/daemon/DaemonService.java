@@ -516,8 +516,8 @@ public class DaemonService extends Service {
         try {
             proc = Runtime.getRuntime().exec(progArray);
         } catch (IOException e) {
-            Log.e(TAG, "execute daemon failed", e);
-            return ERROR_START;
+            Log.e(TAG, "execute daemon with su failed", e);
+            return ERROR_ROOT_REQUIRED;
         }
 
         int suResult;
