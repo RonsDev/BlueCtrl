@@ -517,8 +517,13 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         mButtonKeyboard = (ImageButton)findViewById(R.id.button_keyboard);
-        mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
-        mButtonKeyboard.setOnLongClickListener(mToggleKeyboardLongClickListener);
+        if (getInputManager().getEnabledInputMethodList().isEmpty()) {
+            mButtonKeyboard.setVisibility(View.GONE);
+            mButtonKeyboard = null;
+        } else {
+            mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
+            mButtonKeyboard.setOnLongClickListener(mToggleKeyboardLongClickListener);
+        }
 
 
         mViewFlipper = (ViewFlipper)findViewById(R.id.flipper);
@@ -916,7 +921,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         final boolean isConnected = (hidState == DaemonService.HID_STATE_CONNECTED);
-        mButtonKeyboard.setVisibility(isConnected ? View.VISIBLE : View.GONE);
+        if (mButtonKeyboard != null) {
+            mButtonKeyboard.setVisibility(isConnected ? View.VISIBLE : View.GONE);
+        }
         setWindowFullscreen(isConnected && isScreenHeightSmall());
 
         switch (hidState) {
