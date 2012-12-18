@@ -226,7 +226,9 @@ public class ComposeTextLayout extends LinearLayout {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
 
-        onKeyboardActiveStateChanged(hasWindowFocus);
+        if (hasWindowFocus) {
+            onKeyboardActiveStateChanged(true);
+        }
     }
 
     @Override
@@ -256,6 +258,10 @@ public class ComposeTextLayout extends LinearLayout {
         }
 
         return super.dispatchKeyEventPreIme(event);
+    }
+
+    public void onActivityPause() {
+        onKeyboardActiveStateChanged(false);
     }
 
     private void onKeyboardActiveStateChanged(boolean isActive) {

@@ -211,7 +211,9 @@ public class KeyboardInputView extends View {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
 
-        onKeyboardActiveStateChanged(hasWindowFocus);
+        if (hasWindowFocus) {
+            onKeyboardActiveStateChanged(true);
+        }
     }
 
     @Override
@@ -246,6 +248,10 @@ public class KeyboardInputView extends View {
         } else {
             return super.onKeyMultiple(keyCode, repeatCount, event);
         }
+    }
+
+    public void onActivityPause() {
+        onKeyboardActiveStateChanged(false);
     }
 
     private void onKeyboardActiveStateChanged(boolean isActive) {

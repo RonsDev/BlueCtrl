@@ -134,6 +134,9 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         public void onClick(View v) {
             if ((mViewComposeText != null) && mViewComposeText.isShown()) {
                 mViewComposeText.hide();
+                if (mKeyboardInputView != null) {
+                    mKeyboardInputView.hideToggledKeyboard();
+                }
             } else {
                 if (mKeyboardInputView != null) {
                     mKeyboardInputView.toggleKeyboard();
@@ -263,13 +266,11 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             daemon.disconnectHid();
         }
 
-        if (isFinishing()) {
-            if (mKeyboardInputView != null) {
-                mKeyboardInputView.hideToggledKeyboard();
-            }
-            if (mViewComposeText != null) {
-                mViewComposeText.hide();
-            }
+        if (mKeyboardInputView != null) {
+            mKeyboardInputView.onActivityPause();
+        }
+        if (mViewComposeText != null) {
+            mViewComposeText.onActivityPause();
         }
     }
 
