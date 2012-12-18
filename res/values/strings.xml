@@ -33,12 +33,12 @@
     <string name="unnamed_device_playstation3">PS3 (%1$s)</string>
 
     <string name="menu_about">About</string>
-    <string name="menu_help">Help</string>
     <string name="menu_preferences">Settings</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_remove_device">Remove Device</string>
     <string name="menu_compose_text">Compose Text</string>
     <string name="menu_paste">Paste Text</string>
+    <string name="menu_tutorial">Tutorial</string>
 
     <string name="device_list_add_device">Add Device</string>
     <string name="device_list_empty">No device configured</string>

@@ -450,8 +450,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         MenuItem pasteItem = menu.findItem(R.id.menu_paste);
         pasteItem.setEnabled(isConnected && mClipboard.hasText());
 
-        MenuItem helpItem = menu.findItem(R.id.menu_help);
-        helpItem.setEnabled(isConnected);
+        MenuItem tutorialItem = menu.findItem(R.id.menu_tutorial);
+        tutorialItem.setEnabled(isConnected);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -470,7 +470,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         case R.id.menu_preferences:
             DevicePreferenceActivity.startActivity(this, mBtDevice);
             return true;
-        case R.id.menu_help:
+        case R.id.menu_tutorial:
             mKeepConnected = true;
             TouchpadTutorialActivity.startActivity(this, mBtDevice);
             return true;
