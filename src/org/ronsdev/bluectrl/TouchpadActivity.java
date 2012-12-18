@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -43,11 +44,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -142,6 +145,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
                     mKeyboardInputView.toggleKeyboard();
                 }
             }
+        }
+    };
+
+    private OnLongClickListener mToggleKeyboardLongClickListener = new OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            InputMethodManager imm = getInputManager();
+            if (imm.getEnabledInputMethodList().size() > 1) {
+                imm.showInputMethodPicker();
+
+                if ((mKeyboardInputView != null) &&
+                        ((mViewComposeText == null) || !mViewComposeText.isShown())) {
+                    mKeyboardInputView.showKeyboard();
+                }
+                return true;
+            }
+
+            return false;
         }
     };
 
@@ -497,6 +518,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         mButtonKeyboard = (ImageButton)findViewById(R.id.button_keyboard);
         mButtonKeyboard.setOnClickListener(mToggleKeyboardClickListener);
+        mButtonKeyboard.setOnLongClickListener(mToggleKeyboardLongClickListener);
 
 
         mViewFlipper = (ViewFlipper)findViewById(R.id.flipper);
@@ -569,6 +591,10 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         updateViewSettings();
         updateViews();
+    }
+
+    private InputMethodManager getInputManager() {
+        return (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     private void initKeyboardIconButton(ImageButton button, final int hidKeyCode) {
