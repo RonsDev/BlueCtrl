@@ -53,6 +53,7 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
@@ -98,7 +99,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private KeyboardInputView mKeyboardInputView;
     private TouchpadView mTouchpadView;
     private ComposeTextLayout mViewComposeText;
-    private ViewGroup mAndroidControls;
+    private LinearLayout mAndroidControls;
     private ViewGroup mPs3Controls;
     private View mViewDisconnected;
     private ImageView mInfoImage;
@@ -546,7 +547,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mViewComposeText.setOnSendComposeTextListener(mSendComposeTextListener);
 
 
-        mAndroidControls = (ViewGroup)findViewById(R.id.touchpad_android_controls);
+        mAndroidControls = (LinearLayout)findViewById(R.id.touchpad_android_controls);
 
         ImageButton btnAndroidBack = (ImageButton)findViewById(R.id.btn_android_back);
         initKeyboardAppCtrlIconButton(btnAndroidBack, HidKeyboard.AC_KEY_BACK);
@@ -556,6 +557,18 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
         ImageButton btnAndroidMenu = (ImageButton)findViewById(R.id.btn_android_menu);
         initKeyboardIconButton(btnAndroidMenu, HidKeyboard.KEYCODE_APPLICATION);
+
+        /*
+         * Reverse the order of the buttons in landscape mode so that they are on the same
+         * position as in the portrait mode.
+         */
+        if (mAndroidControls.getOrientation() == LinearLayout.VERTICAL) {
+            mAndroidControls.removeAllViews();
+            mAndroidControls.addView(btnAndroidMenu);
+            mAndroidControls.addView(btnAndroidHome);
+            mAndroidControls.addView(btnAndroidBack);
+        }
+
 
         mPs3Controls = (ViewGroup)findViewById(R.id.touchpad_ps3_controls);
 
