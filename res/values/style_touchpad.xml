@@ -47,6 +47,7 @@
     <style name="touchpad_ps3_controls">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginTop">42dp</item>
     </style>
     <style name="touchpad_ps3_center_buttons">
         <item name="android:layout_width">wrap_content</item>
