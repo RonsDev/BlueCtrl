@@ -1,3 +1,14 @@
+Version 2.4
+-----------
+* New system specific touchpad gestures
+* New interactive touchpad tutorial
+* New menu item for composing text
+* Voice input can be corrected before sending
+* New scroll sensitivity setting
+* You can long press the keyboard button to change the input method
+
+
+
 Version 2.3
 -----------
 * Fixed a problem with the SwiftKey Keyboard
