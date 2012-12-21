@@ -115,7 +115,7 @@ public class MouseTouchListener implements OnTouchListener {
     private static final float MULTIPLE_FLING_SCROLL_THRESHOLD_DP = 24.0f;
 
     /** The amount of friction applied to the fling scroll movement. */
-    private static final float FLING_SCROLL_MOVE_FRICTION_DP = 0.4f;
+    private static final float FLING_SCROLL_MOVE_FRICTION_DP = 0.8f;
 
 
     private TouchpadView mTouchpadView;
