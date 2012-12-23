@@ -372,18 +372,6 @@ public class TouchpadViewGestureListener implements OnTouchpadGestureListener {
                         HidKeyboard.KEYCODE_RIGHT_ARROW);
             }
             break;
-        case TouchpadView.GESTURE_4FINGER:
-            switch (direction) {
-            case TouchpadView.GESTURE_DIRECTION_LEFT:
-                // Ctrl + Right = Move to the right window
-                return pressShortcutKey(HidKeyboard.MODIFIER_LEFT_CTRL,
-                        HidKeyboard.KEYCODE_RIGHT_ARROW);
-            case TouchpadView.GESTURE_DIRECTION_RIGHT:
-                // Ctrl + Left = Move to the left window
-                return pressShortcutKey(HidKeyboard.MODIFIER_LEFT_CTRL,
-                        HidKeyboard.KEYCODE_LEFT_ARROW);
-            }
-            break;
         }
 
         return false;

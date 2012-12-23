@@ -331,22 +331,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Change window (PlayStation 3) -->
-        <LinearLayout style="@style/tutorial_info_block"
-                      android:id="@+id/view_tutorial_4f_lr_playstation3">
-            <FrameLayout style="@style/tutorial_info_block_image_frame">
-                <ImageView style="@style/tutorial_info_block_image"
-                           android:src="@drawable/tutorial_4f_lr"
-                           android:contentDescription="@string/description_info_image" />
-            </FrameLayout>
-            <LinearLayout style="@style/tutorial_info_block_text_block">
-                <TextView style="@style/tutorial_info_block_title"
-                          android:text="@string/tutorial_4f_lr_playstation3_title" />
-                <TextView style="@style/tutorial_info_block_text.first"
-                          android:text="@string/tutorial_4f_lr_playstation3_text" />
-            </LinearLayout>
-        </LinearLayout>
-
         <!-- Open Launcher (Ubuntu Unity) -->
         <LinearLayout style="@style/tutorial_info_block"
                       android:id="@+id/view_tutorial_3f_d_ubuntu_unity">

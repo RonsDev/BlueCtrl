@@ -143,8 +143,6 @@
     <string name="tutorial_4f_d_osx_text">Swipe down with four fingers to see all of your open apps.</string>
     <string name="tutorial_4f_lr_osx_title">Change workspace</string>
     <string name="tutorial_4f_lr_osx_text">Swipe left or right with four fingers to change the workspace.</string>
-    <string name="tutorial_4f_lr_playstation3_title">Change window</string>
-    <string name="tutorial_4f_lr_playstation3_text">Swipe left or right with four fingers to change the browser window.</string>
     <string name="tutorial_3f_d_ubuntu_unity_title">Open Launcher</string>
     <string name="tutorial_3f_d_ubuntu_unity_text">Swipe down with three fingers to show or hide the Launcher.</string>
     <string name="tutorial_3f_u_ubuntu_unity_title">Workspace Switcher</string>

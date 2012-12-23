@@ -230,7 +230,6 @@ public class TouchpadTutorialActivity extends DaemonActivity
             mPageList.add((View)findViewById(R.id.view_tutorial_1f_scroll));
             mPageList.add((View)findViewById(R.id.view_tutorial_pinch_zoom));
             mPageList.add((View)findViewById(R.id.view_tutorial_3f_lr_navigate));
-            mPageList.add((View)findViewById(R.id.view_tutorial_4f_lr_playstation3));
         } else if (DeviceSettings.TOUCHPAD_GESTURE_MODE_UBUNTU_UNITY.equals(gestureMode)) {
             mPageList.add((View)findViewById(R.id.view_tutorial_2f_scroll));
             mPageList.add((View)findViewById(R.id.view_tutorial_1f_scroll));
