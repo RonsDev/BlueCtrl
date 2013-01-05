@@ -39,4 +39,7 @@
     <CheckBoxPreference android:key="fling_scroll"
                         android:title="@string/pref_fling_scroll"
                         android:persistent="false" />
+    <CheckBoxPreference android:key="stay_awake"
+                        android:title="@string/pref_stay_awake"
+                        android:persistent="false" />
 </PreferenceScreen>

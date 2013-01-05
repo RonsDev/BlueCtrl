@@ -39,6 +39,7 @@ public class DeviceSettings {
     public static final String PREF_KEY_INVERT_SCROLL = "invert_scroll";
     public static final String PREF_KEY_FLING_SCROLL = "fling_scroll";
     public static final String PREF_KEY_FORCE_SMOOTH_SCROLL = "force_smooth_scroll";
+    public static final String PREF_KEY_STAY_AWAKE = "stay_awake";
 
     public static final String OS_ANDROID = "android";
     public static final String OS_IOS = "ios";
@@ -71,6 +72,7 @@ public class DeviceSettings {
     public static final boolean DEFAULT_INVERT_SCROLL = false;
     public static final boolean DEFAULT_FLING_SCROLL = true;
     public static final boolean DEFAULT_FORCE_SMOOTH_SCROLL = false;
+    public static final boolean DEFAULT_STAY_AWAKE = false;
 
 
     private static Context sContext = null;
@@ -90,6 +92,7 @@ public class DeviceSettings {
     private boolean mInvertScroll;
     private boolean mFlingScroll;
     private boolean mForceSmoothScroll;
+    private boolean mStayAwake;
 
 
     private static void initStaticMembers(Context context) {
@@ -192,6 +195,8 @@ public class DeviceSettings {
                 DEFAULT_FLING_SCROLL);
         mForceSmoothScroll = preferences.getBoolean(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL),
                 DEFAULT_FORCE_SMOOTH_SCROLL);
+        mStayAwake = preferences.getBoolean(getKey(PREF_KEY_STAY_AWAKE),
+                DEFAULT_STAY_AWAKE);
     }
 
     /** Initializes the preferences for a newly paired device. */
@@ -247,6 +252,9 @@ public class DeviceSettings {
         if (mForceSmoothScroll != oldSettings.mForceSmoothScroll) {
             editor.putBoolean(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL), mForceSmoothScroll);
         }
+        if (mStayAwake != oldSettings.mStayAwake) {
+            editor.putBoolean(getKey(PREF_KEY_STAY_AWAKE), mStayAwake);
+        }
 
         editor.commit();
     }
@@ -265,6 +273,7 @@ public class DeviceSettings {
         editor.remove(getKey(PREF_KEY_INVERT_SCROLL));
         editor.remove(getKey(PREF_KEY_FLING_SCROLL));
         editor.remove(getKey(PREF_KEY_FORCE_SMOOTH_SCROLL));
+        editor.remove(getKey(PREF_KEY_STAY_AWAKE));
 
         editor.commit();
 
@@ -360,5 +369,12 @@ public class DeviceSettings {
     }
     public void setForceSmoothScroll(boolean value) {
         mForceSmoothScroll = value;
+    }
+
+    public boolean getStayAwake() {
+        return mStayAwake;
+    }
+    public void setStayAwake(boolean value) {
+        mStayAwake = value;
     }
 }

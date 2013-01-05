@@ -119,7 +119,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
-    private boolean mIsFullscreen = false;
     private boolean mKeepConnected = false;
 
     private CharSequence mSendTextValue = "";
@@ -392,6 +391,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             }
         }
 
+        updateWindowFlags();
         updateViews();
     }
 
@@ -607,6 +607,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mViewConnecting = (View)findViewById(R.id.view_connecting);
 
 
+        updateWindowFlags();
         updateViewSettings();
         updateViews();
     }
@@ -671,6 +672,26 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private void onKeyboardIconButtonDown(View v) {
         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+    }
+
+    private void updateWindowFlags() {
+        final Window wnd = getWindow();
+        final boolean isConnected = (isDaemonAvailable() &&
+                (getDaemon().getHidState() == DaemonService.HID_STATE_CONNECTED));
+
+        if (isConnected && isScreenHeightSmall()) {
+            wnd.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            wnd.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        } else {
+            wnd.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            wnd.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        if (isConnected && mDeviceSettings.getStayAwake()) {
+            wnd.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            wnd.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     private void updateViewSettings() {
@@ -775,21 +796,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private boolean isScreenHeightSmall() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return ((displayMetrics.heightPixels / displayMetrics.density) < 400);
-    }
-
-    private void setWindowFullscreen(boolean fullscreen) {
-        if (mIsFullscreen != fullscreen) {
-            mIsFullscreen = fullscreen;
-
-            final Window wnd = getWindow();
-            if (fullscreen) {
-                wnd.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                wnd.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            } else {
-                wnd.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-                wnd.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
-        }
     }
 
     private void startSendTextTask(CharSequence text) {
@@ -937,7 +943,6 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         if (mButtonKeyboard != null) {
             mButtonKeyboard.setVisibility(isConnected ? View.VISIBLE : View.GONE);
         }
-        setWindowFullscreen(isConnected && isScreenHeightSmall());
 
         switch (hidState) {
         case DaemonService.HID_STATE_CONNECTING:

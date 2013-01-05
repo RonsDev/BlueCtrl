@@ -62,6 +62,7 @@
     <string name="pref_scroll_sensitivity">Scroll sensitivity</string>
     <string name="pref_invert_scroll">Invert scroll direction</string>
     <string name="pref_fling_scroll">Fling scroll</string>
+    <string name="pref_stay_awake">Stay awake</string>
 
     <string name="pref_touchpad_gesture_mode_default">Default</string>
     <string name="pref_touchpad_gesture_mode_android">Android</string>

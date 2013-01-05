@@ -4,7 +4,8 @@ Version 2.4
 * New interactive touchpad tutorial
 * New menu item for composing text
 * Voice input can be corrected before sending
-* New scroll sensitivity setting
+* New "Scroll sensitivity" setting
+* New "Stay awake" setting
 * You can long press the keyboard button to change the input method
 
 

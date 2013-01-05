@@ -54,6 +54,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
     private FloatSliderPreference mScrollSensitivity;
     private CheckBoxPreference mInvertScroll;
     private CheckBoxPreference mFlingScroll;
+    private CheckBoxPreference mStayAwake;
 
 
     /*
@@ -118,6 +119,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
                 DeviceSettings.PREF_KEY_SCROLL_SENSITIVITY);
         mInvertScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_INVERT_SCROLL);
         mFlingScroll = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_FLING_SCROLL);
+        mStayAwake = (CheckBoxPreference)findPreference(DeviceSettings.PREF_KEY_STAY_AWAKE);
     }
 
     @Override
@@ -157,6 +159,7 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mScrollSensitivity.setValue(mDeviceSettings.getScrollSensitivity());
         mInvertScroll.setChecked(mDeviceSettings.getInvertScroll());
         mFlingScroll.setChecked(mDeviceSettings.getFlingScroll());
+        mStayAwake.setChecked(mDeviceSettings.getStayAwake());
     }
 
     private void updateSettings() {
@@ -167,5 +170,6 @@ public class DevicePreferenceActivity extends PreferenceActivity {
         mDeviceSettings.setScrollSensitivity(mScrollSensitivity.getValue());
         mDeviceSettings.setInvertScroll(mInvertScroll.isChecked());
         mDeviceSettings.setFlingScroll(mFlingScroll.isChecked());
+        mDeviceSettings.setStayAwake(mStayAwake.isChecked());
     }
 }
