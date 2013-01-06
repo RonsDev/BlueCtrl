@@ -1,4 +1,4 @@
-Version 2.4
+Version 3.0
 -----------
 * New system specific touchpad gestures
 * New interactive touchpad tutorial
