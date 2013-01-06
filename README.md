@@ -2,6 +2,7 @@ BlueCtrl
 ========
 
 **REQUIRES ROOT PERMISSIONS**
+**NOT COMPATIBLE WITH ANDROID 4.2**
 
 BlueCtrl is an open source Bluetooth input device emulator that can control remote devices. This means that you can use the touchscreen and keyboard of your Android device to control other devices which support Bluetooth.
 
@@ -12,12 +13,13 @@ Because this app is using the Bluetooth input standard, it supports various oper
 * Linux (Fedora, Ubuntu...)
 * Mac OS X
 * PlayStation 3
+* Windows
 
-One of the problematic operating systems is Microsoft Windows because it doesn't work if another Bluetooth input service is active which is the case on most Android systems. For more information look at:
+Please note that if you want to use this app with Microsoft Windows, you probably need to disable a conflicting Android service. For more information look at:
 
   https://github.com/RonsDev/BlueCtrl/wiki/Bluetooth-input-service-conflict  
 
-This app requires root permissions because it needs direct access to the Bluetooth adapter. Another restriction is that it is only compatible with the default Android Bluetooth stack (BlueZ). Especially older Android versions from Samsung and HTC don't meet this requirement.
+This app requires root permissions because it needs direct access to the Bluetooth adapter. Another restriction is that it is only compatible with a specific Bluetooth stack that is called BlueZ, which is used on many but not all devices with a Android version smaller 4.2.
 
 
 
