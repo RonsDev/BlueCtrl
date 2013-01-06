@@ -33,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.text.ClipboardManager;
 import android.util.DisplayMetrics;
@@ -85,12 +86,16 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
 
     private static final int TOUCHPAD_AREA_ICON_BUTTON_PADDING_DP = 48;
 
+    private static final int DIM_SCREEN_ON_IDLE_TIMEOUT = 30 * 1000;
+
     private static final int SEND_TEXT_PROGRESS_MIN_SIZE = 300;
     private static final int SEND_TEXT_CHUNK_SIZE = 30;
 
 
     private static final String SAVED_STATE_IS_AUTO_CONNECT = "IsAutoConnect";
     private static final String SAVED_STATE_IS_PAIRING_CONNECT = "IsPairingConnect";
+    private static final String SAVED_STATE_IS_SCREEN_DIMMED = "IsScreenDimmed";
+    private static final String SAVED_STATE_DIM_SCREEN_ON_IDLE = "DimScreenOnIdle";
 
 
     private ImageButton mButtonKeyboard;
@@ -116,14 +121,24 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     private DeviceSettings mDeviceSettings;
     private HidKeyboard mHidKeyboard;
     private HidMouse mHidMouse;
+    private Handler mIdleHandler = new Handler();
 
     private boolean mIsAutoConnect = true;
     private boolean mIsPairingConnect = false;
     private boolean mKeepConnected = false;
+    private boolean mIsScreenDimmed = false;
+    private boolean mDimScreenOnIdle = false;
 
     private CharSequence mSendTextValue = "";
     private SendTextThread mSendTextThread;
 
+
+    private final Runnable mDimScreenRunnable = new Runnable() {
+        @Override
+        public void run() {
+            dimScreen(true);
+        }
+    };
 
     private OnClickListener mActionBarHomeClickListener = new OnClickListener() {
         @Override
@@ -252,6 +267,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         } else {
             mIsAutoConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_AUTO_CONNECT);
             mIsPairingConnect = savedInstanceState.getBoolean(SAVED_STATE_IS_PAIRING_CONNECT);
+            mIsScreenDimmed = savedInstanceState.getBoolean(SAVED_STATE_IS_SCREEN_DIMMED);
+            mDimScreenOnIdle = savedInstanceState.getBoolean(SAVED_STATE_DIM_SCREEN_ON_IDLE);
         }
 
         loadLayout();
@@ -274,12 +291,15 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         }
 
         updateViewSettings();
+
+        resetDimScreenOnIdleTimer();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+        stopDimScreenOnIdleTimer();
         stopSendTextTask();
 
         if (!mKeepConnected && isDaemonAvailable()) {
@@ -299,6 +319,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(SAVED_STATE_IS_AUTO_CONNECT, mIsAutoConnect);
         outState.putBoolean(SAVED_STATE_IS_PAIRING_CONNECT, mIsPairingConnect);
+        outState.putBoolean(SAVED_STATE_IS_SCREEN_DIMMED, mIsScreenDimmed);
+        outState.putBoolean(SAVED_STATE_DIM_SCREEN_ON_IDLE, mDimScreenOnIdle);
 
         super.onSaveInstanceState(outState);
     }
@@ -308,6 +330,13 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         super.onConfigurationChanged(newConfig);
 
         loadLayout();
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+
+        resetDimScreenOnIdleTimer();
     }
 
     @Override
@@ -391,7 +420,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             }
         }
 
-        updateWindowFlags();
+        updateWindowFlagFullscreen();
+        updateWindowFlagKeepScreenOn();
         updateViews();
     }
 
@@ -607,7 +637,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mViewConnecting = (View)findViewById(R.id.view_connecting);
 
 
-        updateWindowFlags();
+        updateWindowFlagFullscreen();
+        updateWindowFlagKeepScreenOn();
         updateViewSettings();
         updateViews();
     }
@@ -674,7 +705,7 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
     }
 
-    private void updateWindowFlags() {
+    private void updateWindowFlagFullscreen() {
         final Window wnd = getWindow();
         final boolean isConnected = (isDaemonAvailable() &&
                 (getDaemon().getHidState() == DaemonService.HID_STATE_CONNECTED));
@@ -686,11 +717,20 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
             wnd.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             wnd.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
+    }
 
-        if (isConnected && mDeviceSettings.getStayAwake()) {
+    private void updateWindowFlagKeepScreenOn() {
+        final Window wnd = getWindow();
+        final boolean isConnected = (isDaemonAvailable() &&
+                (getDaemon().getHidState() == DaemonService.HID_STATE_CONNECTED));
+        final boolean isActivityBusy = (mSendTextThread != null);
+
+        if (isConnected && (mDeviceSettings.getStayAwake() || isActivityBusy)) {
             wnd.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            dimScreenOnIdle(!isActivityBusy);
         } else {
             wnd.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            dimScreenOnIdle(false);
         }
     }
 
@@ -775,6 +815,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         mSendTextThread.start();
 
         mSendTextValue = "";
+
+        updateWindowFlagKeepScreenOn();
     }
 
     /** Checks if the given Bluetooth device is from another HID host */
@@ -798,6 +840,34 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         return ((displayMetrics.heightPixels / displayMetrics.density) < 400);
     }
 
+    private void dimScreen(boolean dim) {
+        if (dim != mIsScreenDimmed) {
+            mIsScreenDimmed = dim;
+
+            final Window wnd = getWindow();
+            WindowManager.LayoutParams wndLayoutParams = wnd.getAttributes();
+            wndLayoutParams.screenBrightness = dim ? 0.01f : -1f;
+            wnd.setAttributes(wndLayoutParams);
+        }
+    }
+
+    private void dimScreenOnIdle(boolean dimOnIdle) {
+        mDimScreenOnIdle = dimOnIdle;
+        resetDimScreenOnIdleTimer();
+    }
+
+    private void resetDimScreenOnIdleTimer() {
+        stopDimScreenOnIdleTimer();
+        if (mDimScreenOnIdle) {
+            mIdleHandler.postDelayed(mDimScreenRunnable, DIM_SCREEN_ON_IDLE_TIMEOUT);
+        }
+    }
+
+    private void stopDimScreenOnIdleTimer() {
+        mIdleHandler.removeCallbacks(mDimScreenRunnable);
+        dimScreen(false);
+    }
+
     private void startSendTextTask(CharSequence text) {
         mSendTextValue = text;
         showDialog(DIALOG_SEND_TEXT_PROGRESS);
@@ -817,6 +887,8 @@ public class TouchpadActivity extends DaemonActivity implements OnMouseButtonCli
         if ((mSendTextProgressDlg != null) && mSendTextProgressDlg.isShowing()) {
             mSendTextProgressDlg.dismiss();
         }
+
+        updateWindowFlagKeepScreenOn();
     }
 
     private void sendText(CharSequence text) {
