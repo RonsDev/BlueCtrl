@@ -1,7 +1,7 @@
 BlueCtrl
 ========
 
-**REQUIRES ROOT PERMISSIONS**
+**REQUIRES ROOT PERMISSIONS**  
 **NOT COMPATIBLE WITH ANDROID 4.2**
 
 BlueCtrl is an open source Bluetooth input device emulator that can control remote devices. This means that you can use the touchscreen and keyboard of your Android device to control other devices which support Bluetooth.
